@@ -9,7 +9,10 @@ import {
 } from 'react';
 import { useStore } from 'zustand';
 
-import { type GlobalStore, createGlobalStore } from '@/store/global-store';
+import {
+  type GlobalStore,
+  createGlobalStore,
+} from '@/stores/global/global-store';
 
 type GlobalStoreApi = ReturnType<typeof createGlobalStore>;
 
