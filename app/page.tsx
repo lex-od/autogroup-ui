@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuthStore } from '@/stores/auth/auth-store-provider';
 import { useGlobalStore } from '@/stores/global/global-store-provider';
-import useStore from '@/stores/use-store';
 
 export default function Home() {
-  const auth = useStore(useAuthStore, (state) => state);
+  const { token, setToken } = useAuthStore((state) => state);
   const { someNumber, incSomeNumber } = useGlobalStore((state) => state.hello);
 
   const handleOk = () => {
@@ -34,9 +33,9 @@ export default function Home() {
         </Button>
       </div>
 
-      <p>Store token: {auth?.token}</p>
+      <p>Store token: {token}</p>
       <div>
-        <Button onClick={() => auth?.setToken((auth?.token || '') + 'qwe ')}>
+        <Button onClick={() => setToken((token || '') + 'qwe ')}>
           Add store token symbols
         </Button>
       </div>
