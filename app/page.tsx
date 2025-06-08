@@ -20,29 +20,31 @@ export default function Home() {
 
   return (
     <div className="grid gap-4 p-4">
-      <h1>Basic elements</h1>
+      <h1 className="text-4xl">Basic elements</h1>
 
-      <Input className="max-w-xs" />
+      <div className="grid max-w-sm gap-4">
+        <Input />
 
-      <div className="grid auto-cols-max grid-flow-col gap-4">
-        <Button className="min-w-20" onClick={handleOk}>
-          Fetch users (with token)
-        </Button>
-        <Button className="min-w-20" variant="secondary">
-          Cancel
-        </Button>
-      </div>
+        <div className="grid grid-flow-col justify-start gap-4">
+          <Button className="min-w-20" onClick={handleOk}>
+            Fetch users (with token)
+          </Button>
+          <Button className="min-w-20" variant="secondary">
+            Cancel
+          </Button>
+        </div>
 
-      <p>Store token: {token}</p>
-      <div>
-        <Button onClick={() => setToken((token || '') + 'qwe ')}>
-          Add store token symbols
-        </Button>
-      </div>
+        <p>Store token: {token}</p>
+        <div>
+          <Button onClick={() => setToken((token || '') + 'qwe ')}>
+            Add store token symbols
+          </Button>
+        </div>
 
-      <p>Store someNumber: {someNumber}</p>
-      <div>
-        <Button onClick={incSomeNumber}>Increase someNumber</Button>
+        <p>Store someNumber: {someNumber}</p>
+        <div>
+          <Button onClick={incSomeNumber}>Increase someNumber</Button>
+        </div>
       </div>
     </div>
   );
