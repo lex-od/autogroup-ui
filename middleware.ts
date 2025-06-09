@@ -4,8 +4,6 @@ import type { NextRequest } from 'next/server';
 const VALID_TOKENS = ['token123', 'token456', 'token789'];
 
 export async function middleware(request: NextRequest) {
-  console.log('hello');
-
   const authHeader = request.headers.get('Authorization');
 
   if (

@@ -3,11 +3,11 @@ import { createStore } from 'zustand/vanilla';
 
 export type AuthStore = {
   token: string | null;
-  _hasHydrated: boolean;
+  hasHydrated: boolean;
 
   setToken: (token: string) => void;
   unsetToken: () => void;
-  setHasHydrated: (value: boolean) => void;
+  _setHasHydrated: (value: boolean) => void;
 };
 
 export const createAuthStore = () => {
@@ -15,7 +15,7 @@ export const createAuthStore = () => {
     persist(
       (set) => ({
         token: null,
-        _hasHydrated: false,
+        hasHydrated: false,
 
         setToken: (token) => {
           set({ token });
@@ -23,8 +23,8 @@ export const createAuthStore = () => {
         unsetToken: () => {
           set({ token: null });
         },
-        setHasHydrated: (value) => {
-          set({ _hasHydrated: value });
+        _setHasHydrated: (value) => {
+          set({ hasHydrated: value });
         },
       }),
       {
@@ -35,9 +35,11 @@ export const createAuthStore = () => {
           };
         },
         onRehydrateStorage: (state) => {
-          return () => state.setHasHydrated(true);
+          return () => state._setHasHydrated(true);
         },
       },
     ),
   );
 };
+
+export type AuthStoreApi = ReturnType<typeof createAuthStore>;

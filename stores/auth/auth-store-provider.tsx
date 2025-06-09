@@ -8,18 +8,33 @@ import {
   PropsWithChildren,
 } from 'react';
 import { useStore } from 'zustand';
+import { QueryClient } from '@tanstack/react-query';
 
-import { type AuthStore, createAuthStore } from '@/stores/auth/auth-store';
+import {
+  type AuthStore,
+  type AuthStoreApi,
+  createAuthStore,
+} from '@/stores/auth/auth-store';
+import { setupAxiosInterceptors } from '@/lib/axios-config';
 
-type AuthStoreApi = ReturnType<typeof createAuthStore>;
-
+// Context
 const AuthStoreContext = createContext<AuthStoreApi | undefined>(undefined);
 
-const AuthStoreProvider: FC<PropsWithChildren> = ({ children }) => {
+// Component
+
+interface Props {
+  queryClient: QueryClient;
+}
+
+const AuthStoreProvider: FC<PropsWithChildren<Props>> = ({
+  children,
+  queryClient,
+}) => {
   const storeRef = useRef<AuthStoreApi | null>(null);
 
   if (!storeRef.current) {
     storeRef.current = createAuthStore();
+    setupAxiosInterceptors(storeRef.current, queryClient);
   }
 
   return (
