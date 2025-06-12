@@ -1,30 +1,33 @@
 'use client';
 
-import Link from 'next/link';
+import axios from 'axios';
+import { useMutation } from '@tanstack/react-query';
 
-import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/auth/auth-store-provider';
+import LoginForm, { type LoginFormState } from './login-form';
 
 const Login = () => {
   const setToken = useAuthStore((state) => state.setToken);
 
-  return (
-    <div className="grid gap-4 p-4">
-      <h1 className="text-4xl">Login</h1>
+  const { mutate } = useMutation<
+    { token: string },
+    Error,
+    { email: string; password: string }
+  >({
+    mutationFn: async (params) => {
+      const { data } = await axios.post('/api/hello/login', params);
+      return data;
+    },
+    onSuccess: ({ token }) => {
+      setToken(token);
+    },
+  });
 
-      <div className="grid grid-flow-col justify-start gap-4">
-        <Link className="underline" href="/">
-          Go Home
-        </Link>
-      </div>
+  const handleSubmit = (values: LoginFormState) => {
+    mutate(values);
+  };
 
-      <div className="grid max-w-sm gap-4">
-        <div className="grid grid-flow-col justify-start gap-4">
-          <Button onClick={() => setToken('token123')}>Login</Button>
-        </div>
-      </div>
-    </div>
-  );
+  return <LoginForm onSubmit={handleSubmit} />;
 };
 
 export default Login;

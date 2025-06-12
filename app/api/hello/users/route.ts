@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-
-const helloUsers = [
-  { id: 1, name: 'John Doe' },
-  { id: 2, name: 'Jane Smith' },
-];
+import mockedUsers from '../mockedUsers.json';
 
 export async function GET() {
-  return NextResponse.json(helloUsers);
+  const users = mockedUsers.map(({ id, name, email }) => {
+    return { id, name, email };
+  });
+
+  return NextResponse.json(users);
 }

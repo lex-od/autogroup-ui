@@ -1,18 +1,19 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-const VALID_TOKENS = ['token123', 'token456', 'token789'];
+import mockedUsers from '@/app/api/hello/mockedUsers.json';
 
 export async function middleware(request: NextRequest) {
   const authHeader = request.headers.get('Authorization');
+  const headerToken = authHeader?.replace('Bearer ', '');
 
-  if (
-    !authHeader ||
-    !VALID_TOKENS.includes(authHeader.replace('Bearer ', ''))
-  ) {
+  if (!headerToken) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const user = mockedUsers.find(({ token }) => token === headerToken);
 
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   return NextResponse.next();
 }
 
