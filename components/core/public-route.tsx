@@ -1,3 +1,4 @@
+'use client';
 import { FC, PropsWithChildren, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth/auth-store-provider';

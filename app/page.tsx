@@ -1,11 +1,10 @@
-'use client';
-
 import PublicRoute from '@/components/core/public-route';
+import Home from '@/components/screens/home/home';
 
 const HomePage = () => {
   return (
     <PublicRoute>
-      <div>HomePage</div>
+      <Home />
     </PublicRoute>
   );
 };
