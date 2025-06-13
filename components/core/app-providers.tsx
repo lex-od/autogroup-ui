@@ -11,7 +11,13 @@ const AppProviders: FC<PropsWithChildren> = ({ children }) => {
   const queryClientRef = useRef<QueryClient>(null);
 
   if (!queryClientRef.current) {
-    queryClientRef.current = new QueryClient();
+    queryClientRef.current = new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: 60 * 1000, // 1 minute
+        },
+      },
+    });
   }
 
   return (

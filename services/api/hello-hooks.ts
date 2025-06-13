@@ -4,6 +4,7 @@ import { axiosBase } from '@/lib/axios-config';
 type HelloUser = {
   id: string;
   name: string;
+  email: string;
 };
 
 export const useHelloUsersQuery = (

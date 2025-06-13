@@ -2,22 +2,22 @@
   {
     "id": 1,
     "name": "John Doe",
-    "email": "jonh@hello.com",
-    "password": "pass123",
+    "email": "john@hello.com",
+    "password": "111",
     "token": "token1"
   },
   {
     "id": 2,
     "name": "Jane Smith",
     "email": "jane@hello.com",
-    "password": "pass456",
+    "password": "222",
     "token": "token2"
   },
   {
     "id": 3,
     "name": "Bob Johnson",
     "email": "bob@hello.com",
-    "password": "pass789",
+    "password": "333",
     "token": "token3"
   }
 ]

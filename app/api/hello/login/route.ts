@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import mockedUsers from '../mockedUsers.json';
+import mockedUsers from '../mocked-users.json';
 
 export async function POST(request: Request) {
   const { email, password } = await request.json();

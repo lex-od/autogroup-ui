@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import mockedUsers from '@/app/api/hello/mockedUsers.json';
+import mockedUsers from '@/app/api/hello/mocked-users.json';
 
 export async function middleware(request: NextRequest) {
   const authHeader = request.headers.get('Authorization');

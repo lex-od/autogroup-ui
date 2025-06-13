@@ -13,7 +13,7 @@ const DashboardHome = () => {
 
   return (
     <div className="grid gap-4 p-4">
-      <h1 className="text-4xl">DashboardHome</h1>
+      <h1 className="text-4xl">Dashboard</h1>
 
       <div className="grid grid-flow-col justify-start gap-4">
         <Link className="underline" href="/">
@@ -29,7 +29,13 @@ const DashboardHome = () => {
         </div>
       </div>
 
-      <div>{users?.map((user) => <div key={user.id}>{user.name}</div>)}</div>
+      <div>
+        {users?.map((user) => (
+          <div key={user.id}>
+            {user.name} - {user.email}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
