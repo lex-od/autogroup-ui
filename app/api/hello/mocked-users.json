@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@hello.com",
+    "password": "111",
+    "token": "token1"
+  },
+  {
+    "id": 2,
+    "name": "Jane Smith",
+    "email": "jane@hello.com",
+    "password": "222",
+    "token": "token2"
+  },
+  {
+    "id": 3,
+    "name": "Bob Johnson",
+    "email": "bob@hello.com",
+    "password": "333",
+    "token": "token3"
+  }
+]

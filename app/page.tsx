@@ -1,19 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import PublicRoute from '@/components/core/public-route';
+import Home from '@/components/screens/home/home';
 
-export default function Home() {
+const HomePage = () => {
   return (
-    <div className="p-4 grid gap-4">
-      <h1>Basic elements</h1>
-
-      <Input className="max-w-xs" />
-
-      <div className="grid grid-flow-col gap-4 auto-cols-max">
-        <Button className="min-w-20">Ok</Button>
-        <Button className="min-w-20" variant="secondary">
-          Cancel
-        </Button>
-      </div>
-    </div>
+    <PublicRoute>
+      <Home />
+    </PublicRoute>
   );
-}
+};
+
+export default HomePage;
