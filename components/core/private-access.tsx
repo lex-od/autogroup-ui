@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth/auth-store-provider';
 
 const redirectPath = '/auth/login';
 
-const PrivateRoute: FC<PropsWithChildren> = ({ children }) => {
+const PrivateAccess: FC<PropsWithChildren> = ({ children }) => {
   const router = useRouter();
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const isAuthenticated = useAuthStore((state) => !!state.token);
@@ -23,4 +23,4 @@ const PrivateRoute: FC<PropsWithChildren> = ({ children }) => {
   return children;
 };
 
-export default PrivateRoute;
+export default PrivateAccess;

@@ -9,7 +9,7 @@ type Props = {
 
 const redirectPath = '/dashboard';
 
-const PublicRoute: FC<PropsWithChildren<Props>> = ({
+const PublicAccess: FC<PropsWithChildren<Props>> = ({
   children,
   isProtected,
 }) => {
@@ -30,4 +30,4 @@ const PublicRoute: FC<PropsWithChildren<Props>> = ({
   return children;
 };
 
-export default PublicRoute;
+export default PublicAccess;
