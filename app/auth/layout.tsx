@@ -1,10 +1,12 @@
 import { FC, PropsWithChildren } from 'react';
+import AuthLayoutClient from '@/components/client-layouts/auth-layout-client';
+import PublicAccess from '@/components/core/public-access';
 
 const AuthLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <main className="w-full max-w-sm">{children}</main>
-    </div>
+    <PublicAccess isProtected>
+      <AuthLayoutClient>{children}</AuthLayoutClient>
+    </PublicAccess>
   );
 };
 
