@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CalendarDays, Download, Filter, LogOut, Settings, Home, X } from 'lucide-react';
+import { CalendarDays, Download, Filter, LogOut, Settings, Home, X, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,6 +21,8 @@ interface HeaderProps {
   onFilterChange?: (filters: FilterObject) => void;
   onExport?: () => void;
   isExporting?: boolean;
+  onMobileMenuToggle?: () => void;
+  isMobileMenuOpen?: boolean;
 }
 
 const Header = ({ 
@@ -29,7 +31,9 @@ const Header = ({
   totalCalls = 0,
   onFilterChange,
   onExport,
-  isExporting = false
+  isExporting = false,
+  onMobileMenuToggle,
+  isMobileMenuOpen = false
 }: HeaderProps) => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -118,33 +122,34 @@ const Header = ({
   };
 
   return (
-    <div className="space-y-4 w-full bg-background border-b">
-      <div className="p-4 lg:p-6">
+    <div className="w-full bg-background border-b">
+      <div className="p-3 lg:p-6">
         {/* Основной хедер */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 w-full">
-          {/* Левая часть - заголовок и дата */}
-          <div className="space-y-1 min-w-0">
-            <div className="flex items-center space-x-3 flex-wrap">
-              <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">{title}</h1>
-              <Badge variant="secondary" className="text-xs flex-shrink-0">
-                {totalCalls} звонков
-              </Badge>
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 lg:gap-4 w-full">
+          {/* Левая часть - мобильное меню, заголовок и дата */}
+          <div className="space-y-2 min-w-0 flex-1">
+            <div className="flex items-center space-x-2 lg:space-x-3">
+              <div className="flex items-center space-x-2 min-w-0 flex-1">
+                <h1 className="text-3xl font-bold tracking-tight truncate">
+                  {title}
+                </h1>
+                <Badge variant="secondary" className="text-xs flex-shrink-0">
+                  {totalCalls} звонков
+                </Badge>
+              </div>
             </div>
-            <p className="text-muted-foreground flex items-center space-x-2 text-sm">
+            
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <CalendarDays className="h-4 w-4 flex-shrink-0" />
-              <span>{subtitle || `Сегодня, ${getCurrentDate()}`}</span>
-            </p>
+              <span className="truncate text-sm">
+                {subtitle || `Сегодня, ${getCurrentDate()}`}
+              </span>
+            </div>
           </div>
 
           {/* Правая часть - действия */}
-          <div className="flex items-center space-x-2 flex-wrap">
-            {/* Главная */}
-            <Button variant="ghost" size="sm" className="flex items-center space-x-1 flex-shrink-0">
-              <Home className="h-4 w-4" />
-              <span className="hidden sm:inline">Главная</span>
-            </Button>
-
-            {/* Фильтры */}
+          <div className="flex items-center space-x-1 lg:space-x-2">
+            {/* Фильтры - всегда показываем */}
             <Button
               variant="ghost"
               size="sm"
@@ -152,30 +157,36 @@ const Header = ({
               className="flex items-center space-x-1 relative flex-shrink-0"
             >
               <Filter className="h-4 w-4" />
-              <span className="hidden sm:inline">Фильтры</span>
+              <span className="hidden md:inline">Фильтры</span>
               {getActiveFiltersCount() > 0 && (
-                <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 text-xs">
+                <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs flex items-center justify-center">
                   {getActiveFiltersCount()}
                 </Badge>
               )}
             </Button>
 
-            {/* Экспорт */}
+            {/* Экспорт - скрываем на очень маленьких экранах */}
             <Button
               variant="ghost"
               size="sm"
               onClick={onExport}
               disabled={isExporting}
-              className="flex items-center space-x-1 flex-shrink-0"
+              className="hidden xs:flex items-center space-x-1 flex-shrink-0"
             >
               <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">
+              <span className="hidden md:inline">
                 {isExporting ? 'Экспорт...' : 'Экспорт'}
               </span>
             </Button>
 
-            {/* Настройки */}
-            <Button variant="ghost" size="sm" className="flex-shrink-0">
+            {/* Главная - только на десктопе */}
+            <Button variant="ghost" size="sm" className="hidden lg:flex items-center space-x-1 flex-shrink-0">
+              <Home className="h-4 w-4" />
+              <span>Главная</span>
+            </Button>
+
+            {/* Настройки - только на планшете+ */}
+            <Button variant="ghost" size="sm" className="hidden sm:flex flex-shrink-0">
               <Settings className="h-4 w-4" />
             </Button>
 
@@ -187,17 +198,17 @@ const Header = ({
               className="flex items-center space-x-1 flex-shrink-0"
             >
               <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Выйти</span>
+              <span className="hidden md:inline">Выйти</span>
             </Button>
           </div>
         </div>
 
         {/* Панель фильтров */}
         {showFilters && (
-          <Card className="w-full mt-4">
-            <CardContent className="pt-6">
+          <Card className="w-full mt-3">
+            <CardContent className="p-4 lg:pt-6 lg:px-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium">Фильтры</h3>
+                <h3 className="text-base lg:text-lg font-medium">Фильтры</h3>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -207,7 +218,7 @@ const Header = ({
                 </Button>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
                 {/* Фильтр по дате */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Период</label>

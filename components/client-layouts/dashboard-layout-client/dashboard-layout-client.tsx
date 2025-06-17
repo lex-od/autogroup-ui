@@ -1,8 +1,9 @@
 'use client';
 
 import { FC, PropsWithChildren, createContext, useContext, useState } from 'react';
-import Sidebar from '@/components/core/sidebar';
-import Header from '@/components/core/header';
+import Sidebar from './sidebar';
+import Header from './header';
+import MobileHeader from './mobile-header';
 
 interface FilterObject {
   dateRange?: { from: Date; to: Date };
@@ -16,6 +17,8 @@ interface DashboardContextType {
   onFilterChange: (filters: FilterObject) => void;
   onExport: () => void;
   isExporting: boolean;
+  isMobileMenuOpen: boolean;
+  toggleMobileMenu: () => void;
 }
 
 const DashboardContext = createContext<DashboardContextType>({
@@ -23,6 +26,8 @@ const DashboardContext = createContext<DashboardContextType>({
   onFilterChange: () => {},
   onExport: () => {},
   isExporting: false,
+  isMobileMenuOpen: false,
+  toggleMobileMenu: () => {},
 });
 
 export const useDashboardContext = () => useContext(DashboardContext);
@@ -30,6 +35,7 @@ export const useDashboardContext = () => useContext(DashboardContext);
 const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
   const [totalCalls] = useState(248);
   const [isExporting, setIsExporting] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleFilterChange = (filters: FilterObject) => {
     console.log('Filters changed:', filters);
@@ -45,27 +51,54 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
     }, 2000);
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   const contextValue: DashboardContextType = {
     totalCalls,
     onFilterChange: handleFilterChange,
     onExport: handleExport,
     isExporting,
+    isMobileMenuOpen,
+    toggleMobileMenu,
   };
 
   return (
     <DashboardContext.Provider value={contextValue}>
       <div className="h-screen flex bg-background overflow-hidden">
-        {/* Сайдбар */}
-        <Sidebar />
+        {/* Сайдбар с поддержкой мобильного меню */}
+        <Sidebar 
+          isMobileMenuOpen={isMobileMenuOpen}
+          onMobileMenuClose={closeMobileMenu}
+        />
         
         {/* Основной контент */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Хедер */}
-          <Header
+          {/* Десктопный хедер */}
+          <div className="hidden lg:block">
+            <Header
+              totalCalls={totalCalls}
+              onFilterChange={handleFilterChange}
+              onExport={handleExport}
+              isExporting={isExporting}
+              onMobileMenuToggle={toggleMobileMenu}
+              isMobileMenuOpen={isMobileMenuOpen}
+            />
+          </div>
+
+          {/* Мобильный хедер */}
+          <MobileHeader
             totalCalls={totalCalls}
             onFilterChange={handleFilterChange}
             onExport={handleExport}
             isExporting={isExporting}
+            onMobileMenuToggle={toggleMobileMenu}
+            isMobileMenuOpen={isMobileMenuOpen}
           />
           
           {/* Контент страницы */}
