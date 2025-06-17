@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Call } from '@/lib/types';
+import { Call } from '@/services/api/queries/calls.queries';
 
 interface RouteParams {
   params: Promise<{ id: string }>;

@@ -5,7 +5,7 @@ import { Play, Brain, Phone, Clock, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Call } from '@/lib/types';
+import { Call } from '@/services/api/queries/calls.queries';
 
 interface RecentCallsTableProps {
   calls?: Call[];

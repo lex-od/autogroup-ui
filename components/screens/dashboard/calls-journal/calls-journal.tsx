@@ -44,7 +44,7 @@ import {
   useDeleteCalls,
   useExportCalls 
 } from '@/services/api/queries/calls.queries';
-import { Call } from '@/lib/types';
+import { Call } from '@/services/api/queries/calls.queries';
 import { toast } from 'sonner';
 
 const CallsJournalScreen = () => {

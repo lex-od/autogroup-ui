@@ -18,7 +18,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CallStats } from '@/lib/types';
+import { CallStats } from '@/services/api/queries/calls.queries';
 import { TrendingUp, Activity, Users, Phone } from 'lucide-react';
 
 interface AnalyticsChartsProps {

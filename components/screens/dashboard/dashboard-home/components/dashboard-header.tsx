@@ -6,7 +6,20 @@ import { CalendarDays, Download, Filter, LogOut, Settings, Home, X } from 'lucid
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { DashboardFilters } from '@/lib/types';
+
+// Типы для фильтров
+export interface DateRange {
+  from: Date;
+  to: Date;
+}
+
+export interface DashboardFilters {
+  dateRange: DateRange;
+  managers: string[];
+  callTypes: ('incoming' | 'outgoing')[];
+  sentiments: ('positive' | 'negative' | 'neutral')[];
+  statuses: ('completed' | 'missed' | 'in-progress')[];
+}
 
 interface DashboardHeaderProps {
   onFilterChange?: (filters: Partial<DashboardFilters>) => void;

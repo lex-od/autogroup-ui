@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { CallStats } from '@/lib/types';
+import { CallStats } from '@/services/api/queries/calls.queries';
 
 // Mock данные для демонстрации
 const mockStats: CallStats = {

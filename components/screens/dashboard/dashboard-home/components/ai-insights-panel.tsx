@@ -3,7 +3,7 @@
 import { Brain, TrendingUp, AlertCircle, CheckCircle, Lightbulb } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CallStats } from '@/lib/types';
+import { CallStats } from '@/services/api/queries/calls.queries';
 
 interface AIInsightsPanelProps {
   stats?: CallStats;
