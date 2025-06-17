@@ -1,20 +1,35 @@
 'use client';
 
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, MoreVertical, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import UserInfo from '@/components/ui/user-info';
 import { useAuthStore } from '@/stores/auth/auth-store-provider';
 
 interface HeaderProps {
   title?: string;
   subtitle?: string;
+  pageTitle?: string;
   totalCalls?: number;
+  onExport?: (format: 'csv' | 'xlsx') => void;
+  isExporting?: boolean;
+  showExportMenu?: boolean;
 }
 
 const Header = ({ 
   title = "AUTOGROUP - Аналитика звонков",
   subtitle,
-  totalCalls = 0
+  pageTitle,
+  totalCalls = 0,
+  onExport,
+  isExporting = false,
+  showExportMenu = false
 }: HeaderProps) => {
   const unsetToken = useAuthStore((state) => state.unsetToken);
 
@@ -31,6 +46,12 @@ const Header = ({
     unsetToken();
   };
 
+  const handleExport = (format: 'csv' | 'xlsx') => {
+    if (onExport) {
+      onExport(format);
+    }
+  };
+
   return (
     <div className="w-full bg-background border-b">
       <div className="px-4 py-3">
@@ -39,7 +60,7 @@ const Header = ({
           {/* Левая часть - заголовок и дата */}
           <div className="flex items-center space-x-3 min-w-0 flex-1 h-full">
             <h1 className="text-base font-semibold tracking-tight truncate leading-none">
-              {title}
+              {pageTitle || title}
             </h1>
             <Badge variant="secondary" className="text-xs h-5 px-2 py-0.5 flex items-center">
               {totalCalls} звонков
@@ -52,8 +73,29 @@ const Header = ({
             </div>
           </div>
 
-          {/* Правая часть - информация о пользователе */}
-          <div className="flex items-center h-full">
+          {/* Правая часть - кнопки и пользователь */}
+          <div className="flex items-center space-x-2 h-full">
+            {/* Меню экспорта */}
+            {showExportMenu && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" disabled={isExporting}>
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleExport('csv')} disabled={isExporting}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Экспорт в CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('xlsx')} disabled={isExporting}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Экспорт в Excel
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            
             <UserInfo compact={false} onLogout={handleLogout} />
           </div>
         </div>

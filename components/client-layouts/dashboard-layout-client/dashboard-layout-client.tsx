@@ -14,26 +14,36 @@ interface FilterObject {
 
 interface DashboardContextType {
   totalCalls: number;
+  pageTitle?: string;
+  showExportMenu: boolean;
   onFilterChange: (filters: FilterObject) => void;
-  onExport: () => void;
+  onExport: (format: 'csv' | 'xlsx') => void;
   isExporting: boolean;
   isMobileMenuOpen: boolean;
   toggleMobileMenu: () => void;
+  setPageTitle: (title: string) => void;
+  setShowExportMenu: (show: boolean) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType>({
   totalCalls: 0,
+  pageTitle: undefined,
+  showExportMenu: false,
   onFilterChange: () => {},
   onExport: () => {},
   isExporting: false,
   isMobileMenuOpen: false,
   toggleMobileMenu: () => {},
+  setPageTitle: () => {},
+  setShowExportMenu: () => {},
 });
 
 export const useDashboardContext = () => useContext(DashboardContext);
 
 const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
   const [totalCalls] = useState(248);
+  const [pageTitle, setPageTitle] = useState<string | undefined>();
+  const [showExportMenu, setShowExportMenu] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -42,12 +52,12 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
     // Здесь можно передать фильтры дочерним компонентам
   };
 
-  const handleExport = () => {
+  const handleExport = (format: 'csv' | 'xlsx') => {
     setIsExporting(true);
     // Симуляция экспорта
     setTimeout(() => {
       setIsExporting(false);
-      console.log('Export completed');
+      console.log(`Export completed in ${format} format`);
     }, 2000);
   };
 
@@ -61,11 +71,15 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
 
   const contextValue: DashboardContextType = {
     totalCalls,
+    pageTitle,
+    showExportMenu,
     onFilterChange: handleFilterChange,
     onExport: handleExport,
     isExporting,
     isMobileMenuOpen,
     toggleMobileMenu,
+    setPageTitle,
+    setShowExportMenu,
   };
 
   return (
@@ -82,21 +96,18 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
           {/* Десктопный хедер */}
           <div className="hidden lg:block">
             <Header
+              pageTitle={pageTitle}
               totalCalls={totalCalls}
-              onFilterChange={handleFilterChange}
               onExport={handleExport}
               isExporting={isExporting}
-              onMobileMenuToggle={toggleMobileMenu}
-              isMobileMenuOpen={isMobileMenuOpen}
+              showExportMenu={showExportMenu}
             />
           </div>
 
           {/* Мобильный хедер */}
           <MobileHeader
+            title={pageTitle}
             totalCalls={totalCalls}
-            onFilterChange={handleFilterChange}
-            onExport={handleExport}
-            isExporting={isExporting}
             onMobileMenuToggle={toggleMobileMenu}
             isMobileMenuOpen={isMobileMenuOpen}
           />

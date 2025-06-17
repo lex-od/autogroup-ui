@@ -13,12 +13,12 @@ interface MobileHeaderProps {
   isMobileMenuOpen?: boolean;
 }
 
-const MobileHeader = ({ 
-  title = "AUTOGROUP - Аналитика звонков",
+const MobileHeader = ({
+  title,
   subtitle,
   totalCalls = 0,
   onMobileMenuToggle,
-  isMobileMenuOpen = false
+  isMobileMenuOpen = false,
 }: MobileHeaderProps) => {
   const unsetToken = useAuthStore((state) => state.unsetToken);
 
@@ -27,19 +27,16 @@ const MobileHeader = ({
   };
 
   return (
-    <div className="w-full bg-background border-b lg:hidden">
-      <div className="p-4">
-        {/* Компактный мобильный хедер */}
-        <div className="flex items-center justify-between">
-          {/* Левая часть */}
-          <div className="flex items-center space-x-2 min-w-0 flex-1">
-            {/* Кнопка мобильного меню */}
+    <div className="lg:hidden bg-background border-b">
+      <div className="px-4 py-3">
+        <div className="flex items-center justify-between h-8">
+          {/* Левая часть - меню и заголовок */}
+          <div className="flex items-center space-x-3 min-w-0 flex-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={onMobileMenuToggle}
-              className="flex-shrink-0 h-8 w-8 p-0"
-              data-menu-button
+              className="h-7 w-7 p-0"
             >
               {isMobileMenuOpen ? (
                 <X className="h-4 w-4" />
@@ -47,12 +44,12 @@ const MobileHeader = ({
                 <Menu className="h-4 w-4" />
               )}
             </Button>
-            
-            {/* Только заголовок */}
-            <h1 className="text-base font-bold truncate">Речевая аналитика</h1>
+            <h1 className="text-base font-semibold truncate">
+              {title || "AUTOGROUP - Аналитика звонков"}
+            </h1>
           </div>
 
-          {/* Правая часть - информация о пользователе */}
+          {/* Правая часть - пользователь */}
           <div className="flex items-center">
             <UserInfo compact={true} onLogout={handleLogout} />
           </div>
