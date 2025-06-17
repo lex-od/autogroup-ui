@@ -86,16 +86,29 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     
     // Получаем параметры фильтрации
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
+    const search = searchParams.get('search') || '';
     const status = searchParams.get('status');
     const type = searchParams.get('type');
-    // const managerId = searchParams.get('managerId');
+    const sentiment = searchParams.get('sentiment');
+    const manager = searchParams.get('manager');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
     
     // В реальном приложении здесь будет запрос к базе данных
     // с учетом всех фильтров
     
     let filteredCalls = [...mockCalls];
+    
+    // Поиск по тексту
+    if (search) {
+      filteredCalls = filteredCalls.filter(call => 
+        call.phoneNumber.toLowerCase().includes(search.toLowerCase()) ||
+        call.clientName?.toLowerCase().includes(search.toLowerCase()) ||
+        call.managerName.toLowerCase().includes(search.toLowerCase())
+      );
+    }
     
     // Применяем фильтры
     if (status && status !== 'all') {
@@ -105,9 +118,38 @@ export async function GET(request: NextRequest) {
     if (type && type !== 'all') {
       filteredCalls = filteredCalls.filter(call => call.type === type);
     }
+
+    if (sentiment && sentiment !== 'all') {
+      filteredCalls = filteredCalls.filter(call => 
+        call.aiAnalysis?.sentiment === sentiment
+      );
+    }
+
+    if (manager && manager !== 'all') {
+      filteredCalls = filteredCalls.filter(call => 
+        call.managerName === manager
+      );
+    }
+
+    // Фильтр по дате
+    if (dateFrom) {
+      filteredCalls = filteredCalls.filter(call => 
+        new Date(call.date) >= new Date(dateFrom)
+      );
+    }
+    if (dateTo) {
+      filteredCalls = filteredCalls.filter(call => 
+        new Date(call.date) <= new Date(dateTo)
+      );
+    }
+
+    // Сортировка по дате (новые сначала)
+    filteredCalls.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     
     // Пагинация
     const paginatedCalls = filteredCalls.slice(offset, offset + limit);
+    const totalPages = Math.ceil(filteredCalls.length / limit);
+    const page = Math.floor(offset / limit) + 1;
     
     // Добавляем задержку для имитации реального API
     await new Promise(resolve => setTimeout(resolve, 400));
@@ -115,6 +157,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       calls: paginatedCalls,
       total: filteredCalls.length,
+      page,
+      totalPages,
       limit,
       offset,
     });
@@ -125,4 +169,36 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { callIds } = body;
+    
+    if (!callIds || !Array.isArray(callIds)) {
+      return NextResponse.json(
+        { error: 'Invalid request: callIds array required' },
+        { status: 400 }
+      );
+    }
+    
+    // В реальном приложении здесь будет удаление из базы данных
+    console.log(`Deleting calls with ids: ${callIds.join(', ')}`);
+    
+    // Имитируем задержку
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    return NextResponse.json({ 
+      success: true, 
+      message: `${callIds.length} calls deleted successfully`,
+      deletedCount: callIds.length,
+    });
+  } catch (error) {
+    console.error('Error deleting calls:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete calls' },
+      { status: 500 }
+    );
+  }
+}

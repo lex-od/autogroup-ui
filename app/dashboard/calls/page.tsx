@@ -1,6 +1,5 @@
-import { redirect } from 'next/navigation';
+import CallsJournalScreen from '@/components/screens/dashboard/calls-journal/calls-journal';
 
 export default function CallsPage() {
-  // Перенаправляем на основной дашборд
-  redirect('/dashboard');
+  return <CallsJournalScreen />;
 } 

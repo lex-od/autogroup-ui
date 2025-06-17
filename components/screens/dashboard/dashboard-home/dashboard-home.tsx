@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   useCallStats, 
@@ -18,10 +17,11 @@ import QuickActions from './components/quick-actions';
 
 const DashboardHome = () => {
   const router = useRouter();
-  const [filters] = useState({});
+  // Фильтры для будущего использования
+  // const [filters] = useState({});
 
   // React Query хуки
-  const { data: callStats, isLoading: statsLoading } = useCallStats(filters);
+  const { data: callStats, isLoading: statsLoading } = useCallStats();
   const { data: recentCalls, isLoading: callsLoading } = useRecentCalls(10);
   const { mutate: startAIAnalysis, isPending: isAnalyzing } = useStartAIAnalysis();
 
