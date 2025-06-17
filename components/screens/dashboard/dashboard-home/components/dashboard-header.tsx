@@ -28,7 +28,7 @@ const DashboardHeader = ({
       <div className="flex items-center justify-between p-4">
         {/* Левая часть - заголовок и дата */}
         <div className="flex items-center space-x-3 min-w-0">
-          <h1 className="text-xl font-bold tracking-tight">AI Call Analytics</h1>
+          <h1 className="text-xl font-bold tracking-tight">AUTOGROUP - Аналитика звонков</h1>
           <Badge variant="info" className="text-xs">
             {totalCalls} звонков
           </Badge>

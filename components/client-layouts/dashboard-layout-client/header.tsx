@@ -12,7 +12,7 @@ interface HeaderProps {
 }
 
 const Header = ({ 
-  title = "AI Call Analytics",
+  title = "AUTOGROUP - Аналитика звонков",
   subtitle,
   totalCalls = 0
 }: HeaderProps) => {

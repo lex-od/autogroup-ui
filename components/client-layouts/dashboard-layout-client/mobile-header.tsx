@@ -14,7 +14,7 @@ interface MobileHeaderProps {
 }
 
 const MobileHeader = ({ 
-  title = "AI Call Analytics",
+  title = "AUTOGROUP - Аналитика звонков",
   subtitle,
   totalCalls = 0,
   onMobileMenuToggle,
@@ -49,7 +49,7 @@ const MobileHeader = ({
             </Button>
             
             {/* Только заголовок */}
-            <h1 className="text-base font-bold truncate">CallInsight</h1>
+            <h1 className="text-base font-bold truncate">Речевая аналитика</h1>
           </div>
 
           {/* Правая часть - информация о пользователе */}

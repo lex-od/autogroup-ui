@@ -87,7 +87,7 @@ const Sidebar = ({ isMobileMenuOpen = false, onMobileMenuClose }: SidebarProps) 
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Phone className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-base leading-none">CallInsight</span>
+            <span className="font-semibold text-base leading-none">Речевая аналитика</span>
           </div>
           
           <Button
@@ -160,7 +160,7 @@ const Sidebar = ({ isMobileMenuOpen = false, onMobileMenuClose }: SidebarProps) 
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Phone className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="font-semibold text-base leading-none">CallInsight</span>
+              <span className="font-semibold text-base leading-none">Речевая аналитика</span>
             </div>
           </div>
 

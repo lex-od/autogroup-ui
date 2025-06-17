@@ -6,7 +6,7 @@ alwaysApply: true
 Мы создаем веб-приложение для анализа звонков автомобильного холдинга с помошью ИИ.
 
 
-Build a full-stack web application called **“CallInsight AI”**.
+Build a full-stack web application called **“Call analytics AI”**.
 
 ## 1. Goal
 Create an analytics portal that lets non-technical business users upload or stream phone call recordings and instantly:
@@ -79,5 +79,6 @@ Use Celery + Redis queue. Each task pipeline:
 ## 9. Deliverables
 * Working production deployment.  
 * `/docs` (FastAPI-Swagger) auto-generated API reference.  
+
 
 * Seed script that creates a demo user and imports two sample recordings.
