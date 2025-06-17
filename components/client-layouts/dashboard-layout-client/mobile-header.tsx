@@ -1,7 +1,8 @@
 'use client';
 
-import { LogOut, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import UserInfo from '@/components/ui/user-info';
 import { useAuthStore } from '@/stores/auth/auth-store-provider';
 
 interface MobileHeaderProps {
@@ -51,17 +52,9 @@ const MobileHeader = ({
             <h1 className="text-base font-bold truncate">CallInsight</h1>
           </div>
 
-          {/* Правая часть - только кнопка выхода */}
+          {/* Правая часть - информация о пользователе */}
           <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="flex items-center space-x-1 h-8 px-2"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="text-xs">Выйти</span>
-            </Button>
+            <UserInfo compact={true} onLogout={handleLogout} />
           </div>
         </div>
       </div>

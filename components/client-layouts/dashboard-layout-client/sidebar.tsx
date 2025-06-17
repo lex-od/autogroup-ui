@@ -82,12 +82,12 @@ const Sidebar = ({ isMobileMenuOpen = false, onMobileMenuClose }: SidebarProps) 
         )}
       >
         {/* Логотип и кнопка сворачивания */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <div className={cn("flex items-center space-x-2", isCollapsed && "lg:hidden")}>
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <div className={cn("flex items-center space-x-2 h-8", isCollapsed && "lg:hidden")}>
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Phone className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-lg">CallInsight</span>
+            <span className="font-semibold text-base leading-none">CallInsight</span>
           </div>
           
           <Button
@@ -145,23 +145,7 @@ const Sidebar = ({ isMobileMenuOpen = false, onMobileMenuClose }: SidebarProps) 
           </div>
         </nav>
 
-        {/* Профиль */}
-        <div className="p-4 border-t">
-          <div className={cn(
-            "flex items-center p-2 rounded-lg bg-muted/50",
-            isCollapsed ? "justify-center" : "space-x-3"
-          )}>
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium">
-              А
-            </div>
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">Администратор</p>
-                <p className="text-xs text-muted-foreground truncate">admin@autogroup.ru</p>
-              </div>
-            )}
-          </div>
-        </div>
+
       </div>
 
       {/* Мобильный сайдбар */}
@@ -171,12 +155,12 @@ const Sidebar = ({ isMobileMenuOpen = false, onMobileMenuClose }: SidebarProps) 
           className="lg:hidden flex flex-col h-full bg-card border-r fixed left-0 top-0 w-72 shadow-xl z-50"
         >
           {/* Логотип */}
-          <div className="flex items-center p-4 border-b">
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center px-4 py-3 border-b">
+            <div className="flex items-center space-x-2 h-8">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Phone className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="font-semibold text-lg">CallInsight</span>
+              <span className="font-semibold text-base leading-none">CallInsight</span>
             </div>
           </div>
 
@@ -223,18 +207,7 @@ const Sidebar = ({ isMobileMenuOpen = false, onMobileMenuClose }: SidebarProps) 
             </div>
           </nav>
 
-          {/* Профиль */}
-          <div className="p-4 border-t">
-            <div className="flex items-center space-x-3 p-2 rounded-lg bg-muted/50">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium">
-                А
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">Администратор</p>
-                <p className="text-xs text-muted-foreground truncate">admin@autogroup.ru</p>
-              </div>
-            </div>
-          </div>
+
         </div>
       )}
     </>

@@ -1,8 +1,8 @@
 'use client';
 
-import { CalendarDays, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { CalendarDays } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import UserInfo from '@/components/ui/user-info';
 import { useAuthStore } from '@/stores/auth/auth-store-provider';
 
 interface HeaderProps {
@@ -33,36 +33,28 @@ const Header = ({
 
   return (
     <div className="w-full bg-background border-b">
-      <div className="p-4">
-        {/* Компактный хедер */}
-        <div className="flex items-center justify-between">
+      <div className="px-4 py-3">
+        {/* Компактный хедер с точной высотой 32px */}
+        <div className="flex items-center justify-between h-8">
           {/* Левая часть - заголовок и дата */}
-          <div className="flex items-center space-x-3 min-w-0 flex-1">
-            <h1 className="text-xl font-bold tracking-tight truncate">
+          <div className="flex items-center space-x-3 min-w-0 flex-1 h-full">
+            <h1 className="text-base font-semibold tracking-tight truncate leading-none">
               {title}
             </h1>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs h-5 px-2 py-0.5 flex items-center">
               {totalCalls} звонков
             </Badge>
-            <div className="hidden lg:flex items-center space-x-1 text-xs text-muted-foreground">
-              <CalendarDays className="h-3 w-3" />
-              <span className="truncate">
+            <div className="hidden lg:flex items-center space-x-1 text-xs text-muted-foreground h-full">
+              <CalendarDays className="h-4 w-4" />
+              <span className="truncate leading-none">
                 {subtitle || `Сегодня, ${getCurrentDate()}`}
               </span>
             </div>
           </div>
 
-          {/* Правая часть - только кнопка выхода */}
-          <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="flex items-center space-x-1 h-8"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden md:inline">Выйти</span>
-            </Button>
+          {/* Правая часть - информация о пользователе */}
+          <div className="flex items-center h-full">
+            <UserInfo compact={false} onLogout={handleLogout} />
           </div>
         </div>
       </div>
