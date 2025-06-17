@@ -16,7 +16,7 @@ export async function GET(
     // Для демонстрации возвращаем mock данные
     const mockCall: Call = {
       id,
-      phoneNumber: '+7 (495) 123-45-67',
+      phoneNumber: '+3 (067) 123-45-67',
       clientName: 'Михаил Козлов',
       managerName: 'Анна Смирнова',
       duration: 420,

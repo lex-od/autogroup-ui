@@ -43,7 +43,7 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
   // Mock данные звонка (в реальном приложении получали бы из API)
   const callData = {
     id: callId,
-    phoneNumber: '+7 (495) 123-45-67',
+    phoneNumber: '+3 (067) 123-45-67',
     clientName: 'Михаил Козлов',
     managerName: 'Анна Смирнова',
     duration: 420,

@@ -5,7 +5,7 @@ import { Call } from '@/services/api/queries/calls.queries';
 const mockCalls: Call[] = [
   {
     id: '1',
-    phoneNumber: '+7 (495) 123-45-67',
+    phoneNumber: '+3 (067) 123-45-67',
     clientName: 'Михаил Козлов',
     managerName: 'Анна Смирнова',
     duration: 420,
@@ -59,7 +59,7 @@ const mockCalls: Call[] = [
   },
   {
     id: '4',
-    phoneNumber: '+7 (495) 777-88-99',
+    phoneNumber: '+3 (067) 777-88-99',
     clientName: 'Ольга Сидорова',
     managerName: 'Елена Кузнецова',
     duration: 650,
