@@ -1,6 +1,13 @@
 'use client';
 
-import { FC, PropsWithChildren, createContext, useContext, useState } from 'react';
+import {
+  FC,
+  PropsWithChildren,
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+} from 'react';
 import Sidebar from './sidebar';
 import Header from './header';
 import MobileHeader from './mobile-header';
@@ -65,9 +72,9 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const closeMobileMenu = () => {
+  const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
-  };
+  }, []);
 
   const contextValue: DashboardContextType = {
     totalCalls,
@@ -84,15 +91,15 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <DashboardContext.Provider value={contextValue}>
-      <div className="h-screen flex bg-background overflow-hidden">
+      <div className="flex h-screen overflow-hidden bg-background">
         {/* Сайдбар с поддержкой мобильного меню */}
-        <Sidebar 
+        <Sidebar
           isMobileMenuOpen={isMobileMenuOpen}
           onMobileMenuClose={closeMobileMenu}
         />
-        
+
         {/* Основной контент */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex min-w-0 flex-1 flex-col">
           {/* Десктопный хедер */}
           <div className="hidden lg:block">
             <Header
@@ -111,12 +118,10 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
             onMobileMenuToggle={toggleMobileMenu}
             isMobileMenuOpen={isMobileMenuOpen}
           />
-          
+
           {/* Контент страницы */}
           <main className="flex-1 overflow-auto">
-            <div className="h-full">
-              {children}
-            </div>
+            <div className="h-full">{children}</div>
           </main>
         </div>
       </div>

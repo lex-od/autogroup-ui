@@ -15,8 +15,6 @@ interface MobileHeaderProps {
 
 const MobileHeader = ({
   title,
-  subtitle,
-  totalCalls = 0,
   onMobileMenuToggle,
   isMobileMenuOpen = false,
 }: MobileHeaderProps) => {
@@ -27,11 +25,11 @@ const MobileHeader = ({
   };
 
   return (
-    <div className="lg:hidden bg-background border-b">
+    <div className="border-b bg-background lg:hidden">
       <div className="px-4 py-3">
-        <div className="flex items-center justify-between h-8">
+        <div className="flex h-8 items-center justify-between">
           {/* Левая часть - меню и заголовок */}
-          <div className="flex items-center space-x-3 min-w-0 flex-1">
+          <div className="flex min-w-0 flex-1 items-center space-x-3">
             <Button
               variant="ghost"
               size="sm"
@@ -44,8 +42,8 @@ const MobileHeader = ({
                 <Menu className="h-4 w-4" />
               )}
             </Button>
-            <h1 className="text-base font-semibold truncate">
-              {title || "AUTOGROUP - Аналитика звонков"}
+            <h1 className="truncate text-base font-semibold">
+              {title || 'AUTOGROUP - Аналитика звонков'}
             </h1>
           </div>
 
@@ -59,4 +57,4 @@ const MobileHeader = ({
   );
 };
 
-export default MobileHeader; 
+export default MobileHeader;

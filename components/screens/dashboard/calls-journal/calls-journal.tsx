@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  Search, 
-  Filter, 
-  Phone, 
-  User, 
-  Clock, 
+import {
+  Search,
+  Filter,
+  Phone,
+  User,
+  Clock,
   Calendar,
   ChevronLeft,
   ChevronRight,
@@ -18,19 +18,19 @@ import {
   Trash2,
   PhoneIncoming,
   PhoneOutgoing,
-  ChevronDown
+  ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import {
   DropdownMenu,
@@ -43,12 +43,14 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { DateRangePicker, type DateRange } from '@/components/ui/date-range-picker';
-import { 
-  useCalls, 
-  useDeleteCall, 
+import {
+  DateRangePicker,
+  type DateRange,
+} from '@/components/ui/date-range-picker';
+import {
+  useCalls,
+  useDeleteCall,
   useDeleteCalls,
-  useExportCalls 
 } from '@/services/api/queries/calls.queries';
 import { Call } from '@/services/api/queries/calls.queries';
 import { toast } from 'sonner';
@@ -56,8 +58,8 @@ import { useDashboardContext } from '@/components/client-layouts/dashboard-layou
 
 const CallsJournalScreen = () => {
   const router = useRouter();
-  const { setPageTitle, setShowExportMenu, onExport } = useDashboardContext();
-  
+  const { setPageTitle, setShowExportMenu } = useDashboardContext();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(20);
@@ -76,7 +78,7 @@ const CallsJournalScreen = () => {
   useEffect(() => {
     setPageTitle('Журнал звонков');
     setShowExportMenu(true);
-    
+
     // Очищаем при размонтировании
     return () => {
       setPageTitle('');
@@ -87,10 +89,13 @@ const CallsJournalScreen = () => {
   // Мутации
   const deleteCallMutation = useDeleteCall();
   const deleteCallsMutation = useDeleteCalls();
-  const exportCallsMutation = useExportCalls();
 
   // Получаем данные звонков
-  const { data: callsData, isLoading, refetch } = useCalls({
+  const {
+    data: callsData,
+    isLoading,
+    refetch,
+  } = useCalls({
     limit: pageSize,
     offset: (currentPage - 1) * pageSize,
     search: searchTerm,
@@ -112,22 +117,22 @@ const CallsJournalScreen = () => {
   };
 
   const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleDateRangeChange = (range: DateRange) => {
-    setFilters(prev => ({ 
-      ...prev, 
+    setFilters((prev) => ({
+      ...prev,
       dateFrom: range.from,
-      dateTo: range.to
+      dateTo: range.to,
     }));
   };
 
   const handleSelectCall = (callId: string) => {
-    setSelectedCalls(prev => 
-      prev.includes(callId) 
-        ? prev.filter(id => id !== callId)
-        : [...prev, callId]
+    setSelectedCalls((prev) =>
+      prev.includes(callId)
+        ? prev.filter((id) => id !== callId)
+        : [...prev, callId],
     );
   };
 
@@ -135,7 +140,7 @@ const CallsJournalScreen = () => {
     if (selectedCalls.length === calls.length) {
       setSelectedCalls([]);
     } else {
-      setSelectedCalls(calls.map(call => call.id));
+      setSelectedCalls(calls.map((call) => call.id));
     }
   };
 
@@ -147,7 +152,7 @@ const CallsJournalScreen = () => {
     try {
       await deleteCallMutation.mutateAsync(callId);
       toast.success('Звонок успешно удален');
-      setSelectedCalls(prev => prev.filter(id => id !== callId));
+      setSelectedCalls((prev) => prev.filter((id) => id !== callId));
     } catch (error) {
       toast.error('Ошибка при удалении звонка');
       console.error('Delete call error:', error);
@@ -156,7 +161,7 @@ const CallsJournalScreen = () => {
 
   const handleDeleteSelected = async () => {
     if (selectedCalls.length === 0) return;
-    
+
     try {
       await deleteCallsMutation.mutateAsync(selectedCalls);
       toast.success(`Удалено звонков: ${selectedCalls.length}`);
@@ -187,7 +192,7 @@ const CallsJournalScreen = () => {
   const getStatusBadge = (status: Call['status']) => {
     const variants = {
       completed: 'default',
-      missed: 'destructive', 
+      missed: 'destructive',
       'in-progress': 'secondary',
     } as const;
 
@@ -204,7 +209,9 @@ const CallsJournalScreen = () => {
     );
   };
 
-  const getSentimentBadge = (sentiment?: 'positive' | 'negative' | 'neutral') => {
+  const getSentimentBadge = (
+    sentiment?: 'positive' | 'negative' | 'neutral',
+  ) => {
     if (!sentiment) return null;
 
     const variants = {
@@ -241,10 +248,10 @@ const CallsJournalScreen = () => {
   };
 
   return (
-    <div className="w-full h-full">
-      <div className="p-4 lg:p-6 space-y-4 max-w-full mx-auto">
+    <div className="h-full w-full">
+      <div className="mx-auto max-w-full space-y-4 p-4 lg:p-6">
         {/* Компактные KPI карточки */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <Card className="bg-card/50">
             <CardContent className="p-2">
               <div className="flex items-center justify-between">
@@ -256,17 +263,19 @@ const CallsJournalScreen = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-card/50">
             <CardContent className="p-2">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Сегодня</p>
                   <p className="text-base font-bold">
-                    {calls.filter(call => {
-                      const today = new Date().toDateString();
-                      return new Date(call.date).toDateString() === today;
-                    }).length}
+                    {
+                      calls.filter((call) => {
+                        const today = new Date().toDateString();
+                        return new Date(call.date).toDateString() === today;
+                      }).length
+                    }
                   </p>
                 </div>
                 <Calendar className="h-3 w-3 text-muted-foreground" />
@@ -280,7 +289,7 @@ const CallsJournalScreen = () => {
                 <div>
                   <p className="text-xs text-muted-foreground">Завершенные</p>
                   <p className="text-base font-bold">
-                    {calls.filter(call => call.status === 'completed').length}
+                    {calls.filter((call) => call.status === 'completed').length}
                   </p>
                 </div>
                 <User className="h-3 w-3 text-muted-foreground" />
@@ -294,7 +303,7 @@ const CallsJournalScreen = () => {
                 <div>
                   <p className="text-xs text-muted-foreground">Пропущенные</p>
                   <p className="text-base font-bold">
-                    {calls.filter(call => call.status === 'missed').length}
+                    {calls.filter((call) => call.status === 'missed').length}
                   </p>
                 </div>
                 <Clock className="h-3 w-3 text-muted-foreground" />
@@ -306,8 +315,8 @@ const CallsJournalScreen = () => {
         {/* Поиск и компактная кнопка фильтров */}
         <div className="flex items-center space-x-3">
           {/* Поиск */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="relative flex-1">
+            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
             <Input
               placeholder="Поиск по номеру телефона, имени клиента или менеджеру..."
               value={searchTerm}
@@ -318,22 +327,22 @@ const CallsJournalScreen = () => {
 
           {/* Компактная кнопка фильтров */}
           <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-            <CollapsibleTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-3 shrink-0">
-              <Filter className="h-4 w-4 mr-2" />
+            <CollapsibleTrigger className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium whitespace-nowrap shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50">
+              <Filter className="mr-2 h-4 w-4" />
               Фильтры
-              <ChevronDown className="h-4 w-4 ml-2" />
+              <ChevronDown className="ml-2 h-4 w-4" />
             </CollapsibleTrigger>
           </Collapsible>
 
           {/* Кнопка удаления выбранных */}
           {selectedCalls.length > 0 && (
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               size="sm"
               onClick={handleDeleteSelected}
               disabled={deleteCallsMutation.isPending}
             >
-              <Trash2 className="h-4 w-4 mr-1" />
+              <Trash2 className="mr-1 h-4 w-4" />
               Удалить ({selectedCalls.length})
             </Button>
           )}
@@ -344,14 +353,14 @@ const CallsJournalScreen = () => {
           <CollapsibleContent>
             <Card className="bg-muted/30">
               <CardContent className="p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
                   {/* Период дат - двойной календарь */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Период</label>
                     <DateRangePicker
                       value={{
                         from: filters.dateFrom,
-                        to: filters.dateTo
+                        to: filters.dateTo,
                       }}
                       onChange={handleDateRangeChange}
                       placeholder="Выберите период"
@@ -362,10 +371,12 @@ const CallsJournalScreen = () => {
                   {/* Статус */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Статус</label>
-                    <select 
-                      className="w-full p-2 border rounded-md text-sm bg-background"
+                    <select
+                      className="w-full rounded-md border bg-background p-2 text-sm"
                       value={filters.status}
-                      onChange={(e) => handleFilterChange('status', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('status', e.target.value)
+                      }
                     >
                       <option value="all">Все статусы</option>
                       <option value="completed">Завершенные</option>
@@ -377,10 +388,12 @@ const CallsJournalScreen = () => {
                   {/* Тип */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Тип</label>
-                    <select 
-                      className="w-full p-2 border rounded-md text-sm bg-background"
+                    <select
+                      className="w-full rounded-md border bg-background p-2 text-sm"
                       value={filters.type}
-                      onChange={(e) => handleFilterChange('type', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('type', e.target.value)
+                      }
                     >
                       <option value="all">Все типы</option>
                       <option value="incoming">Входящие</option>
@@ -391,10 +404,12 @@ const CallsJournalScreen = () => {
                   {/* Настроение */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Настроение</label>
-                    <select 
-                      className="w-full p-2 border rounded-md text-sm bg-background"
+                    <select
+                      className="w-full rounded-md border bg-background p-2 text-sm"
                       value={filters.sentiment}
-                      onChange={(e) => handleFilterChange('sentiment', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('sentiment', e.target.value)
+                      }
                     >
                       <option value="all">Любое</option>
                       <option value="positive">Позитивное</option>
@@ -406,10 +421,12 @@ const CallsJournalScreen = () => {
                   {/* Менеджер */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Менеджер</label>
-                    <select 
-                      className="w-full p-2 border rounded-md text-sm bg-background"
+                    <select
+                      className="w-full rounded-md border bg-background p-2 text-sm"
                       value={filters.manager}
-                      onChange={(e) => handleFilterChange('manager', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('manager', e.target.value)
+                      }
                     >
                       <option value="all">Все менеджеры</option>
                       <option value="Анна Смирнова">Анна Смирнова</option>
@@ -431,11 +448,14 @@ const CallsJournalScreen = () => {
             {isLoading ? (
               <div className="space-y-3 p-6">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center space-x-4 p-3 rounded-lg animate-pulse">
-                    <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                  <div
+                    key={i}
+                    className="flex animate-pulse items-center space-x-4 rounded-lg p-3"
+                  >
+                    <div className="h-4 w-4 rounded bg-gray-200"></div>
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-4 w-1/4 rounded bg-gray-200"></div>
+                      <div className="h-3 w-1/2 rounded bg-gray-200"></div>
                     </div>
                   </div>
                 ))}
@@ -449,7 +469,10 @@ const CallsJournalScreen = () => {
                         <TableHead className="w-12">
                           <input
                             type="checkbox"
-                            checked={selectedCalls.length === calls.length && calls.length > 0}
+                            checked={
+                              selectedCalls.length === calls.length &&
+                              calls.length > 0
+                            }
                             onChange={handleSelectAll}
                             className="rounded"
                           />
@@ -466,12 +489,16 @@ const CallsJournalScreen = () => {
                     </TableHeader>
                     <TableBody>
                       {calls.map((call) => (
-                        <TableRow 
+                        <TableRow
                           key={call.id}
-                          className="hover:bg-muted/50 cursor-pointer border-b border-border/40"
+                          className="cursor-pointer border-b border-border/40 hover:bg-muted/50"
                           onClick={() => handleViewCall(call.id)}
                         >
-                          <TableCell onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                          <TableCell
+                            onClick={(e: React.MouseEvent) =>
+                              e.stopPropagation()
+                            }
+                          >
                             <input
                               type="checkbox"
                               checked={selectedCalls.includes(call.id)}
@@ -479,43 +506,52 @@ const CallsJournalScreen = () => {
                               className="rounded"
                             />
                           </TableCell>
-                          <TableCell>
-                            {getCallTypeIcon(call.type)}
-                          </TableCell>
+                          <TableCell>{getCallTypeIcon(call.type)}</TableCell>
                           <TableCell>
                             <div>
-                              <p className="font-medium">{call.clientName || 'Неизвестно'}</p>
-                              <p className="text-xs text-muted-foreground">{call.phoneNumber}</p>
+                              <p className="font-medium">
+                                {call.clientName || 'Неизвестно'}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {call.phoneNumber}
+                              </p>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center space-x-2">
                               <User className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-sm">{call.managerName}</span>
+                              <span className="text-sm">
+                                {call.managerName}
+                              </span>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center space-x-2">
                               <Calendar className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-sm">{formatDate(call.date)}</span>
+                              <span className="text-sm">
+                                {formatDate(call.date)}
+                              </span>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center space-x-2">
                               <Clock className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-sm">{formatDuration(call.duration)}</span>
+                              <span className="text-sm">
+                                {formatDuration(call.duration)}
+                              </span>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="space-y-1">
                               {getStatusBadge(call.status)}
-                              {call.aiAnalysis?.sentiment && getSentimentBadge(call.aiAnalysis.sentiment)}
+                              {call.aiAnalysis?.sentiment &&
+                                getSentimentBadge(call.aiAnalysis.sentiment)}
                             </div>
                           </TableCell>
                           <TableCell>
                             {call.aiAnalysis ? (
                               <Badge variant="default" className="text-xs">
-                                <Brain className="h-3 w-3 mr-1" />
+                                <Brain className="mr-1 h-3 w-3" />
                                 Готов
                               </Badge>
                             ) : (
@@ -524,29 +560,39 @@ const CallsJournalScreen = () => {
                               </Badge>
                             )}
                           </TableCell>
-                          <TableCell onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                          <TableCell
+                            onClick={(e: React.MouseEvent) =>
+                              e.stopPropagation()
+                            }
+                          >
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0"
+                                >
                                   <MoreVertical className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => handleViewCall(call.id)}>
-                                  <Eye className="h-4 w-4 mr-2" />
+                                <DropdownMenuItem
+                                  onClick={() => handleViewCall(call.id)}
+                                >
+                                  <Eye className="mr-2 h-4 w-4" />
                                   Просмотр
                                 </DropdownMenuItem>
                                 {call.recordingUrl && (
                                   <DropdownMenuItem>
-                                    <Play className="h-4 w-4 mr-2" />
+                                    <Play className="mr-2 h-4 w-4" />
                                     Прослушать
                                   </DropdownMenuItem>
                                 )}
-                                <DropdownMenuItem 
+                                <DropdownMenuItem
                                   onClick={() => handleDeleteCall(call.id)}
                                   className="text-destructive"
                                 >
-                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  <Trash2 className="mr-2 h-4 w-4" />
                                   Удалить
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
@@ -560,7 +606,7 @@ const CallsJournalScreen = () => {
 
                 {/* Пагинация */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-between p-4 border-t">
+                  <div className="flex items-center justify-between border-t p-4">
                     <div className="text-sm text-muted-foreground">
                       Страница {currentPage} из {totalPages}
                     </div>
@@ -568,33 +614,47 @@ const CallsJournalScreen = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(1, prev - 1))
+                        }
                         disabled={currentPage === 1}
                       >
                         <ChevronLeft className="h-4 w-4" />
                         Назад
                       </Button>
                       <div className="flex items-center space-x-1">
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                          const pageNum = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
-                          if (pageNum > totalPages) return null;
-                          return (
-                            <Button
-                              key={pageNum}
-                              variant={currentPage === pageNum ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => setCurrentPage(pageNum)}
-                              className="w-8 h-8 p-0"
-                            >
-                              {pageNum}
-                            </Button>
-                          );
-                        })}
+                        {Array.from(
+                          { length: Math.min(5, totalPages) },
+                          (_, i) => {
+                            const pageNum =
+                              currentPage <= 3 ? i + 1 : currentPage - 2 + i;
+                            if (pageNum > totalPages) return null;
+                            return (
+                              <Button
+                                key={pageNum}
+                                variant={
+                                  currentPage === pageNum
+                                    ? 'default'
+                                    : 'outline'
+                                }
+                                size="sm"
+                                onClick={() => setCurrentPage(pageNum)}
+                                className="h-8 w-8 p-0"
+                              >
+                                {pageNum}
+                              </Button>
+                            );
+                          },
+                        )}
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(totalPages, prev + 1),
+                          )
+                        }
                         disabled={currentPage === totalPages}
                       >
                         Вперед
@@ -605,8 +665,8 @@ const CallsJournalScreen = () => {
                 )}
               </div>
             ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <Phone className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <div className="py-12 text-center text-muted-foreground">
+                <Phone className="mx-auto mb-2 h-12 w-12 opacity-50" />
                 <p>Звонки не найдены</p>
                 <p className="text-sm">Попробуйте изменить критерии поиска</p>
               </div>
@@ -618,4 +678,4 @@ const CallsJournalScreen = () => {
   );
 };
 
-export default CallsJournalScreen; 
+export default CallsJournalScreen;
