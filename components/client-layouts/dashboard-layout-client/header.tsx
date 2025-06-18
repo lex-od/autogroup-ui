@@ -9,8 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import UserInfo from '@/components/ui/user-info';
 import { useAuthStore } from '@/stores/auth/auth-store-provider';
+import UserInfo from './user-info';
 
 interface HeaderProps {
   title?: string;

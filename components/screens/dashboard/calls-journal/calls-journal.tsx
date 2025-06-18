@@ -46,7 +46,7 @@ import {
 import {
   DateRangePicker,
   type DateRange,
-} from '@/components/ui/date-range-picker';
+} from '@/components/ui/date-range-picker.legacy';
 import {
   useCalls,
   useDeleteCall,

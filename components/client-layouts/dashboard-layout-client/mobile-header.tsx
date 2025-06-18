@@ -2,8 +2,8 @@
 
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import UserInfo from '@/components/ui/user-info';
 import { useAuthStore } from '@/stores/auth/auth-store-provider';
+import UserInfo from './user-info';
 
 interface MobileHeaderProps {
   title?: string;
