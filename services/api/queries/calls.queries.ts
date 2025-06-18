@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { axiosBase } from '@/services/api/api-client';
+import { axiosBase } from '@/lib/axios-config';
 
 // Типы для звонков и аналитики
 export interface Call {
@@ -127,7 +127,7 @@ export const useCallAIAnalysis = (callId: string) => {
 // Мутации
 export const useStartAIAnalysis = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (callId: string) => {
       const { data } = await axiosBase.post(`/calls/${callId}/ai-analysis`);
@@ -147,21 +147,21 @@ export const useExportCalls = () => {
       const response = await axiosBase.post('/calls/export', params, {
         responseType: 'blob',
       });
-      
+
       // Создаем URL для скачивания файла
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      
+
       // Определяем имя файла и расширение
       const filename = `calls-export-${new Date().toISOString().split('T')[0]}.${params.format}`;
       link.setAttribute('download', filename);
-      
+
       // Инициируем скачивание
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       return response.data;
     },
   });
@@ -169,7 +169,7 @@ export const useExportCalls = () => {
 
 export const useDeleteCall = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (callId: string) => {
       const { data } = await axiosBase.delete(`/calls/${callId}`);
@@ -185,7 +185,7 @@ export const useDeleteCall = () => {
 
 export const useDeleteCalls = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (callIds: string[]) => {
       const { data } = await axiosBase.delete('/calls', {
@@ -203,7 +203,7 @@ export const useDeleteCalls = () => {
 
 export const useUploadCall = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (formData: FormData) => {
       const { data } = await axiosBase.post('/calls', formData, {
@@ -219,4 +219,4 @@ export const useUploadCall = () => {
       queryClient.invalidateQueries({ queryKey: ['call-stats'] });
     },
   });
-}; 
+};
