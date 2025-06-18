@@ -1,6 +1,12 @@
 'use client';
 
-import { Brain, TrendingUp, AlertCircle, CheckCircle, Lightbulb } from 'lucide-react';
+import {
+  Brain,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle,
+  Lightbulb,
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CallStats } from '@/services/api/queries/calls.queries';
@@ -23,8 +29,8 @@ const AIInsightsPanel = ({ stats, isLoading }: AIInsightsPanelProps) => {
         <CardContent className="space-y-4">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-full"></div>
+              <div className="mb-2 h-4 w-3/4 rounded bg-gray-200"></div>
+              <div className="h-3 w-full rounded bg-gray-200"></div>
             </div>
           ))}
         </CardContent>
@@ -38,8 +44,11 @@ const AIInsightsPanel = ({ stats, isLoading }: AIInsightsPanelProps) => {
 
     if (stats) {
       // Анализ конверсии
-      const conversionRate = stats.totalCalls > 0 ? (stats.completedCalls / stats.totalCalls) * 100 : 0;
-      
+      const conversionRate =
+        stats.totalCalls > 0
+          ? (stats.completedCalls / stats.totalCalls) * 100
+          : 0;
+
       if (conversionRate < 70) {
         insights.push({
           type: 'warning' as const,
@@ -61,14 +70,16 @@ const AIInsightsPanel = ({ stats, isLoading }: AIInsightsPanelProps) => {
         insights.push({
           type: 'error' as const,
           title: 'Негативное настроение клиентов',
-          description: 'Средний sentiment ниже нормы. Возможно, есть проблемы с качеством обслуживания.',
+          description:
+            'Средний sentiment ниже нормы. Возможно, есть проблемы с качеством обслуживания.',
           action: 'Провести дополнительное обучение менеджеров',
         });
       } else if (stats.averageSentiment > 0.7) {
         insights.push({
           type: 'success' as const,
           title: 'Позитивные отзывы клиентов',
-          description: 'Клиенты довольны качеством обслуживания. Хорошая работа команды!',
+          description:
+            'Клиенты довольны качеством обслуживания. Хорошая работа команды!',
           action: 'Мотивировать команду',
         });
       }
@@ -78,14 +89,16 @@ const AIInsightsPanel = ({ stats, isLoading }: AIInsightsPanelProps) => {
         insights.push({
           type: 'info' as const,
           title: 'Короткие звонки',
-          description: 'Средняя длительность звонков менее 2 минут. Возможно, клиенты быстро принимают решения.',
+          description:
+            'Средняя длительность звонков менее 2 минут. Возможно, клиенты быстро принимают решения.',
           action: 'Изучить эффективность скриптов',
         });
       } else if (stats.averageDuration > 600) {
         insights.push({
           type: 'warning' as const,
           title: 'Длинные переговоры',
-          description: 'Звонки длятся более 10 минут в среднем. Стоит оптимизировать процесс продаж.',
+          description:
+            'Звонки длятся более 10 минут в среднем. Стоит оптимизировать процесс продаж.',
           action: 'Пересмотреть скрипты продаж',
         });
       }
@@ -154,28 +167,31 @@ const AIInsightsPanel = ({ stats, isLoading }: AIInsightsPanelProps) => {
           {insights.map((insight, index) => (
             <div
               key={index}
-              className="p-4 rounded-lg border border-muted bg-muted/30 hover:bg-muted/50 transition-colors"
+              className="rounded-lg border border-muted bg-muted/30 p-4 transition-colors hover:bg-muted/50"
             >
               <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 mt-1">
+                <div className="mt-1 flex-shrink-0">
                   {getInsightIcon(insight.type)}
                 </div>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-2">
+
+                <div className="min-w-0 flex-1">
+                  <div className="mb-2 flex items-center space-x-2">
                     <h4 className="text-sm font-medium">{insight.title}</h4>
-                    <Badge variant={getInsightBadge(insight.type)} className="text-xs">
+                    <Badge
+                      variant={getInsightBadge(insight.type)}
+                      className="text-xs"
+                    >
                       {insight.type === 'success' && 'Отлично'}
                       {insight.type === 'warning' && 'Внимание'}
                       {insight.type === 'error' && 'Проблема'}
                       {insight.type === 'info' && 'Инфо'}
                     </Badge>
                   </div>
-                  
-                  <p className="text-sm text-muted-foreground mb-2">
+
+                  <p className="mb-2 text-sm text-muted-foreground">
                     {insight.description}
                   </p>
-                  
+
                   <div className="flex items-center space-x-1 text-xs text-primary">
                     <TrendingUp className="h-3 w-3" />
                     <span>{insight.action}</span>
@@ -188,24 +204,34 @@ const AIInsightsPanel = ({ stats, isLoading }: AIInsightsPanelProps) => {
 
         {/* Общие метрики производительности */}
         {stats && (
-          <div className="mt-6 p-4 bg-primary/5 rounded-lg">
-            <h4 className="text-sm font-medium mb-3 flex items-center">
-              <TrendingUp className="h-4 w-4 mr-2" />
+          <div className="mt-6 rounded-lg bg-primary/5 p-4">
+            <h4 className="mb-3 flex items-center text-sm font-medium">
+              <TrendingUp className="mr-2 h-4 w-4" />
               Ключевые метрики
             </h4>
-            
+
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-muted-foreground">Конверсия:</span>
                 <p className="font-medium">
-                  {stats.totalCalls > 0 ? ((stats.completedCalls / stats.totalCalls) * 100).toFixed(1) : 0}%
+                  {stats.totalCalls > 0
+                    ? ((stats.completedCalls / stats.totalCalls) * 100).toFixed(
+                        1,
+                      )
+                    : 0}
+                  %
                 </p>
               </div>
-              
+
               <div>
-                <span className="text-muted-foreground">Удовлетворенность:</span>
+                <span className="text-muted-foreground">
+                  Удовлетворенность:
+                </span>
                 <p className="font-medium">
-                  {stats.averageSentiment ? (stats.averageSentiment * 100).toFixed(0) : 0}%
+                  {stats.averageSentiment
+                    ? (stats.averageSentiment * 100).toFixed(0)
+                    : 0}
+                  %
                 </p>
               </div>
             </div>
@@ -216,4 +242,4 @@ const AIInsightsPanel = ({ stats, isLoading }: AIInsightsPanelProps) => {
   );
 };
 
-export default AIInsightsPanel; 
+export default AIInsightsPanel;
