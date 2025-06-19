@@ -2,28 +2,19 @@
 
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/stores/auth/auth-store-provider';
-import UserInfo from './user-info';
+import UserMenu from './user-menu';
 
 interface MobileHeaderProps {
-  title?: string;
-  subtitle?: string;
-  totalCalls?: number;
-  onMobileMenuToggle?: () => void;
-  isMobileMenuOpen?: boolean;
+  pageTitle: string;
+  onMobileMenuToggle: () => void;
+  isMobileMenuOpen: boolean;
 }
 
-const MobileHeader = ({
-  title,
+const DashboardHeaderMobile = ({
+  pageTitle,
   onMobileMenuToggle,
   isMobileMenuOpen = false,
 }: MobileHeaderProps) => {
-  const unsetToken = useAuthStore((state) => state.unsetToken);
-
-  const handleLogout = () => {
-    unsetToken();
-  };
-
   return (
     <div className="border-b bg-background lg:hidden">
       <div className="px-4 py-3">
@@ -42,14 +33,12 @@ const MobileHeader = ({
                 <Menu className="h-4 w-4" />
               )}
             </Button>
-            <h1 className="truncate text-base font-semibold">
-              {title || 'AUTOGROUP - Аналитика звонков'}
-            </h1>
+            <h1 className="truncate text-base font-semibold">{pageTitle}</h1>
           </div>
 
           {/* Правая часть - пользователь */}
           <div className="flex items-center">
-            <UserInfo compact={true} onLogout={handleLogout} />
+            <UserMenu compact />
           </div>
         </div>
       </div>
@@ -57,4 +46,4 @@ const MobileHeader = ({
   );
 };
 
-export default MobileHeader;
+export default DashboardHeaderMobile;
