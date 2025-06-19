@@ -6,8 +6,10 @@ import {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from 'react';
+import { usePathname } from 'next/navigation';
 import Sidebar from './sidebar';
 import Header from './header';
 import MobileHeader from './mobile-header';
@@ -21,38 +23,44 @@ interface FilterObject {
 
 interface DashboardContextType {
   totalCalls: number;
-  pageTitle?: string;
-  showExportMenu: boolean;
   onFilterChange: (filters: FilterObject) => void;
   onExport: (format: 'csv' | 'xlsx') => void;
   isExporting: boolean;
   isMobileMenuOpen: boolean;
   toggleMobileMenu: () => void;
-  setPageTitle: (title: string) => void;
-  setShowExportMenu: (show: boolean) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType>({
   totalCalls: 0,
-  pageTitle: undefined,
-  showExportMenu: false,
   onFilterChange: () => {},
   onExport: () => {},
   isExporting: false,
   isMobileMenuOpen: false,
   toggleMobileMenu: () => {},
-  setPageTitle: () => {},
-  setShowExportMenu: () => {},
 });
 
 export const useDashboardContext = () => useContext(DashboardContext);
 
 const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
   const [totalCalls] = useState(248);
-  const [pageTitle, setPageTitle] = useState<string | undefined>();
-  const [showExportMenu, setShowExportMenu] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isCallsJournalPage = pathname === '/dashboard/calls';
+
+  const pageTitle = useMemo(() => {
+    const isDashboardHomePage = pathname === '/dashboard';
+    const isCallsJournalSection = pathname.startsWith('/dashboard/calls');
+
+    if (isDashboardHomePage) {
+      return 'AUTOGROUP - Аналитика звонков';
+    }
+    if (isCallsJournalSection) {
+      return 'Журнал звонков';
+    }
+    return 'AUTOGROUP - Аналитика звонков';
+  }, [pathname]);
 
   const handleFilterChange = (filters: FilterObject) => {
     console.log('Filters changed:', filters);
@@ -78,15 +86,11 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
 
   const contextValue: DashboardContextType = {
     totalCalls,
-    pageTitle,
-    showExportMenu,
     onFilterChange: handleFilterChange,
     onExport: handleExport,
     isExporting,
     isMobileMenuOpen,
     toggleMobileMenu,
-    setPageTitle,
-    setShowExportMenu,
   };
 
   return (
@@ -107,7 +111,7 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
               totalCalls={totalCalls}
               onExport={handleExport}
               isExporting={isExporting}
-              showExportMenu={showExportMenu}
+              showExportMenu={isCallsJournalPage}
             />
           </div>
 

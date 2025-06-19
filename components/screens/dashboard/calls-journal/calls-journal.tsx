@@ -54,11 +54,9 @@ import {
 } from '@/services/api/queries/calls.queries';
 import { Call } from '@/services/api/queries/calls.queries';
 import { toast } from 'sonner';
-import { useDashboardContext } from '@/components/client-layouts/dashboard-layout-client/dashboard-layout-client';
 
 const CallsJournalScreen = () => {
   const router = useRouter();
-  const { setPageTitle, setShowExportMenu } = useDashboardContext();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -73,18 +71,6 @@ const CallsJournalScreen = () => {
     dateFrom: '',
     dateTo: '',
   });
-
-  // Устанавливаем заголовок страницы и показываем меню экспорта при загрузке
-  useEffect(() => {
-    setPageTitle('Журнал звонков');
-    setShowExportMenu(true);
-
-    // Очищаем при размонтировании
-    return () => {
-      setPageTitle('');
-      setShowExportMenu(false);
-    };
-  }, [setPageTitle, setShowExportMenu]);
 
   // Мутации
   const deleteCallMutation = useDeleteCall();
