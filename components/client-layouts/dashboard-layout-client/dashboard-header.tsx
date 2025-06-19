@@ -9,30 +9,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuthStore } from '@/stores/auth/auth-store-provider';
-import UserInfo from './user-info';
+import UserMenu from './user-menu';
 
 interface HeaderProps {
-  title?: string;
-  subtitle?: string;
-  pageTitle?: string;
-  totalCalls?: number;
-  onExport?: (format: 'csv' | 'xlsx') => void;
-  isExporting?: boolean;
-  showExportMenu?: boolean;
+  pageTitle: string;
+  totalCalls: number;
+  onExport: (format: 'csv' | 'xlsx') => void;
+  isExporting: boolean;
+  showExportMenu: boolean;
 }
 
-const Header = ({
-  title = 'AUTOGROUP - Аналитика звонков',
-  subtitle,
+const DashboardHeader = ({
   pageTitle,
-  totalCalls = 0,
+  totalCalls,
   onExport,
-  isExporting = false,
-  showExportMenu = false,
+  isExporting,
+  showExportMenu,
 }: HeaderProps) => {
-  const unsetToken = useAuthStore((state) => state.unsetToken);
-
   const getCurrentDate = () => {
     return new Date().toLocaleDateString('ru-RU', {
       weekday: 'long',
@@ -40,16 +33,6 @@ const Header = ({
       month: 'long',
       day: 'numeric',
     });
-  };
-
-  const handleLogout = () => {
-    unsetToken();
-  };
-
-  const handleExport = (format: 'csv' | 'xlsx') => {
-    if (onExport) {
-      onExport(format);
-    }
   };
 
   return (
@@ -60,7 +43,7 @@ const Header = ({
           {/* Левая часть - заголовок и дата */}
           <div className="flex h-full min-w-0 flex-1 items-center space-x-3">
             <h1 className="truncate text-base leading-none font-semibold tracking-tight">
-              {pageTitle || title}
+              {pageTitle}
             </h1>
             <Badge
               variant="secondary"
@@ -71,7 +54,7 @@ const Header = ({
             <div className="hidden h-full items-center space-x-1 text-xs text-muted-foreground lg:flex">
               <CalendarDays className="h-4 w-4" />
               <span className="truncate leading-none">
-                {subtitle || `Сегодня, ${getCurrentDate()}`}
+                Сегодня, {getCurrentDate()}
               </span>
             </div>
           </div>
@@ -93,14 +76,14 @@ const Header = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
-                    onClick={() => handleExport('csv')}
+                    onClick={() => onExport('csv')}
                     disabled={isExporting}
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Экспорт в CSV
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => handleExport('xlsx')}
+                    onClick={() => onExport('xlsx')}
                     disabled={isExporting}
                   >
                     <Download className="mr-2 h-4 w-4" />
@@ -110,7 +93,7 @@ const Header = ({
               </DropdownMenu>
             )}
 
-            <UserInfo compact={false} onLogout={handleLogout} />
+            <UserMenu />
           </div>
         </div>
       </div>
@@ -118,4 +101,4 @@ const Header = ({
   );
 };
 
-export default Header;
+export default DashboardHeader;

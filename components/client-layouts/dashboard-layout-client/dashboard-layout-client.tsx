@@ -1,45 +1,10 @@
 'use client';
 
-import {
-  FC,
-  PropsWithChildren,
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import { FC, PropsWithChildren, useCallback, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import Sidebar from './sidebar';
-import Header from './header';
-import MobileHeader from './mobile-header';
-
-interface FilterObject {
-  dateRange?: { from: Date; to: Date };
-  managers?: string[];
-  statuses?: string[];
-  sentiments?: string[];
-}
-
-interface DashboardContextType {
-  totalCalls: number;
-  onFilterChange: (filters: FilterObject) => void;
-  onExport: (format: 'csv' | 'xlsx') => void;
-  isExporting: boolean;
-  isMobileMenuOpen: boolean;
-  toggleMobileMenu: () => void;
-}
-
-const DashboardContext = createContext<DashboardContextType>({
-  totalCalls: 0,
-  onFilterChange: () => {},
-  onExport: () => {},
-  isExporting: false,
-  isMobileMenuOpen: false,
-  toggleMobileMenu: () => {},
-});
-
-export const useDashboardContext = () => useContext(DashboardContext);
+import DashboardSidebar from './dashboard-sidebar';
+import DashboardHeader from './dashboard-header';
+import DashboardHeaderMobile from './dashboard-header-mobile';
 
 const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
   const [totalCalls] = useState(248);
@@ -62,74 +27,53 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
     return 'AUTOGROUP - Аналитика звонков';
   }, [pathname]);
 
-  const handleFilterChange = (filters: FilterObject) => {
-    console.log('Filters changed:', filters);
-    // Здесь можно передать фильтры дочерним компонентам
-  };
-
-  const handleExport = (format: 'csv' | 'xlsx') => {
+  const handleExport = useCallback((format: 'csv' | 'xlsx') => {
     setIsExporting(true);
     // Симуляция экспорта
     setTimeout(() => {
       setIsExporting(false);
       console.log(`Export completed in ${format} format`);
     }, 2000);
-  };
+  }, []);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen((state) => !state);
+  }, []);
 
   const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
   }, []);
 
-  const contextValue: DashboardContextType = {
-    totalCalls,
-    onFilterChange: handleFilterChange,
-    onExport: handleExport,
-    isExporting,
-    isMobileMenuOpen,
-    toggleMobileMenu,
-  };
-
   return (
-    <DashboardContext.Provider value={contextValue}>
-      <div className="flex h-screen overflow-hidden bg-background">
-        {/* Сайдбар с поддержкой мобильного меню */}
-        <Sidebar
+    <div className="flex h-screen overflow-hidden bg-background">
+      {/* Sidebar with mobile menu */}
+      <DashboardSidebar
+        isMobileMenuOpen={isMobileMenuOpen}
+        onMobileMenuClose={closeMobileMenu}
+      />
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="hidden lg:block">
+          <DashboardHeader
+            pageTitle={pageTitle}
+            totalCalls={totalCalls}
+            onExport={handleExport}
+            isExporting={isExporting}
+            showExportMenu={isCallsJournalPage}
+          />
+        </div>
+
+        <DashboardHeaderMobile
+          pageTitle={pageTitle}
+          onMobileMenuToggle={toggleMobileMenu}
           isMobileMenuOpen={isMobileMenuOpen}
-          onMobileMenuClose={closeMobileMenu}
         />
 
-        {/* Основной контент */}
-        <div className="flex min-w-0 flex-1 flex-col">
-          {/* Десктопный хедер */}
-          <div className="hidden lg:block">
-            <Header
-              pageTitle={pageTitle}
-              totalCalls={totalCalls}
-              onExport={handleExport}
-              isExporting={isExporting}
-              showExportMenu={isCallsJournalPage}
-            />
-          </div>
-
-          {/* Мобильный хедер */}
-          <MobileHeader
-            title={pageTitle}
-            totalCalls={totalCalls}
-            onMobileMenuToggle={toggleMobileMenu}
-            isMobileMenuOpen={isMobileMenuOpen}
-          />
-
-          {/* Контент страницы */}
-          <main className="flex-1 overflow-auto">
-            <div className="h-full">{children}</div>
-          </main>
-        </div>
+        <main className="flex-1 overflow-auto">
+          <div className="h-full">{children}</div>
+        </main>
       </div>
-    </DashboardContext.Provider>
+    </div>
   );
 };
 

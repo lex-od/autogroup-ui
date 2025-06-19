@@ -23,7 +23,7 @@ interface SidebarProps {
   onMobileMenuClose: () => void;
 }
 
-const Sidebar = ({
+const DashboardSidebar = ({
   isMobileMenuOpen = false,
   onMobileMenuClose,
 }: SidebarProps) => {
@@ -167,7 +167,7 @@ const Sidebar = ({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'flex cursor-default items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     item.current
                       ? 'bg-primary text-primary-foreground'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -193,7 +193,7 @@ const Sidebar = ({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'flex cursor-default items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     item.current
                       ? 'bg-primary text-primary-foreground'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -281,4 +281,4 @@ const Sidebar = ({
   );
 };
 
-export default Sidebar;
+export default DashboardSidebar;

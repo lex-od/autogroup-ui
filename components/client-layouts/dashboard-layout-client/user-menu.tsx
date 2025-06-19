@@ -10,54 +10,55 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAuthStore } from '@/stores/auth/auth-store-provider';
 
 interface UserInfoProps {
-  name?: string;
-  email?: string;
   compact?: boolean;
-  className?: string;
-  onLogout?: () => void;
 }
 
-const UserInfo = ({ 
-  name = "Администратор",
-  email = "admin@autogroup.ru",
-  compact = false,
-  className,
-  onLogout
-}: UserInfoProps) => {
+const UserMenu = ({ compact = false }: UserInfoProps) => {
+  const unsetToken = useAuthStore((state) => state.unsetToken);
+
+  const name = 'Администратор';
+  const email = 'admin@autogroup.ua';
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className={cn(
-          "flex items-center gap-2 px-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer",
-          compact ? "min-w-0 h-8" : "space-x-3 h-8",
-          className
-        )}>
+        <div
+          className={cn(
+            'flex cursor-default items-center gap-2 rounded-lg bg-muted/50 px-3 transition-colors hover:bg-muted',
+            compact ? 'h-8 min-w-0' : 'h-8 space-x-3',
+          )}
+        >
           {/* Аватар */}
-          <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xs font-medium flex-shrink-0">
+          <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
             {name?.charAt(0) || 'А'}
           </div>
-          
+
           {/* Информация о пользователе */}
           {!compact && (
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium truncate leading-none">{name}</p>
-              <p className="text-xs text-muted-foreground truncate opacity-75 leading-none">{email}</p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs leading-none font-medium">
+                {name}
+              </p>
+              <p className="truncate text-xs leading-none text-muted-foreground opacity-75">
+                {email}
+              </p>
             </div>
           )}
-          
+
           {/* Стрелка вниз для dropdown */}
           {!compact && (
-            <ChevronDown className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+            <ChevronDown className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
           )}
         </div>
       </DropdownMenuTrigger>
-      
+
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{name}</p>
+            <p className="text-sm leading-none font-medium">{name}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {email}
             </p>
@@ -73,7 +74,7 @@ const UserInfo = ({
           <span>Настройки</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onLogout}>
+        <DropdownMenuItem onClick={unsetToken}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Выйти</span>
         </DropdownMenuItem>
@@ -82,4 +83,4 @@ const UserInfo = ({
   );
 };
 
-export default UserInfo; 
+export default UserMenu;
