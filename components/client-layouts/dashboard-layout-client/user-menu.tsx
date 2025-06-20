@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronDown, LogOut, Settings, User } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -10,14 +11,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuthStore } from '@/stores/auth/auth-store-provider';
+import { useLogoutMutation } from '@/services/api/auth-api';
 
 interface UserInfoProps {
   compact?: boolean;
 }
 
 const UserMenu = ({ compact = false }: UserInfoProps) => {
-  const unsetToken = useAuthStore((state) => state.unsetToken);
+  const queryClient = useQueryClient();
+
+  const logout = useLogoutMutation({
+    onSuccess: () => {
+      queryClient.clear();
+    },
+  });
 
   const name = 'Администратор';
   const email = 'admin@autogroup.ua';
@@ -74,7 +81,7 @@ const UserMenu = ({ compact = false }: UserInfoProps) => {
           <span>Настройки</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={unsetToken}>
+        <DropdownMenuItem onClick={() => logout.mutate()}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Выйти</span>
         </DropdownMenuItem>

@@ -22,7 +22,9 @@ const AppProviders: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <QueryClientProvider client={queryClientRef.current}>
-      <AuthStoreProvider queryClient={queryClientRef.current}>
+      <AuthStoreProvider
+      // queryClient={queryClientRef.current}
+      >
         <GlobalStoreProvider>{children}</GlobalStoreProvider>
       </AuthStoreProvider>
 
