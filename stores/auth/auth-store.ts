@@ -1,45 +1,26 @@
-import { persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
+import { Session } from '@supabase/supabase-js';
 
 export type AuthStore = {
-  token: string | null;
-  hasHydrated: boolean;
+  session: Session | null;
+  authLoading: boolean;
 
-  setToken: (token: string) => void;
-  unsetToken: () => void;
-  _setHasHydrated: (value: boolean) => void;
+  setSession: (newSession: Session | null) => void;
+  unsetAuthLoading: () => void;
 };
 
 export const createAuthStore = () => {
-  return createStore<AuthStore>()(
-    persist(
-      (set) => ({
-        token: null,
-        hasHydrated: false,
+  return createStore<AuthStore>()((set) => ({
+    session: null,
+    authLoading: true,
 
-        setToken: (token) => {
-          set({ token });
-        },
-        unsetToken: () => {
-          set({ token: null });
-        },
-        _setHasHydrated: (value) => {
-          set({ hasHydrated: value });
-        },
-      }),
-      {
-        name: 'auth-store',
-        partialize: ({ token }) => {
-          return {
-            token,
-          };
-        },
-        onRehydrateStorage: (state) => {
-          return () => state._setHasHydrated(true);
-        },
-      },
-    ),
-  );
+    setSession: (newSession) => {
+      set({ session: newSession });
+    },
+    unsetAuthLoading: () => {
+      set({ authLoading: false });
+    },
+  }));
 };
 
 export type AuthStoreApi = ReturnType<typeof createAuthStore>;

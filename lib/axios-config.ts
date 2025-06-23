@@ -1,29 +1,27 @@
 import axios from 'axios';
-import { QueryClient } from '@tanstack/react-query';
-import { type AuthStoreApi } from '@/stores/auth/auth-store';
 
 export const axiosBase = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
 });
 
-export const setupAxiosInterceptors = (
-  authStoreApi: AuthStoreApi,
-  queryClient: QueryClient,
-) => {
-  axiosBase.interceptors.request.use((config) => {
-    const token = authStoreApi.getState().token;
+// export const setupAxiosInterceptors = (
+//   authStoreApi: AuthStoreApi,
+//   queryClient: QueryClient,
+// ) => {
+//   axiosBase.interceptors.request.use((config) => {
+//     const token = authStoreApi.getState().token;
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   });
 
-  axiosBase.interceptors.response.use(undefined, (error) => {
-    if (error.response?.status === 401) {
-      authStoreApi.getState().unsetToken();
-      queryClient.clear();
-    }
-    throw error;
-  });
-};
+//   axiosBase.interceptors.response.use(undefined, (error) => {
+//     if (error.response?.status === 401) {
+//       authStoreApi.getState().unsetToken();
+//       queryClient.clear();
+//     }
+//     throw error;
+//   });
+// };

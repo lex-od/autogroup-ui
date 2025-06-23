@@ -1,7 +1,7 @@
 'use client';
 import { FC, PropsWithChildren, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth/auth-store-provider';
+import { useAuthSelector } from '@/stores/auth/auth-selectors';
 
 type Props = {
   isProtected?: boolean;
@@ -14,16 +14,15 @@ const PublicAccess: FC<PropsWithChildren<Props>> = ({
   isProtected,
 }) => {
   const router = useRouter();
-  const hasHydrated = useAuthStore((state) => state.hasHydrated);
-  const isAuthenticated = useAuthStore((state) => !!state.token);
+  const { isAuthenticated, authLoading } = useAuthSelector();
 
   useEffect(() => {
-    if (isProtected && hasHydrated && isAuthenticated) {
+    if (isProtected && !authLoading && isAuthenticated) {
       router.replace(redirectPath);
     }
-  }, [isProtected, hasHydrated, isAuthenticated, router]);
+  }, [isProtected, authLoading, isAuthenticated, router]);
 
-  if (isProtected && (!hasHydrated || isAuthenticated)) {
+  if (isProtected && (authLoading || isAuthenticated)) {
     return null;
   }
 

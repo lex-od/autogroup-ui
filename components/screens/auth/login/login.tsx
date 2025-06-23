@@ -1,17 +1,10 @@
 'use client';
 
-import { useAuthStore } from '@/stores/auth/auth-store-provider';
-import { useLoginMutation } from '@/services/api/auth-hooks';
+import { useLoginMutation } from '@/services/api/auth-api';
 import LoginForm from './login-form';
 
 const Login = () => {
-  const setToken = useAuthStore((state) => state.setToken);
-
-  const { mutate } = useLoginMutation({
-    onSuccess: ({ token }) => {
-      setToken(token);
-    },
-  });
+  const { mutate } = useLoginMutation();
 
   return <LoginForm onSubmit={mutate} />;
 };

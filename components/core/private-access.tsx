@@ -1,22 +1,22 @@
 'use client';
+
 import { FC, PropsWithChildren, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth/auth-store-provider';
+import { useAuthSelector } from '@/stores/auth/auth-selectors';
 
 const redirectPath = '/auth/login';
 
 const PrivateAccess: FC<PropsWithChildren> = ({ children }) => {
   const router = useRouter();
-  const hasHydrated = useAuthStore((state) => state.hasHydrated);
-  const isAuthenticated = useAuthStore((state) => !!state.token);
+  const { isAuthenticated, authLoading } = useAuthSelector();
 
   useEffect(() => {
-    if (hasHydrated && !isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
       router.replace(redirectPath);
     }
-  }, [hasHydrated, isAuthenticated, router]);
+  }, [authLoading, isAuthenticated, router]);
 
-  if (!hasHydrated || !isAuthenticated) {
+  if (authLoading || !isAuthenticated) {
     return null;
   }
 
