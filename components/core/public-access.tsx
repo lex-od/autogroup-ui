@@ -1,7 +1,9 @@
 'use client';
+
 import { FC, PropsWithChildren, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthSelector } from '@/stores/auth/auth-selectors';
+import { useIsAuthSelector } from '@/stores/auth/auth-selectors';
+import { useAuthStore } from '@/stores/auth/auth-store-provider';
 
 type Props = {
   isProtected?: boolean;
@@ -14,7 +16,8 @@ const PublicAccess: FC<PropsWithChildren<Props>> = ({
   isProtected,
 }) => {
   const router = useRouter();
-  const { isAuthenticated, authLoading } = useAuthSelector();
+  const isAuthenticated = useIsAuthSelector();
+  const authLoading = useAuthStore((state) => state.authLoading);
 
   useEffect(() => {
     if (isProtected && !authLoading && isAuthenticated) {
