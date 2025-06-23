@@ -54,6 +54,7 @@ import {
 } from '@/services/api/queries/calls.queries';
 import { Call } from '@/services/api/queries/calls.queries';
 import { toast } from 'sonner';
+import { useCallsQuery } from '@/services/api/calls-api';
 
 const CallsJournalScreen = () => {
   const router = useRouter();
@@ -71,6 +72,8 @@ const CallsJournalScreen = () => {
     dateFrom: '',
     dateTo: '',
   });
+
+  useCallsQuery();
 
   // Мутации
   const deleteCallMutation = useDeleteCall();
