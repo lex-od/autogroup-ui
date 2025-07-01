@@ -18,6 +18,7 @@ const AuthChecker: FC<PropsWithChildren> = ({ children }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      unsetAuthLoading();
     });
 
     return () => subscription.unsubscribe();
