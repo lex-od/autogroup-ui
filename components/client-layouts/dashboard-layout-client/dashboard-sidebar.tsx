@@ -14,6 +14,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  FlaskConical,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -97,6 +98,12 @@ const DashboardSidebar = ({
       href: '/dashboard/scheduler',
       icon: Calendar,
       current: pathname === '/dashboard/scheduler',
+    },
+    {
+      name: 'Test features',
+      href: '/dashboard/test-features',
+      icon: FlaskConical,
+      current: pathname === '/dashboard/test-features',
     },
   ];
 

@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { PostgrestError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase-config';
 
-interface Call {
+export interface Call {
   audio_format: null;
   call_date: null;
   call_type: 'incoming' | 'outgoing';
