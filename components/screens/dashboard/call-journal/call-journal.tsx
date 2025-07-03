@@ -51,9 +51,9 @@ import {
   useDeleteCall,
   useDeleteCalls,
 } from '@/services/api/queries/calls.queries';
-import { Call, useCallsQuery } from '@/services/api/calls-api';
+import { CallsItem, useCallsQuery } from '@/services/api/calls-api';
 
-const CallsJournalScreen = () => {
+const CallJournal = () => {
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -156,9 +156,9 @@ const CallsJournalScreen = () => {
     });
   };
 
-  const getStatusBadge = (status: Call['status']) => {
+  const getStatusBadge = (status: CallsItem['status']) => {
     const variants: Record<
-      Call['status'],
+      CallsItem['status'],
       VariantProps<typeof badgeVariants>['variant']
     > = {
       uploaded: 'secondary',
@@ -168,7 +168,7 @@ const CallsJournalScreen = () => {
       completed: 'default',
       failed: 'destructive',
     };
-    const labels: Record<Call['status'], string> = {
+    const labels: Record<CallsItem['status'], string> = {
       uploaded: 'Загружен',
       processing: 'Обработка',
       transcribing: 'Транскрибация',
@@ -184,7 +184,7 @@ const CallsJournalScreen = () => {
     );
   };
 
-  const getCallTypeIcon = (type: Call['call_type']) => {
+  const getCallTypeIcon = (type: CallsItem['call_type']) => {
     return type === 'incoming' ? (
       <div className="flex items-center space-x-1 text-green-600">
         <PhoneIncoming className="h-3 w-3" />
@@ -605,4 +605,4 @@ const CallsJournalScreen = () => {
   );
 };
 
-export default CallsJournalScreen;
+export default CallJournal;

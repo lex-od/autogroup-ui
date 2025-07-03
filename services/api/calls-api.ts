@@ -2,7 +2,9 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { PostgrestError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase-config';
 
-export interface Call {
+// General types
+
+interface Call {
   audio_format: null;
   call_date: null;
   call_type: 'incoming' | 'outgoing';
@@ -32,8 +34,12 @@ export interface Call {
   user_id: string | null;
 }
 
+// ============================================================================
+
+export type CallsItem = Call;
+
 export const useCallsQuery = (
-  queryOptions?: Partial<UseQueryOptions<Call[], PostgrestError>>,
+  queryOptions?: Partial<UseQueryOptions<CallsItem[], PostgrestError>>,
 ) => {
   return useQuery({
     queryKey: ['calls'],
@@ -42,6 +48,129 @@ export const useCallsQuery = (
         .from('calls')
         .select('*')
         .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return data;
+    },
+    ...queryOptions,
+  });
+};
+
+// ============================================================================
+
+export type CallDetailsResponse = Call;
+
+export const useCallDetailsQuery = (
+  id: string,
+  queryOptions?: Partial<UseQueryOptions<CallDetailsResponse, PostgrestError>>,
+) => {
+  return useQuery({
+    queryKey: ['call-details', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('calls')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    },
+    ...queryOptions,
+  });
+};
+
+// ============================================================================
+
+export type CallTranscriptResponse = {
+  call_id: string;
+  created_at: string;
+  full_text: string;
+  id: string;
+  language: string;
+  model_used: string;
+  overall_confidence: number | null;
+  processing_time_ms: number;
+  retry_count: number;
+  segments: Array<{
+    confidence: number | null;
+    end_ms: number;
+    speaker: string;
+    start_ms: number;
+    text: string;
+  }>;
+  silence_duration_ms: number | null;
+  speaker_labels: unknown;
+  speakers_count: number;
+  word_count: number;
+};
+
+export const useCallTranscriptQuery = (
+  id: string,
+  queryOptions?: Partial<
+    UseQueryOptions<CallTranscriptResponse, PostgrestError>
+  >,
+) => {
+  return useQuery({
+    queryKey: ['call-transcript', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('transcripts')
+        .select('*')
+        .eq('call_id', id)
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    },
+    ...queryOptions,
+  });
+};
+
+// ============================================================================
+
+export type CallAnalysisResponse = {
+  action_items: string[];
+  call_id: string;
+  client_readiness: null;
+  compliance_issues: string[];
+  created_at: string;
+  expected_deal_size: null;
+  follow_up_priority: null;
+  id: string;
+  insights: {
+    client_readiness: 'высокая' | null;
+    expected_deal_size: 'высокий' | 'средний' | null;
+    follow_up_priority: 'высокий' | 'средний' | null;
+  };
+  key_phrases: string[];
+  missed_opportunities: string[];
+  model_used: string;
+  processing_time_ms: number;
+  sentiment_confidence: number; // 0.0 to 1.0
+  sentiment_label: 'positive' | 'neutral' | 'negative';
+  sentiment_score: number; // -1.0 to 1.0
+  service_quality_score: number; // 1-5
+  summary: string;
+  tokens_used: null;
+  topics: string[];
+};
+
+export const useCallAnalysisQuery = (
+  id: string,
+  queryOptions?: Partial<UseQueryOptions<CallAnalysisResponse, PostgrestError>>,
+) => {
+  return useQuery({
+    queryKey: ['call-analysis', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ai_analysis')
+        .select('*')
+        .eq('call_id', id)
+        .single();
 
       if (error) throw error;
 

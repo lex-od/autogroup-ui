@@ -2,11 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  Play, 
-  Pause, 
-  SkipBack, 
-  SkipForward, 
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
   Volume2,
   Download,
   ArrowLeft,
@@ -16,27 +16,41 @@ import {
   Brain,
   FileText,
   MessageSquare,
-  Star
+  Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCallAIAnalysis } from '@/services/api/queries/calls.queries';
+import {
+  useCallAnalysisQuery,
+  useCallDetailsQuery,
+  useCallTranscriptQuery,
+} from '@/services/api/calls-api';
 
-interface CallDetailScreenProps {
+interface CallDetailsProps {
   callId: string;
 }
 
-const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
+const CallDetails = ({ callId }: CallDetailsProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   // const [volume] = useState(1);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [selectedTranscriptTime, setSelectedTranscriptTime] = useState<number | null>(null);
-  
+  const [selectedTranscriptTime, setSelectedTranscriptTime] = useState<
+    number | null
+  >(null);
+
   const audioRef = useRef<HTMLAudioElement>(null);
-  
+
+  const { data: details, isPending: detailsPending } =
+    useCallDetailsQuery(callId);
+  const { data: transcript, isPending: transcriptPending } =
+    useCallTranscriptQuery(callId);
+  const { data: analysis, isPending: analysisPending } =
+    useCallAnalysisQuery(callId);
+
   // Получаем данные звонка и AI анализ
   const { data: aiAnalysis, isLoading } = useCallAIAnalysis(callId);
 
@@ -55,13 +69,41 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
 
   // Mock транскрипция с временными метками
   const transcriptSegments = [
-    { time: 0, speaker: 'Менеджер', text: 'Здравствуйте! Автосалон "Премиум", меня зовут Анна. Чем могу помочь?' },
-    { time: 8, speaker: 'Клиент', text: 'Добрый день! Я интересуюсь покупкой автомобиля. Хотел бы узнать о ваших предложениях.' },
-    { time: 18, speaker: 'Менеджер', text: 'Отлично! Какая марка и модель вас интересует? Какой у вас бюджет?' },
-    { time: 25, speaker: 'Клиент', text: 'Рассматриваю BMW X5 или Mercedes GLE. Бюджет до 6 миллионов рублей.' },
-    { time: 35, speaker: 'Менеджер', text: 'Прекрасный выбор! У нас есть несколько отличных вариантов в этом сегменте. Вы рассматриваете покупку в кредит или за наличные?' },
-    { time: 48, speaker: 'Клиент', text: 'Предпочел бы кредит. Какие у вас условия? И можно ли посмотреть автомобили сегодня?' },
-    { time: 58, speaker: 'Менеджер', text: 'Конечно! Кредит от 0.1% годовых. Trade-in тоже возможен. Приезжайте сегодня после 14:00, покажу все модели.' },
+    {
+      time: 0,
+      speaker: 'Менеджер',
+      text: 'Здравствуйте! Автосалон "Премиум", меня зовут Анна. Чем могу помочь?',
+    },
+    {
+      time: 8,
+      speaker: 'Клиент',
+      text: 'Добрый день! Я интересуюсь покупкой автомобиля. Хотел бы узнать о ваших предложениях.',
+    },
+    {
+      time: 18,
+      speaker: 'Менеджер',
+      text: 'Отлично! Какая марка и модель вас интересует? Какой у вас бюджет?',
+    },
+    {
+      time: 25,
+      speaker: 'Клиент',
+      text: 'Рассматриваю BMW X5 или Mercedes GLE. Бюджет до 6 миллионов рублей.',
+    },
+    {
+      time: 35,
+      speaker: 'Менеджер',
+      text: 'Прекрасный выбор! У нас есть несколько отличных вариантов в этом сегменте. Вы рассматриваете покупку в кредит или за наличные?',
+    },
+    {
+      time: 48,
+      speaker: 'Клиент',
+      text: 'Предпочел бы кредит. Какие у вас условия? И можно ли посмотреть автомобили сегодня?',
+    },
+    {
+      time: 58,
+      speaker: 'Менеджер',
+      text: 'Конечно! Кредит от 0.1% годовых. Trade-in тоже возможен. Приезжайте сегодня после 14:00, покажу все модели.',
+    },
   ];
 
   useEffect(() => {
@@ -95,7 +137,7 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
   const seek = (time: number) => {
     const audio = audioRef.current;
     if (!audio) return;
-    
+
     audio.currentTime = time;
     setCurrentTime(time);
     setSelectedTranscriptTime(time);
@@ -104,7 +146,7 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
   const skipTime = (seconds: number) => {
     const audio = audioRef.current;
     if (!audio) return;
-    
+
     const newTime = Math.max(0, Math.min(duration, currentTime + seconds));
     seek(newTime);
   };
@@ -121,10 +163,10 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
       negative: 'destructive' as const,
       neutral: 'warning' as const,
     };
-    
+
     const labels = {
       positive: 'Позитивный',
-      negative: 'Негативный', 
+      negative: 'Негативный',
       neutral: 'Нейтральный',
     };
 
@@ -139,13 +181,13 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
     return (
       <div className="container mx-auto p-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <div className="h-32 bg-gray-200 rounded"></div>
-              <div className="h-96 bg-gray-200 rounded"></div>
+          <div className="mb-6 h-8 w-48 rounded bg-gray-200"></div>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-2">
+              <div className="h-32 rounded bg-gray-200"></div>
+              <div className="h-96 rounded bg-gray-200"></div>
             </div>
-            <div className="h-96 bg-gray-200 rounded"></div>
+            <div className="h-96 rounded bg-gray-200"></div>
           </div>
         </div>
       </div>
@@ -153,7 +195,7 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-7xl">
+    <div className="container mx-auto max-w-7xl space-y-6 p-6">
       {/* Хедер */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -176,17 +218,19 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Основной контент */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Информация о звонке */}
           <Card>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="flex items-center space-x-3">
                   <Phone className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Номер телефона</p>
+                    <p className="text-sm text-muted-foreground">
+                      Номер телефона
+                    </p>
                     <p className="font-medium">{callData.phoneNumber}</p>
                   </div>
                 </div>
@@ -207,8 +251,12 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
                 <div className="flex items-center space-x-3">
                   <Clock className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Длительность</p>
-                    <p className="font-medium">{formatTime(callData.duration)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Длительность
+                    </p>
+                    <p className="font-medium">
+                      {formatTime(callData.duration)}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -230,23 +278,23 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
                 onEnded={() => setIsPlaying(false)}
                 className="hidden"
               />
-              
+
               {/* Прогресс бар */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>{formatTime(currentTime)}</span>
                   <span>{formatTime(duration)}</span>
                 </div>
-                <div 
-                  className="w-full h-2 bg-gray-200 rounded-full cursor-pointer"
+                <div
+                  className="h-2 w-full cursor-pointer rounded-full bg-gray-200"
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     const percent = (e.clientX - rect.left) / rect.width;
                     seek(percent * duration);
                   }}
                 >
-                  <div 
-                    className="h-full bg-primary rounded-full transition-all"
+                  <div
+                    className="h-full rounded-full bg-primary transition-all"
                     style={{ width: `${(currentTime / duration) * 100}%` }}
                   />
                 </div>
@@ -261,11 +309,11 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
                 >
                   <SkipBack className="h-4 w-4" />
                 </Button>
-                
+
                 <Button
                   size="lg"
                   onClick={togglePlayPause}
-                  className="w-12 h-12 rounded-full"
+                  className="h-12 w-12 rounded-full"
                 >
                   {isPlaying ? (
                     <Pause className="h-6 w-6" />
@@ -273,7 +321,7 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
                     <Play className="h-6 w-6" />
                   )}
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -286,10 +334,10 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
               {/* Скорость воспроизведения */}
               <div className="flex items-center justify-center space-x-2">
                 <span className="text-sm">Скорость:</span>
-                {[0.5, 1, 1.25, 1.5, 2].map(rate => (
+                {[0.5, 1, 1.25, 1.5, 2].map((rate) => (
                   <Button
                     key={rate}
-                    variant={playbackRate === rate ? "default" : "outline"}
+                    variant={playbackRate === rate ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => {
                       setPlaybackRate(rate);
@@ -314,23 +362,23 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4 max-h-96 overflow-y-auto">
+              <div className="max-h-96 space-y-4 overflow-y-auto">
                 {transcriptSegments.map((segment, index) => (
                   <div
                     key={index}
-                    className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                    className={`cursor-pointer rounded-lg p-3 transition-colors ${
                       selectedTranscriptTime === segment.time
-                        ? 'bg-primary/10 border border-primary'
+                        ? 'border border-primary bg-primary/10'
                         : 'hover:bg-muted/50'
                     }`}
                     onClick={() => seek(segment.time)}
                   >
                     <div className="flex items-start space-x-3">
-                      <div className="text-xs text-muted-foreground min-w-16">
+                      <div className="min-w-16 text-xs text-muted-foreground">
                         {formatTime(segment.time)}
                       </div>
                       <div className="flex-1">
-                        <div className="font-medium text-sm mb-1">
+                        <div className="mb-1 text-sm font-medium">
                           {segment.speaker}
                         </div>
                         <div className="text-sm">{segment.text}</div>
@@ -358,7 +406,7 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
                 <>
                   {/* Настроение */}
                   <div>
-                    <p className="text-sm font-medium mb-2">Настроение</p>
+                    <p className="mb-2 text-sm font-medium">Настроение</p>
                     <div className="flex items-center justify-between">
                       {getSentimentBadge(aiAnalysis.sentiment)}
                       <span className="text-sm text-muted-foreground">
@@ -369,31 +417,41 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
 
                   {/* Качество лида */}
                   <div>
-                    <p className="text-sm font-medium mb-2">Качество лида</p>
-                    <Badge variant={
-                      aiAnalysis.leadQuality === 'hot' ? 'destructive' :
-                      aiAnalysis.leadQuality === 'warm' ? 'warning' : 'secondary'
-                    }>
-                      {aiAnalysis.leadQuality === 'hot' ? 'Горячий' :
-                       aiAnalysis.leadQuality === 'warm' ? 'Теплый' : 'Холодный'}
+                    <p className="mb-2 text-sm font-medium">Качество лида</p>
+                    <Badge
+                      variant={
+                        aiAnalysis.leadQuality === 'hot'
+                          ? 'destructive'
+                          : aiAnalysis.leadQuality === 'warm'
+                            ? 'warning'
+                            : 'secondary'
+                      }
+                    >
+                      {aiAnalysis.leadQuality === 'hot'
+                        ? 'Горячий'
+                        : aiAnalysis.leadQuality === 'warm'
+                          ? 'Теплый'
+                          : 'Холодный'}
                     </Badge>
                   </div>
 
                   {/* Оценка удовлетворенности */}
                   <div>
-                    <p className="text-sm font-medium mb-2">Удовлетворенность</p>
+                    <p className="mb-2 text-sm font-medium">
+                      Удовлетворенность
+                    </p>
                     <div className="flex items-center space-x-1">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
                           className={`h-4 w-4 ${
                             i < aiAnalysis.satisfaction
-                              ? 'text-yellow-400 fill-yellow-400'
+                              ? 'fill-yellow-400 text-yellow-400'
                               : 'text-gray-300'
                           }`}
                         />
                       ))}
-                      <span className="text-sm text-muted-foreground ml-2">
+                      <span className="ml-2 text-sm text-muted-foreground">
                         {aiAnalysis.satisfaction}/5
                       </span>
                     </div>
@@ -401,10 +459,14 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
 
                   {/* Ключевые темы */}
                   <div>
-                    <p className="text-sm font-medium mb-2">Ключевые темы</p>
+                    <p className="mb-2 text-sm font-medium">Ключевые темы</p>
                     <div className="flex flex-wrap gap-1">
                       {aiAnalysis.keyTopics.map((topic, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="text-xs"
+                        >
                           {topic}
                         </Badge>
                       ))}
@@ -413,7 +475,7 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
 
                   {/* Резюме */}
                   <div>
-                    <p className="text-sm font-medium mb-2">Резюме</p>
+                    <p className="mb-2 text-sm font-medium">Резюме</p>
                     <p className="text-sm text-muted-foreground">
                       {aiAnalysis.summary}
                     </p>
@@ -421,10 +483,15 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
 
                   {/* Действия */}
                   <div>
-                    <p className="text-sm font-medium mb-2">Рекомендуемые действия</p>
+                    <p className="mb-2 text-sm font-medium">
+                      Рекомендуемые действия
+                    </p>
                     <ul className="space-y-1">
                       {aiAnalysis.actionItems.map((action, index) => (
-                        <li key={index} className="text-sm text-muted-foreground flex items-start space-x-2">
+                        <li
+                          key={index}
+                          className="flex items-start space-x-2 text-sm text-muted-foreground"
+                        >
                           <span className="text-primary">•</span>
                           <span>{action}</span>
                         </li>
@@ -433,8 +500,8 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
                   </div>
                 </>
               ) : (
-                <div className="text-center py-4">
-                  <Brain className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
+                <div className="py-4 text-center">
+                  <Brain className="mx-auto mb-2 h-12 w-12 text-muted-foreground" />
                   <p className="text-muted-foreground">AI анализ недоступен</p>
                 </div>
               )}
@@ -451,10 +518,10 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
             </CardHeader>
             <CardContent>
               <textarea
-                className="w-full h-32 p-3 border rounded-md resize-none text-sm"
+                className="h-32 w-full resize-none rounded-md border p-3 text-sm"
                 placeholder="Добавьте заметки к этому звонку..."
               />
-              <Button className="w-full mt-3" size="sm">
+              <Button className="mt-3 w-full" size="sm">
                 Сохранить заметки
               </Button>
             </CardContent>
@@ -465,4 +532,4 @@ const CallDetailScreen = ({ callId }: CallDetailScreenProps) => {
   );
 };
 
-export default CallDetailScreen; 
+export default CallDetails;

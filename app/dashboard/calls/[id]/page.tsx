@@ -1,10 +1,14 @@
-import CallDetailScreen from '@/components/screens/dashboard/call-detail/call-detail';
+import { FC } from 'react';
+import CallDetails from '@/components/screens/dashboard/call-details/call-details';
 
-interface CallDetailPageProps {
+interface CallDetailsPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function CallDetailPage({ params }: CallDetailPageProps) {
+const CallDetailsPage: FC<CallDetailsPageProps> = async ({ params }) => {
   const { id } = await params;
-  return <CallDetailScreen callId={id} />;
-} 
+
+  return <CallDetails callId={id} />;
+};
+
+export default CallDetailsPage;

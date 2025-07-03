@@ -1,5 +1,7 @@
-import CallsJournalScreen from '@/components/screens/dashboard/calls-journal/calls-journal';
+import CallJournal from '@/components/screens/dashboard/call-journal/call-journal';
 
-export default function CallsPage() {
-  return <CallsJournalScreen />;
-} 
+const CallJournalPage = () => {
+  return <CallJournal />;
+};
+
+export default CallJournalPage;
