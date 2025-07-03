@@ -14,7 +14,6 @@ import {
   User,
   Phone,
   Brain,
-  FileText,
   MessageSquare,
   Star,
 } from 'lucide-react';
@@ -23,10 +22,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCallAIAnalysis } from '@/services/api/queries/calls.queries';
 import {
+  TranscriptSegmentItem,
   useCallAnalysisQuery,
   useCallDetailsQuery,
   useCallTranscriptQuery,
 } from '@/services/api/calls-api';
+import { formatDuration } from './call-details.utils';
+import CallTranscript from './call-transcript/call-transcript';
 
 interface CallDetailsProps {
   callId: string;
@@ -36,9 +38,8 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  // const [volume] = useState(1);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [selectedTranscriptTime, setSelectedTranscriptTime] = useState<
+  const [selectedSegmentStart, setSelectedSegmentStart] = useState<
     number | null
   >(null);
 
@@ -52,59 +53,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     useCallAnalysisQuery(callId);
 
   // Получаем данные звонка и AI анализ
-  const { data: aiAnalysis, isLoading } = useCallAIAnalysis(callId);
-
-  // Mock данные звонка (в реальном приложении получали бы из API)
-  const callData = {
-    id: callId,
-    phoneNumber: '+3 (067) 123-45-67',
-    clientName: 'Михаил Козлов',
-    managerName: 'Анна Смирнова',
-    duration: 420,
-    date: new Date().toISOString(),
-    type: 'incoming' as const,
-    status: 'completed' as const,
-    recordingUrl: '/recordings/call-sample.mp3', // Это будет реальная ссылка
-  };
-
-  // Mock транскрипция с временными метками
-  const transcriptSegments = [
-    {
-      time: 0,
-      speaker: 'Менеджер',
-      text: 'Здравствуйте! Автосалон "Премиум", меня зовут Анна. Чем могу помочь?',
-    },
-    {
-      time: 8,
-      speaker: 'Клиент',
-      text: 'Добрый день! Я интересуюсь покупкой автомобиля. Хотел бы узнать о ваших предложениях.',
-    },
-    {
-      time: 18,
-      speaker: 'Менеджер',
-      text: 'Отлично! Какая марка и модель вас интересует? Какой у вас бюджет?',
-    },
-    {
-      time: 25,
-      speaker: 'Клиент',
-      text: 'Рассматриваю BMW X5 или Mercedes GLE. Бюджет до 6 миллионов рублей.',
-    },
-    {
-      time: 35,
-      speaker: 'Менеджер',
-      text: 'Прекрасный выбор! У нас есть несколько отличных вариантов в этом сегменте. Вы рассматриваете покупку в кредит или за наличные?',
-    },
-    {
-      time: 48,
-      speaker: 'Клиент',
-      text: 'Предпочел бы кредит. Какие у вас условия? И можно ли посмотреть автомобили сегодня?',
-    },
-    {
-      time: 58,
-      speaker: 'Менеджер',
-      text: 'Конечно! Кредит от 0.1% годовых. Trade-in тоже возможен. Приезжайте сегодня после 14:00, покажу все модели.',
-    },
-  ];
+  const { data: aiAnalysis } = useCallAIAnalysis(callId);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -140,7 +89,6 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
 
     audio.currentTime = time;
     setCurrentTime(time);
-    setSelectedTranscriptTime(time);
   };
 
   const skipTime = (seconds: number) => {
@@ -151,10 +99,9 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     seek(newTime);
   };
 
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  const handleSegmentClick = (segment: TranscriptSegmentItem) => {
+    setSelectedSegmentStart(segment.start_ms);
+    seek(segment.start_ms / 1000);
   };
 
   const getSentimentBadge = (sentiment: string) => {
@@ -163,13 +110,11 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
       negative: 'destructive' as const,
       neutral: 'warning' as const,
     };
-
     const labels = {
       positive: 'Позитивный',
       negative: 'Негативный',
       neutral: 'Нейтральный',
     };
-
     return (
       <Badge variant={variants[sentiment as keyof typeof variants]}>
         {labels[sentiment as keyof typeof labels]}
@@ -177,7 +122,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     );
   };
 
-  if (isLoading) {
+  if (detailsPending) {
     return (
       <div className="container mx-auto p-6">
         <div className="animate-pulse">
@@ -193,22 +138,26 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
       </div>
     );
   }
-
+  if (!details) {
+    return null;
+  }
   return (
     <div className="container mx-auto max-w-7xl space-y-6 p-6">
       {/* Хедер */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/dashboard" className="flex items-center space-x-1">
+            <Link href="/dashboard/calls" className="cursor-default space-x-1">
               <ArrowLeft className="h-4 w-4" />
-              <span>Назад к дашборду</span>
+              <span>Назад к звонкам</span>
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Звонок #{callId}</h1>
+            <h1 className="text-2xl font-bold">
+              Звонок {details.client_name || details.phone_number}
+            </h1>
             <p className="text-muted-foreground">
-              {new Date(callData.date).toLocaleString('ru-RU')}
+              {new Date(details.created_at).toLocaleString('ru-RU')}
             </p>
           </div>
         </div>
@@ -231,21 +180,27 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
                     <p className="text-sm text-muted-foreground">
                       Номер телефона
                     </p>
-                    <p className="font-medium">{callData.phoneNumber}</p>
+                    <p className="font-medium">
+                      {details.phone_number || 'Нет номера'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <User className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Клиент</p>
-                    <p className="font-medium">{callData.clientName}</p>
+                    <p className="font-medium">
+                      {details.client_name || 'Нет названия'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <User className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Менеджер</p>
-                    <p className="font-medium">{callData.managerName}</p>
+                    <p className="font-medium">
+                      {details.manager_name || 'Нет имени'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -255,7 +210,9 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
                       Длительность
                     </p>
                     <p className="font-medium">
-                      {formatTime(callData.duration)}
+                      {details.duration_seconds
+                        ? formatDuration(details.duration_seconds)
+                        : 'Нет данных'}
                     </p>
                   </div>
                 </div>
@@ -274,7 +231,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             <CardContent className="space-y-4">
               <audio
                 ref={audioRef}
-                src={callData.recordingUrl}
+                // src="/recordings/call-sample.mp3"
                 onEnded={() => setIsPlaying(false)}
                 className="hidden"
               />
@@ -282,8 +239,8 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
               {/* Прогресс бар */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{formatTime(currentTime)}</span>
-                  <span>{formatTime(duration)}</span>
+                  <span>{formatDuration(currentTime)}</span>
+                  <span>{formatDuration(duration)}</span>
                 </div>
                 <div
                   className="h-2 w-full cursor-pointer rounded-full bg-gray-200"
@@ -354,41 +311,12 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
           </Card>
 
           {/* Транскрипция */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FileText className="h-5 w-5" />
-                <span>Транскрипция</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="max-h-96 space-y-4 overflow-y-auto">
-                {transcriptSegments.map((segment, index) => (
-                  <div
-                    key={index}
-                    className={`cursor-pointer rounded-lg p-3 transition-colors ${
-                      selectedTranscriptTime === segment.time
-                        ? 'border border-primary bg-primary/10'
-                        : 'hover:bg-muted/50'
-                    }`}
-                    onClick={() => seek(segment.time)}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className="min-w-16 text-xs text-muted-foreground">
-                        {formatTime(segment.time)}
-                      </div>
-                      <div className="flex-1">
-                        <div className="mb-1 text-sm font-medium">
-                          {segment.speaker}
-                        </div>
-                        <div className="text-sm">{segment.text}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <CallTranscript
+            transcript={transcript}
+            transcriptPending={transcriptPending}
+            selectedSegmentStart={selectedSegmentStart}
+            onSegmentClick={handleSegmentClick}
+          />
         </div>
 
         {/* Боковая панель с AI анализом */}

@@ -84,6 +84,14 @@ export const useCallDetailsQuery = (
 
 // ============================================================================
 
+export interface TranscriptSegmentItem {
+  confidence: number | null;
+  end_ms: number;
+  speaker: string;
+  start_ms: number;
+  text: string;
+}
+
 export type CallTranscriptResponse = {
   call_id: string;
   created_at: string;
@@ -94,13 +102,7 @@ export type CallTranscriptResponse = {
   overall_confidence: number | null;
   processing_time_ms: number;
   retry_count: number;
-  segments: Array<{
-    confidence: number | null;
-    end_ms: number;
-    speaker: string;
-    start_ms: number;
-    text: string;
-  }>;
+  segments: TranscriptSegmentItem[];
   silence_duration_ms: number | null;
   speaker_labels: unknown;
   speakers_count: number;
