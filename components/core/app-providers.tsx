@@ -15,6 +15,7 @@ const AppProviders: FC<PropsWithChildren> = ({ children }) => {
       defaultOptions: {
         queries: {
           staleTime: 120 * 1000, // 2 minutes
+          retry: 1,
         },
       },
     });

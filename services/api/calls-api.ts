@@ -1,6 +1,12 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  UseQueryOptions,
+} from '@tanstack/react-query';
 import { PostgrestError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase-config';
+import { supabaseUrl } from '@/lib/environment';
 
 // General types
 
@@ -179,5 +185,60 @@ export const useCallAnalysisQuery = (
       return data;
     },
     ...queryOptions,
+  });
+};
+
+// ============================================================================
+// Upload Call Mutation
+// Invalidate: ['calls']
+
+export interface UploadCallParams {
+  file: File;
+  managerName: string;
+  callType: 'incoming' | 'outgoing';
+  phoneNumber?: string;
+  clientName?: string;
+}
+
+export const useUploadCallMutation = (
+  mutationOptions?: UseMutationOptions<void, Error, UploadCallParams>,
+) => {
+  return useMutation({
+    mutationFn: async (params) => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        throw new Error('No active session');
+      }
+
+      const formData = new FormData();
+      formData.append('file', params.file);
+      formData.append('managerName', params.managerName);
+      formData.append('callType', params.callType);
+
+      if (params.clientName) {
+        formData.append('clientName', params.clientName);
+      }
+      if (params.phoneNumber) {
+        formData.append('phoneNumber', params.phoneNumber);
+      }
+
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/upload-handler`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: formData,
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`Status: ${response.status}`);
+      }
+    },
+    ...mutationOptions,
   });
 };
