@@ -71,31 +71,31 @@ const DashboardSidebar = ({
     },
     {
       name: 'Аналитика',
-      href: '/dashboard/analytics',
+      href: '#',
       icon: BarChart3,
       current: pathname === '/dashboard/analytics',
     },
     {
       name: 'Менеджеры',
-      href: '/dashboard/managers',
+      href: '#',
       icon: Users,
       current: pathname === '/dashboard/managers',
     },
     {
       name: 'AI Анализ',
-      href: '/dashboard/ai-analysis',
+      href: '#',
       icon: Brain,
       current: pathname === '/dashboard/ai-analysis',
     },
     {
       name: 'Отчеты',
-      href: '/dashboard/reports',
+      href: '#',
       icon: FileText,
       current: pathname === '/dashboard/reports',
     },
     {
       name: 'Планировщик',
-      href: '/dashboard/scheduler',
+      href: '#',
       icon: Calendar,
       current: pathname === '/dashboard/scheduler',
     },
@@ -110,7 +110,7 @@ const DashboardSidebar = ({
   const secondaryNavigation = [
     {
       name: 'Настройки',
-      href: '/dashboard/settings',
+      href: '#',
       icon: Settings,
       current: pathname === '/dashboard/settings',
     },

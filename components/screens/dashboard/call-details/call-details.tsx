@@ -13,14 +13,10 @@ import {
   Clock,
   User,
   Phone,
-  Brain,
   MessageSquare,
-  Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useCallAIAnalysis } from '@/services/api/queries/calls.queries';
 import {
   TranscriptSegmentItem,
   useCallAnalysisQuery,
@@ -29,6 +25,7 @@ import {
 } from '@/services/api/calls-api';
 import { formatDuration } from './call-details.utils';
 import CallTranscript from './call-transcript/call-transcript';
+import AiAnalysis from './ai-analysis/ai-analysis';
 
 interface CallDetailsProps {
   callId: string;
@@ -51,9 +48,6 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     useCallTranscriptQuery(callId);
   const { data: analysis, isPending: analysisPending } =
     useCallAnalysisQuery(callId);
-
-  // Получаем данные звонка и AI анализ
-  const { data: aiAnalysis } = useCallAIAnalysis(callId);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -102,24 +96,6 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
   const handleSegmentClick = (segment: TranscriptSegmentItem) => {
     setSelectedSegmentStart(segment.start_ms);
     seek(segment.start_ms / 1000);
-  };
-
-  const getSentimentBadge = (sentiment: string) => {
-    const variants = {
-      positive: 'success' as const,
-      negative: 'destructive' as const,
-      neutral: 'warning' as const,
-    };
-    const labels = {
-      positive: 'Позитивный',
-      negative: 'Негативный',
-      neutral: 'Нейтральный',
-    };
-    return (
-      <Badge variant={variants[sentiment as keyof typeof variants]}>
-        {labels[sentiment as keyof typeof labels]}
-      </Badge>
-    );
   };
 
   if (detailsPending) {
@@ -322,119 +298,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
         {/* Боковая панель с AI анализом */}
         <div className="space-y-6">
           {/* AI Анализ */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Brain className="h-5 w-5" />
-                <span>AI Анализ</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {aiAnalysis ? (
-                <>
-                  {/* Настроение */}
-                  <div>
-                    <p className="mb-2 text-sm font-medium">Настроение</p>
-                    <div className="flex items-center justify-between">
-                      {getSentimentBadge(aiAnalysis.sentiment)}
-                      <span className="text-sm text-muted-foreground">
-                        {(aiAnalysis.sentimentScore * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Качество лида */}
-                  <div>
-                    <p className="mb-2 text-sm font-medium">Качество лида</p>
-                    <Badge
-                      variant={
-                        aiAnalysis.leadQuality === 'hot'
-                          ? 'destructive'
-                          : aiAnalysis.leadQuality === 'warm'
-                            ? 'warning'
-                            : 'secondary'
-                      }
-                    >
-                      {aiAnalysis.leadQuality === 'hot'
-                        ? 'Горячий'
-                        : aiAnalysis.leadQuality === 'warm'
-                          ? 'Теплый'
-                          : 'Холодный'}
-                    </Badge>
-                  </div>
-
-                  {/* Оценка удовлетворенности */}
-                  <div>
-                    <p className="mb-2 text-sm font-medium">
-                      Удовлетворенность
-                    </p>
-                    <div className="flex items-center space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < aiAnalysis.satisfaction
-                              ? 'fill-yellow-400 text-yellow-400'
-                              : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
-                      <span className="ml-2 text-sm text-muted-foreground">
-                        {aiAnalysis.satisfaction}/5
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Ключевые темы */}
-                  <div>
-                    <p className="mb-2 text-sm font-medium">Ключевые темы</p>
-                    <div className="flex flex-wrap gap-1">
-                      {aiAnalysis.keyTopics.map((topic, index) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="text-xs"
-                        >
-                          {topic}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Резюме */}
-                  <div>
-                    <p className="mb-2 text-sm font-medium">Резюме</p>
-                    <p className="text-sm text-muted-foreground">
-                      {aiAnalysis.summary}
-                    </p>
-                  </div>
-
-                  {/* Действия */}
-                  <div>
-                    <p className="mb-2 text-sm font-medium">
-                      Рекомендуемые действия
-                    </p>
-                    <ul className="space-y-1">
-                      {aiAnalysis.actionItems.map((action, index) => (
-                        <li
-                          key={index}
-                          className="flex items-start space-x-2 text-sm text-muted-foreground"
-                        >
-                          <span className="text-primary">•</span>
-                          <span>{action}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </>
-              ) : (
-                <div className="py-4 text-center">
-                  <Brain className="mx-auto mb-2 h-12 w-12 text-muted-foreground" />
-                  <p className="text-muted-foreground">AI анализ недоступен</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <AiAnalysis analysis={analysis} analysisPending={analysisPending} />
 
           {/* Заметки */}
           <Card>

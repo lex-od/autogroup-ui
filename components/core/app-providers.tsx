@@ -14,7 +14,7 @@ const AppProviders: FC<PropsWithChildren> = ({ children }) => {
     queryClientRef.current = new QueryClient({
       defaultOptions: {
         queries: {
-          staleTime: 60 * 1000, // 1 minute
+          staleTime: 120 * 1000, // 2 minutes
         },
       },
     });
