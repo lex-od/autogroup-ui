@@ -14,7 +14,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  FlaskConical,
+  CloudUpload,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -70,6 +70,12 @@ const DashboardSidebar = ({
       current: pathname.startsWith('/dashboard/calls'),
     },
     {
+      name: 'Загрузка звонка',
+      href: '/dashboard/upload-call',
+      icon: CloudUpload,
+      current: pathname === '/dashboard/upload-call',
+    },
+    {
       name: 'Аналитика',
       href: '#',
       icon: BarChart3,
@@ -98,12 +104,6 @@ const DashboardSidebar = ({
       href: '#',
       icon: Calendar,
       current: pathname === '/dashboard/scheduler',
-    },
-    {
-      name: 'Test features',
-      href: '/dashboard/test-features',
-      icon: FlaskConical,
-      current: pathname === '/dashboard/test-features',
     },
   ];
 
