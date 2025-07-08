@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SelectFieldOption } from '@/components/ui-custom/forms/select-field';
 
 export const uploadCallSchema = z.object({
   file: z
@@ -13,6 +14,11 @@ export const uploadCallSchema = z.object({
     }),
   managerName: z.string().trim().min(5, { message: 'Минимум 5 символов' }),
   callType: z.string().nonempty({ message: 'Обязательно' }),
-  phoneNumber: z.string().min(10, { message: 'Минимум 10 символов' }),
+  phoneNumber: z.string().trim().min(10, { message: 'Минимум 10 символов' }),
   clientName: z.string().trim().min(5, { message: 'Минимум 5 символов' }),
 });
+
+export const callTypeOptions: SelectFieldOption[] = [
+  { value: 'incoming', label: 'Входящий' },
+  { value: 'outgoing', label: 'Исходящий' },
+];

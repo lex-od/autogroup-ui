@@ -17,6 +17,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import SelectField from '@/components/ui-custom/forms/select-field';
+import { callTypeOptions } from './upload-call-form.utils';
 
 export interface UploadCallValues {
   file: File | null;
@@ -95,18 +97,15 @@ const UploadCallForm: FC<Props> = ({ form, onSubmit, isPending }) => {
                 </FormItem>
               )}
             />
-            <FormField
+            <SelectField
               control={form.control}
               name="callType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Тип звонка</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Введите тип звонка" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Тип звонка"
+              options={callTypeOptions}
+              placeholder="Выберите тип звонка"
+              triggerProps={{
+                className: 'min-w-60',
+              }}
             />
             <FormField
               control={form.control}

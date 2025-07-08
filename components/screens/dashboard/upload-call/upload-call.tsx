@@ -4,7 +4,10 @@ import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useUploadCallMutation } from '@/services/api/calls-api';
+import {
+  UploadCallParams,
+  useUploadCallMutation,
+} from '@/services/api/calls-api';
 import {
   UploadCallForm,
   uploadCallSchema,
@@ -35,11 +38,7 @@ const UploadCall = () => {
 
   const handleSubmit = useCallback(
     (values: UploadCallValues) => {
-      uploadCall({
-        ...values,
-        file: values.file!,
-        callType: 'outgoing',
-      });
+      uploadCall(values as UploadCallParams);
     },
     [uploadCall],
   );
