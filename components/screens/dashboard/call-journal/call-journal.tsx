@@ -203,8 +203,8 @@ const CallJournal = () => {
       <div className="mx-auto max-w-full space-y-4 p-4 lg:p-6">
         {/* Компактные KPI карточки */}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <Card className="bg-card/50">
-            <CardContent className="p-2">
+          <Card className="bg-card/50 py-4">
+            <CardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Всего звонков</p>
@@ -215,8 +215,8 @@ const CallJournal = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50">
-            <CardContent className="p-2">
+          <Card className="bg-card/50 py-4">
+            <CardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Сегодня</p>
@@ -227,8 +227,8 @@ const CallJournal = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50">
-            <CardContent className="p-2">
+          <Card className="bg-card/50 py-4">
+            <CardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Завершенные</p>
@@ -239,8 +239,8 @@ const CallJournal = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50">
-            <CardContent className="p-2">
+          <Card className="bg-card/50 py-4">
+            <CardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Пропущенные</p>

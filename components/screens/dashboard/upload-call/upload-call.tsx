@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 import {
   UploadCallParams,
   useUploadCallMutation,
@@ -20,8 +21,12 @@ const UploadCall = () => {
   const { mutate: uploadCall, isPending: uploadCallPending } =
     useUploadCallMutation({
       onSuccess: () => {
+        toast.success('Файл успешно загружен');
         form.reset();
         queryClient.invalidateQueries({ queryKey: ['calls'] });
+      },
+      onError: () => {
+        toast.error('Что-то пошло не так');
       },
     });
 
