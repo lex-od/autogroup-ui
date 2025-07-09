@@ -5,7 +5,7 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query';
 import { PostgrestError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase-config';
+import { supabase } from '@/lib/supabase';
 import { supabaseUrl } from '@/lib/environment';
 
 // General types

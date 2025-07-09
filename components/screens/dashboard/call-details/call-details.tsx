@@ -23,6 +23,7 @@ import {
   useCallDetailsQuery,
   useCallTranscriptQuery,
 } from '@/services/api/calls-api';
+import { getPublicUrl } from '@/lib/supabase';
 import { formatDuration } from './call-details.utils';
 import CallTranscript from './call-transcript/call-transcript';
 import AiAnalysis from './ai-analysis/ai-analysis';
@@ -121,7 +122,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     <div className="mx-auto max-w-7xl space-y-6 p-6">
       {/* Хедер */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/dashboard/calls" className="cursor-default space-x-1">
               <ArrowLeft className="h-4 w-4" />
@@ -137,10 +138,18 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             </p>
           </div>
         </div>
-        <Button variant="outline" className="flex items-center space-x-1">
-          <Download className="h-4 w-4" />
-          <span>Скачать запись</span>
-        </Button>
+        {details.storage_path && (
+          <Button variant="outline" className="cursor-default" asChild>
+            <a
+              href={getPublicUrl('call-recordings', details.storage_path, {
+                download: true,
+              })}
+            >
+              <Download />
+              <span>Скачать запись</span>
+            </a>
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

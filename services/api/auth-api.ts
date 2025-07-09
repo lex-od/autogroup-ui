@@ -10,7 +10,7 @@ import {
   useQuery,
   UseQueryOptions,
 } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase-config';
+import { supabase } from '@/lib/supabase';
 
 export const useLoginMutation = (
   mutationOptions?: UseMutationOptions<
