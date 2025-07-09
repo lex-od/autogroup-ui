@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Search,
@@ -11,18 +11,18 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  Play,
   Brain,
   MoreVertical,
-  Eye,
   Trash2,
   PhoneIncoming,
   PhoneOutgoing,
   ChevronDown,
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { VariantProps } from 'class-variance-authority';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
@@ -48,19 +48,16 @@ import {
   type DateRange,
 } from '@/components/ui/date-range-picker.legacy';
 import {
-  useCalls,
   useDeleteCall,
   useDeleteCalls,
 } from '@/services/api/queries/calls.queries';
-import { Call } from '@/services/api/queries/calls.queries';
-import { toast } from 'sonner';
+import { CallsItem, useCallsQuery } from '@/services/api/calls-api';
 
-const CallsJournalScreen = () => {
+const CallJournal = () => {
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(20);
   const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({
@@ -72,31 +69,13 @@ const CallsJournalScreen = () => {
     dateTo: '',
   });
 
+  const { data: calls, isPending: callsPending } = useCallsQuery();
+
   // Мутации
   const deleteCallMutation = useDeleteCall();
   const deleteCallsMutation = useDeleteCalls();
 
-  // Получаем данные звонков
-  const {
-    data: callsData,
-    isLoading,
-    refetch,
-  } = useCalls({
-    limit: pageSize,
-    offset: (currentPage - 1) * pageSize,
-    search: searchTerm,
-    ...filters,
-  });
-
-  const calls = callsData?.calls || [];
-  const totalCalls = callsData?.total || 0;
-  const totalPages = Math.ceil(totalCalls / pageSize);
-
-  // Обновляем данные при изменении фильтров
-  useEffect(() => {
-    setCurrentPage(1);
-    refetch();
-  }, [searchTerm, filters, refetch]);
+  const totalPages = 1;
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
@@ -123,11 +102,13 @@ const CallsJournalScreen = () => {
   };
 
   const handleSelectAll = () => {
+    if (!calls?.length) return;
+
     if (selectedCalls.length === calls.length) {
       setSelectedCalls([]);
-    } else {
-      setSelectedCalls(calls.map((call) => call.id));
+      return;
     }
+    setSelectedCalls(calls.map((call) => call.id));
   };
 
   const handleViewCall = (callId: string) => {
@@ -175,51 +156,35 @@ const CallsJournalScreen = () => {
     });
   };
 
-  const getStatusBadge = (status: Call['status']) => {
-    const variants = {
+  const getStatusBadge = (status: CallsItem['status']) => {
+    const variants: Record<
+      CallsItem['status'],
+      VariantProps<typeof badgeVariants>['variant']
+    > = {
+      uploaded: 'secondary',
+      processing: 'secondary',
+      transcribing: 'secondary',
+      analyzing: 'secondary',
       completed: 'default',
-      missed: 'destructive',
-      'in-progress': 'secondary',
-    } as const;
-
-    const labels = {
-      completed: 'Завершен',
-      missed: 'Пропущен',
-      'in-progress': 'В процессе',
+      failed: 'destructive',
     };
-
+    const labels: Record<CallsItem['status'], string> = {
+      uploaded: 'Загружен',
+      processing: 'Обработка',
+      transcribing: 'Транскрибация',
+      analyzing: 'Анализ',
+      completed: 'Завершен',
+      failed: 'Ошибка',
+    };
     return (
       <Badge variant={variants[status]} className="text-xs">
+        {status === 'completed' && <Brain className="mr-1 h-3 w-3" />}
         {labels[status]}
       </Badge>
     );
   };
 
-  const getSentimentBadge = (
-    sentiment?: 'positive' | 'negative' | 'neutral',
-  ) => {
-    if (!sentiment) return null;
-
-    const variants = {
-      positive: 'default',
-      negative: 'destructive',
-      neutral: 'secondary',
-    } as const;
-
-    const labels = {
-      positive: 'Позитивный',
-      negative: 'Негативный',
-      neutral: 'Нейтральный',
-    };
-
-    return (
-      <Badge variant={variants[sentiment]} className="text-xs">
-        {labels[sentiment]}
-      </Badge>
-    );
-  };
-
-  const getCallTypeIcon = (type: Call['type']) => {
+  const getCallTypeIcon = (type: CallsItem['call_type']) => {
     return type === 'incoming' ? (
       <div className="flex items-center space-x-1 text-green-600">
         <PhoneIncoming className="h-3 w-3" />
@@ -238,59 +203,48 @@ const CallsJournalScreen = () => {
       <div className="mx-auto max-w-full space-y-4 p-4 lg:p-6">
         {/* Компактные KPI карточки */}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <Card className="bg-card/50">
-            <CardContent className="p-2">
+          <Card className="bg-card/50 py-4">
+            <CardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Всего звонков</p>
-                  <p className="text-base font-bold">{totalCalls}</p>
+                  <p className="text-base font-bold">[no-data]</p>
                 </div>
                 <Phone className="h-3 w-3 text-muted-foreground" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50">
-            <CardContent className="p-2">
+          <Card className="bg-card/50 py-4">
+            <CardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Сегодня</p>
-                  <p className="text-base font-bold">
-                    {
-                      calls.filter((call) => {
-                        const today = new Date().toDateString();
-                        return new Date(call.date).toDateString() === today;
-                      }).length
-                    }
-                  </p>
+                  <p className="text-base font-bold">[no-data]</p>
                 </div>
                 <Calendar className="h-3 w-3 text-muted-foreground" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50">
-            <CardContent className="p-2">
+          <Card className="bg-card/50 py-4">
+            <CardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Завершенные</p>
-                  <p className="text-base font-bold">
-                    {calls.filter((call) => call.status === 'completed').length}
-                  </p>
+                  <p className="text-base font-bold">[no-data]</p>
                 </div>
                 <User className="h-3 w-3 text-muted-foreground" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50">
-            <CardContent className="p-2">
+          <Card className="bg-card/50 py-4">
+            <CardContent>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Пропущенные</p>
-                  <p className="text-base font-bold">
-                    {calls.filter((call) => call.status === 'missed').length}
-                  </p>
+                  <p className="text-base font-bold">[no-data]</p>
                 </div>
                 <Clock className="h-3 w-3 text-muted-foreground" />
               </div>
@@ -431,7 +385,7 @@ const CallsJournalScreen = () => {
         {/* Таблица звонков */}
         <Card>
           <CardContent className="p-0">
-            {isLoading ? (
+            {callsPending && (
               <div className="space-y-3 p-6">
                 {[...Array(5)].map((_, i) => (
                   <div
@@ -446,216 +400,203 @@ const CallsJournalScreen = () => {
                   </div>
                 ))}
               </div>
-            ) : calls.length > 0 ? (
-              <div className="space-y-4">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-b">
-                        <TableHead className="w-12">
-                          <input
-                            type="checkbox"
-                            checked={
-                              selectedCalls.length === calls.length &&
-                              calls.length > 0
-                            }
-                            onChange={handleSelectAll}
-                            className="rounded"
-                          />
-                        </TableHead>
-                        <TableHead>Тип</TableHead>
-                        <TableHead>Клиент / Телефон</TableHead>
-                        <TableHead>Менеджер</TableHead>
-                        <TableHead>Дата и время</TableHead>
-                        <TableHead>Длительность</TableHead>
-                        <TableHead>Статус</TableHead>
-                        <TableHead>AI Анализ</TableHead>
-                        <TableHead className="w-16">Действия</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {calls.map((call) => (
-                        <TableRow
-                          key={call.id}
-                          className="cursor-pointer border-b border-border/40 hover:bg-muted/50"
-                          onClick={() => handleViewCall(call.id)}
-                        >
-                          <TableCell
-                            onClick={(e: React.MouseEvent) =>
-                              e.stopPropagation()
-                            }
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedCalls.includes(call.id)}
-                              onChange={() => handleSelectCall(call.id)}
-                              className="rounded"
-                            />
-                          </TableCell>
-                          <TableCell>{getCallTypeIcon(call.type)}</TableCell>
-                          <TableCell>
-                            <div>
-                              <p className="font-medium">
-                                {call.clientName || 'Неизвестно'}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {call.phoneNumber}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <User className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-sm">
-                                {call.managerName}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <Calendar className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-sm">
-                                {formatDate(call.date)}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <Clock className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-sm">
-                                {formatDuration(call.duration)}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              {getStatusBadge(call.status)}
-                              {call.aiAnalysis?.sentiment &&
-                                getSentimentBadge(call.aiAnalysis.sentiment)}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {call.aiAnalysis ? (
-                              <Badge variant="default" className="text-xs">
-                                <Brain className="mr-1 h-3 w-3" />
-                                Готов
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="text-xs">
-                                Ожидает
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell
-                            onClick={(e: React.MouseEvent) =>
-                              e.stopPropagation()
-                            }
-                          >
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 w-8 p-0"
-                                >
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onClick={() => handleViewCall(call.id)}
-                                >
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  Просмотр
-                                </DropdownMenuItem>
-                                {call.recordingUrl && (
-                                  <DropdownMenuItem>
-                                    <Play className="mr-2 h-4 w-4" />
-                                    Прослушать
-                                  </DropdownMenuItem>
-                                )}
-                                <DropdownMenuItem
-                                  onClick={() => handleDeleteCall(call.id)}
-                                  className="text-destructive"
-                                >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Удалить
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                {/* Пагинация */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-between border-t p-4">
-                    <div className="text-sm text-muted-foreground">
-                      Страница {currentPage} из {totalPages}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setCurrentPage((prev) => Math.max(1, prev - 1))
-                        }
-                        disabled={currentPage === 1}
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                        Назад
-                      </Button>
-                      <div className="flex items-center space-x-1">
-                        {Array.from(
-                          { length: Math.min(5, totalPages) },
-                          (_, i) => {
-                            const pageNum =
-                              currentPage <= 3 ? i + 1 : currentPage - 2 + i;
-                            if (pageNum > totalPages) return null;
-                            return (
-                              <Button
-                                key={pageNum}
-                                variant={
-                                  currentPage === pageNum
-                                    ? 'default'
-                                    : 'outline'
-                                }
-                                size="sm"
-                                onClick={() => setCurrentPage(pageNum)}
-                                className="h-8 w-8 p-0"
-                              >
-                                {pageNum}
-                              </Button>
-                            );
-                          },
-                        )}
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(totalPages, prev + 1),
-                          )
-                        }
-                        disabled={currentPage === totalPages}
-                      >
-                        Вперед
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
+            )}
+            {!callsPending && (
+              <>
+                {!calls?.length && (
+                  <div className="py-12 text-center text-muted-foreground">
+                    <Phone className="mx-auto mb-2 h-12 w-12 opacity-50" />
+                    <p>Звонки не найдены</p>
+                    <p className="text-sm">
+                      Попробуйте изменить критерии поиска
+                    </p>
                   </div>
                 )}
-              </div>
-            ) : (
-              <div className="py-12 text-center text-muted-foreground">
-                <Phone className="mx-auto mb-2 h-12 w-12 opacity-50" />
-                <p>Звонки не найдены</p>
-                <p className="text-sm">Попробуйте изменить критерии поиска</p>
-              </div>
+                {!!calls?.length && (
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="border-b">
+                            <TableHead className="w-12">
+                              <input
+                                type="checkbox"
+                                checked={
+                                  selectedCalls.length === calls.length &&
+                                  calls.length > 0
+                                }
+                                onChange={handleSelectAll}
+                                className="rounded"
+                              />
+                            </TableHead>
+                            <TableHead>Тип</TableHead>
+                            <TableHead>Клиент / Телефон</TableHead>
+                            <TableHead>Менеджер</TableHead>
+                            <TableHead>Дата и время</TableHead>
+                            <TableHead>Длительность</TableHead>
+                            <TableHead>Статус</TableHead>
+                            <TableHead className="w-16">Действия</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {calls.map((call) => (
+                            <TableRow
+                              key={call.id}
+                              className="border-b border-border/40 hover:bg-muted/50"
+                              onClick={() => handleViewCall(call.id)}
+                            >
+                              <TableCell
+                                onClick={(e: React.MouseEvent) =>
+                                  e.stopPropagation()
+                                }
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedCalls.includes(call.id)}
+                                  onChange={() => handleSelectCall(call.id)}
+                                  className="rounded"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                {getCallTypeIcon(call.call_type)}
+                              </TableCell>
+                              <TableCell>
+                                <div>
+                                  <p className="font-medium">
+                                    {call.client_name}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {call.phone_number}
+                                  </p>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center space-x-2">
+                                  <User className="h-3 w-3 text-muted-foreground" />
+                                  <span className="text-sm">
+                                    {call.manager_name}
+                                  </span>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                {call.call_date && (
+                                  <div className="flex items-center space-x-2">
+                                    <Calendar className="h-3 w-3 text-muted-foreground" />
+                                    <span className="text-sm">
+                                      {formatDate(call.call_date)}
+                                    </span>
+                                  </div>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {call.duration_seconds !== null && (
+                                  <div className="flex items-center space-x-2">
+                                    <Clock className="h-3 w-3 text-muted-foreground" />
+                                    <span className="text-sm">
+                                      {formatDuration(call.duration_seconds)}
+                                    </span>
+                                  </div>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {getStatusBadge(call.status)}
+                              </TableCell>
+                              <TableCell
+                                onClick={(e: React.MouseEvent) =>
+                                  e.stopPropagation()
+                                }
+                              >
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      onClick={() => handleDeleteCall(call.id)}
+                                      className="text-destructive"
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Удалить
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+
+                    {/* Пагинация */}
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-between border-t p-4">
+                        <div className="text-sm text-muted-foreground">
+                          Страница {currentPage} из {totalPages}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              setCurrentPage((prev) => Math.max(1, prev - 1))
+                            }
+                            disabled={currentPage === 1}
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            Назад
+                          </Button>
+                          <div className="flex items-center space-x-1">
+                            {Array.from(
+                              { length: Math.min(5, totalPages) },
+                              (_, i) => {
+                                const pageNum =
+                                  currentPage <= 3
+                                    ? i + 1
+                                    : currentPage - 2 + i;
+                                if (pageNum > totalPages) return null;
+                                return (
+                                  <Button
+                                    key={pageNum}
+                                    variant={
+                                      currentPage === pageNum
+                                        ? 'default'
+                                        : 'outline'
+                                    }
+                                    size="sm"
+                                    onClick={() => setCurrentPage(pageNum)}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    {pageNum}
+                                  </Button>
+                                );
+                              },
+                            )}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              setCurrentPage((prev) =>
+                                Math.min(totalPages, prev + 1),
+                              )
+                            }
+                            disabled={currentPage === totalPages}
+                          >
+                            Вперед
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
@@ -664,4 +605,4 @@ const CallsJournalScreen = () => {
   );
 };
 
-export default CallsJournalScreen;
+export default CallJournal;

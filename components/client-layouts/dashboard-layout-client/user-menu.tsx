@@ -11,7 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useLogoutMutation } from '@/services/api/auth-api';
+import {
+  useCurrentUserQuery,
+  useLogoutMutation,
+} from '@/services/api/auth-api';
 
 interface UserInfoProps {
   compact?: boolean;
@@ -20,14 +23,21 @@ interface UserInfoProps {
 const UserMenu = ({ compact = false }: UserInfoProps) => {
   const queryClient = useQueryClient();
 
+  const { data: currUser, isPending: isCurrUserPending } =
+    useCurrentUserQuery();
+
   const logout = useLogoutMutation({
     onSuccess: () => {
       queryClient.clear();
     },
   });
 
-  const name = 'Администратор';
-  const email = 'admin@autogroup.ua';
+  const name = currUser?.user?.user_metadata.full_name as string | undefined;
+  const email = currUser?.user?.email;
+
+  if (isCurrUserPending) {
+    return null;
+  }
 
   return (
     <DropdownMenu>
