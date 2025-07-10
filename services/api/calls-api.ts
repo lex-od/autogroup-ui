@@ -34,7 +34,7 @@ interface Call {
     | 'analyzing'
     | 'completed'
     | 'failed';
-  storage_path: string | null;
+  storage_path: string;
   tags: unknown[];
   updated_at: string | null;
   user_id: string | null;

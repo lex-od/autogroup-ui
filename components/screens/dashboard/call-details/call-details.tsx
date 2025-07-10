@@ -51,12 +51,14 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     useCallAnalysisQuery(callId);
 
   useEffect(() => {
+    if (!audioRef.current) return;
     const audio = audioRef.current;
-    if (!audio) return;
 
+    if (!Number.isNaN(audio.duration)) {
+      setDuration(audio.duration);
+    }
     const updateTime = () => setCurrentTime(audio.currentTime);
     const updateDuration = () => setDuration(audio.duration);
-
     audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('loadedmetadata', updateDuration);
 
@@ -64,7 +66,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
       audio.removeEventListener('timeupdate', updateTime);
       audio.removeEventListener('loadedmetadata', updateDuration);
     };
-  }, []);
+  }, [details, detailsPending]);
 
   const togglePlayPause = () => {
     const audio = audioRef.current;
@@ -138,18 +140,16 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             </p>
           </div>
         </div>
-        {details.storage_path && (
-          <Button variant="outline" className="cursor-default" asChild>
-            <a
-              href={getPublicUrl('call-recordings', details.storage_path, {
-                download: true,
-              })}
-            >
-              <Download />
-              <span>Скачать запись</span>
-            </a>
-          </Button>
-        )}
+        <Button variant="outline" className="cursor-default" asChild>
+          <a
+            href={getPublicUrl('call-recordings', details.storage_path, {
+              download: true,
+            })}
+          >
+            <Download />
+            Скачать запись
+          </a>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -216,9 +216,8 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             <CardContent className="space-y-4">
               <audio
                 ref={audioRef}
-                // src="/recordings/call-sample.mp3"
+                src={getPublicUrl('call-recordings', details.storage_path)}
                 onEnded={() => setIsPlaying(false)}
-                className="hidden"
               />
 
               {/* Прогресс бар */}
