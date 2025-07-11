@@ -1,13 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import {
-  Play,
-  Pause,
-  SkipBack,
-  SkipForward,
-  Volume2,
   Download,
   ArrowLeft,
   Clock,
@@ -23,24 +18,22 @@ import {
   useCallDetailsQuery,
   useCallTranscriptQuery,
 } from '@/services/api/calls-api';
+import { getPublicUrl } from '@/lib/supabase';
 import { formatDuration } from './call-details.utils';
 import CallTranscript from './call-transcript/call-transcript';
 import AiAnalysis from './ai-analysis/ai-analysis';
+import AudioPlayer, { AudioPlayerHandle } from './audio-player/audio-player';
 
 interface CallDetailsProps {
   callId: string;
 }
 
 const CallDetails = ({ callId }: CallDetailsProps) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [playbackRate, setPlaybackRate] = useState(1);
   const [selectedSegmentStart, setSelectedSegmentStart] = useState<
     number | null
   >(null);
 
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const playerRef = useRef<AudioPlayerHandle>(null);
 
   const { data: details, isPending: detailsPending } =
     useCallDetailsQuery(callId);
@@ -49,53 +42,10 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
   const { data: analysis, isPending: analysisPending } =
     useCallAnalysisQuery(callId);
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const updateDuration = () => setDuration(audio.duration);
-
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', updateDuration);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', updateDuration);
-    };
-  }, []);
-
-  const togglePlayPause = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const seek = (time: number) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.currentTime = time;
-    setCurrentTime(time);
-  };
-
-  const skipTime = (seconds: number) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const newTime = Math.max(0, Math.min(duration, currentTime + seconds));
-    seek(newTime);
-  };
-
   const handleSegmentClick = (segment: TranscriptSegmentItem) => {
     setSelectedSegmentStart(segment.start_ms);
-    seek(segment.start_ms / 1000);
+    playerRef.current?.seek(segment.start_ms / 1000);
+    playerRef.current?.play();
   };
 
   if (detailsPending) {
@@ -121,7 +71,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     <div className="mx-auto max-w-7xl space-y-6 p-6">
       {/* Хедер */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/dashboard/calls" className="cursor-default space-x-1">
               <ArrowLeft className="h-4 w-4" />
@@ -137,9 +87,15 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             </p>
           </div>
         </div>
-        <Button variant="outline" className="flex items-center space-x-1">
-          <Download className="h-4 w-4" />
-          <span>Скачать запись</span>
+        <Button variant="outline" className="cursor-default" asChild>
+          <a
+            href={getPublicUrl('call-recordings', details.storage_path, {
+              download: true,
+            })}
+          >
+            <Download />
+            Скачать запись
+          </a>
         </Button>
       </div>
 
@@ -197,94 +153,10 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
           </Card>
 
           {/* Аудиоплеер */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Volume2 className="h-5 w-5" />
-                <span>Запись разговора</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <audio
-                ref={audioRef}
-                // src="/recordings/call-sample.mp3"
-                onEnded={() => setIsPlaying(false)}
-                className="hidden"
-              />
-
-              {/* Прогресс бар */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{formatDuration(currentTime)}</span>
-                  <span>{formatDuration(duration)}</span>
-                </div>
-                <div
-                  className="h-2 w-full cursor-pointer rounded-full bg-gray-200"
-                  onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const percent = (e.clientX - rect.left) / rect.width;
-                    seek(percent * duration);
-                  }}
-                >
-                  <div
-                    className="h-full rounded-full bg-primary transition-all"
-                    style={{ width: `${(currentTime / duration) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Контролы */}
-              <div className="flex items-center justify-center space-x-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => skipTime(-10)}
-                >
-                  <SkipBack className="h-4 w-4" />
-                </Button>
-
-                <Button
-                  size="lg"
-                  onClick={togglePlayPause}
-                  className="h-12 w-12 rounded-full"
-                >
-                  {isPlaying ? (
-                    <Pause className="h-6 w-6" />
-                  ) : (
-                    <Play className="h-6 w-6" />
-                  )}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => skipTime(10)}
-                >
-                  <SkipForward className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {/* Скорость воспроизведения */}
-              <div className="flex items-center justify-center space-x-2">
-                <span className="text-sm">Скорость:</span>
-                {[0.5, 1, 1.25, 1.5, 2].map((rate) => (
-                  <Button
-                    key={rate}
-                    variant={playbackRate === rate ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => {
-                      setPlaybackRate(rate);
-                      if (audioRef.current) {
-                        audioRef.current.playbackRate = rate;
-                      }
-                    }}
-                  >
-                    {rate}x
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <AudioPlayer
+            src={getPublicUrl('call-recordings', details.storage_path)}
+            ref={playerRef}
+          />
 
           {/* Транскрипция */}
           <CallTranscript

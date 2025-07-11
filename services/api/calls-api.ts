@@ -5,7 +5,7 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query';
 import { PostgrestError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase-config';
+import { supabase } from '@/lib/supabase';
 import { supabaseUrl } from '@/lib/environment';
 
 // General types
@@ -34,7 +34,7 @@ interface Call {
     | 'analyzing'
     | 'completed'
     | 'failed';
-  storage_path: string | null;
+  storage_path: string;
   tags: unknown[];
   updated_at: string | null;
   user_id: string | null;

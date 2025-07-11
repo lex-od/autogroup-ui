@@ -1,5 +1,6 @@
 import { FC, useEffect, useRef } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { LoaderCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -136,7 +137,8 @@ const UploadCallForm: FC<Props> = ({ form, onSubmit, isPending }) => {
 
             <div>
               <Button type="submit" disabled={isPending}>
-                Начать загрузку
+                {isPending && <LoaderCircle className="animate-spin" />}
+                {isPending ? 'Загрузка' : 'Начать загрузку'}
               </Button>
             </div>
           </form>

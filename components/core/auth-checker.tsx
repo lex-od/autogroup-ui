@@ -1,7 +1,7 @@
 'use client';
 
 import { FC, PropsWithChildren, useEffect } from 'react';
-import { supabase } from '@/lib/supabase-config';
+import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth/auth-store-provider';
 
 const AuthChecker: FC<PropsWithChildren> = ({ children }) => {
