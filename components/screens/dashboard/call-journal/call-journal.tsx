@@ -52,6 +52,7 @@ import {
   useDeleteCalls,
 } from '@/services/api/queries/calls.queries';
 import { CallsItem, useCallsQuery } from '@/services/api/calls-api';
+import CallTableSkeleton from './call-table-skeleton';
 
 const CallJournal = () => {
   const router = useRouter();
@@ -385,22 +386,8 @@ const CallJournal = () => {
         {/* Таблица звонков */}
         <Card>
           <CardContent className="p-0">
-            {callsPending && (
-              <div className="space-y-3 p-6">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="flex animate-pulse items-center space-x-4 rounded-lg p-3"
-                  >
-                    <div className="h-4 w-4 rounded bg-gray-200"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 w-1/4 rounded bg-gray-200"></div>
-                      <div className="h-3 w-1/2 rounded bg-gray-200"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {callsPending && <CallTableSkeleton />}
+
             {!callsPending && (
               <>
                 {!calls?.length && (
