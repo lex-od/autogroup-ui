@@ -1,65 +1,65 @@
-import { FC, RefObject, useState, useEffect, JSX } from 'react';
+import { FC, useState, useEffect, useRef, useImperativeHandle } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDuration } from '../call-details.utils';
 
+export interface AudioPlayerHandle {
+  play: () => void;
+  seek: (time: number) => void;
+}
 interface AudioPlayerProps {
-  src?: JSX.IntrinsicElements['audio']['src'];
-  audioRef: RefObject<HTMLAudioElement | null>;
+  src?: React.JSX.IntrinsicElements['audio']['src'];
+  ref: React.Ref<AudioPlayerHandle>;
 }
 
-const AudioPlayer: FC<AudioPlayerProps> = ({ src, audioRef }) => {
+const AudioPlayer: FC<AudioPlayerProps> = ({ src, ref }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [playbackRate, setPlaybackRate] = useState(1);
+  const [rate, setRate] = useState(1);
+
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useImperativeHandle(ref, () => ({ play, seek }), []);
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    if (!audioRef.current) return;
 
-    if (!Number.isNaN(audio.duration)) {
-      setDuration(audio.duration);
+    if (!Number.isNaN(audioRef.current.duration)) {
+      setDuration(audioRef.current.duration);
     }
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const updateDuration = () => setDuration(audio.duration);
+  }, [src]);
 
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', updateDuration);
+  const play = () => {
+    audioRef.current?.play();
+  };
 
-    return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', updateDuration);
-    };
-  }, [audioRef]);
+  const pause = () => {
+    audioRef.current?.pause();
+  };
 
   const togglePlayPause = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
     if (isPlaying) {
-      audio.pause();
+      pause();
     } else {
-      audio.play();
+      play();
     }
-    setIsPlaying(!isPlaying);
   };
 
-  const seek = (seconds: number) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.currentTime = seconds;
-    setCurrentTime(seconds);
+  const seek = (time: number) => {
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = time;
   };
 
-  const skipTime = (seconds: number) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const newTime = Math.max(0, Math.min(duration, currentTime + seconds));
+  const skipTime = (time: number) => {
+    const newTime = Math.max(0, Math.min(duration, currentTime + time));
     seek(newTime);
+  };
+
+  const setPlaybackRate = (playbackRate: number) => {
+    if (!audioRef.current) return;
+    audioRef.current.playbackRate = playbackRate;
   };
 
   return (
@@ -75,9 +75,12 @@ const AudioPlayer: FC<AudioPlayerProps> = ({ src, audioRef }) => {
         <audio
           ref={audioRef}
           src={src}
+          onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+          onPlay={() => setIsPlaying(true)}
+          onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+          onPause={() => setIsPlaying(false)}
           onEnded={() => setIsPlaying(false)}
-          // onLoadedMetadata={}
-          // onTimeUpdate={}
+          onRateChange={(e) => setRate(e.currentTarget.playbackRate)}
         />
 
         {/* Прогресс бар */}
@@ -87,7 +90,7 @@ const AudioPlayer: FC<AudioPlayerProps> = ({ src, audioRef }) => {
             <span>{formatDuration(duration)}</span>
           </div>
           <div
-            className="h-2 w-full cursor-pointer rounded-full bg-gray-200"
+            className="h-2 w-full rounded-full bg-gray-200"
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const percent = (e.clientX - rect.left) / rect.width;
@@ -126,19 +129,14 @@ const AudioPlayer: FC<AudioPlayerProps> = ({ src, audioRef }) => {
 
         {/* Скорость воспроизведения */}
         <div className="flex items-center justify-center space-x-2">
-          {[0.5, 1, 1.25, 1.5, 2].map((rate) => (
+          {[0.5, 1, 1.25, 1.5, 2].map((rateItem) => (
             <Button
-              key={rate}
-              variant={playbackRate === rate ? 'default' : 'outline'}
+              key={rateItem}
+              variant={rateItem === rate ? 'default' : 'outline'}
               size="sm"
-              onClick={() => {
-                if (audioRef.current) {
-                  audioRef.current.playbackRate = rate;
-                  setPlaybackRate(rate);
-                }
-              }}
+              onClick={() => setPlaybackRate(rateItem)}
             >
-              {rate}x
+              {rateItem}x
             </Button>
           ))}
         </div>

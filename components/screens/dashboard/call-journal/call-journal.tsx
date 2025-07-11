@@ -442,7 +442,7 @@ const CallJournal = () => {
                           {calls.map((call) => (
                             <TableRow
                               key={call.id}
-                              className="border-b border-border/40 hover:bg-muted/50"
+                              className="cursor-default border-b border-border/40 hover:bg-muted/50"
                               onClick={() => handleViewCall(call.id)}
                             >
                               <TableCell

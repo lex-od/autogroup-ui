@@ -22,7 +22,7 @@ import { getPublicUrl } from '@/lib/supabase';
 import { formatDuration } from './call-details.utils';
 import CallTranscript from './call-transcript/call-transcript';
 import AiAnalysis from './ai-analysis/ai-analysis';
-import AudioPlayer from './audio-player/audio-player';
+import AudioPlayer, { AudioPlayerHandle } from './audio-player/audio-player';
 
 interface CallDetailsProps {
   callId: string;
@@ -33,7 +33,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     number | null
   >(null);
 
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const playerRef = useRef<AudioPlayerHandle>(null);
 
   const { data: details, isPending: detailsPending } =
     useCallDetailsQuery(callId);
@@ -44,7 +44,8 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
 
   const handleSegmentClick = (segment: TranscriptSegmentItem) => {
     setSelectedSegmentStart(segment.start_ms);
-    // seek(segment.start_ms / 1000);
+    playerRef.current?.seek(segment.start_ms / 1000);
+    playerRef.current?.play();
   };
 
   if (detailsPending) {
@@ -154,7 +155,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
           {/* Аудиоплеер */}
           <AudioPlayer
             src={getPublicUrl('call-recordings', details.storage_path)}
-            audioRef={audioRef}
+            ref={playerRef}
           />
 
           {/* Транскрипция */}
