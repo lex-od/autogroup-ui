@@ -70,7 +70,12 @@ const CallJournal = () => {
     dateTo: '',
   });
 
-  const { data: calls, isPending: callsPending } = useCallsQuery();
+  const { data: calls, isPending: callsPending } = useCallsQuery({
+    dateFrom: null,
+    dateTo: null,
+    callType: null,
+    search: '',
+  });
 
   // Мутации
   const deleteCallMutation = useDeleteCall();

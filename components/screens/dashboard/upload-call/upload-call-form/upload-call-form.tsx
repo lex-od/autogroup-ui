@@ -66,7 +66,7 @@ const UploadCallForm: FC<Props> = ({ form, onSubmit, isPending }) => {
                 field: { value, onChange, ref: refCallback, ...rest },
               }) => (
                 <FormItem>
-                  <FormLabel>Файл звонка</FormLabel>
+                  <FormLabel>Файл звонка *</FormLabel>
                   <FormControl>
                     <Input
                       type="file"
@@ -90,7 +90,7 @@ const UploadCallForm: FC<Props> = ({ form, onSubmit, isPending }) => {
               name="managerName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Имя менеджера</FormLabel>
+                  <FormLabel>Имя менеджера *</FormLabel>
                   <FormControl>
                     <Input placeholder="Введите имя менеджера" {...field} />
                   </FormControl>
@@ -101,7 +101,7 @@ const UploadCallForm: FC<Props> = ({ form, onSubmit, isPending }) => {
             <SelectField
               control={form.control}
               name="callType"
-              label="Тип звонка"
+              label="Тип звонка *"
               options={callTypeOptions}
               placeholder="Выберите тип звонка"
               triggerProps={{
@@ -113,7 +113,7 @@ const UploadCallForm: FC<Props> = ({ form, onSubmit, isPending }) => {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Номер телефона</FormLabel>
+                  <FormLabel>Номер телефона *</FormLabel>
                   <FormControl>
                     <Input placeholder="Введите номер телефона" {...field} />
                   </FormControl>

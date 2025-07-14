@@ -9,11 +9,12 @@ import { supabase } from '@/lib/supabase';
 import { supabaseUrl } from '@/lib/environment';
 
 // General types
+export type CallType = 'incoming' | 'outgoing';
 
 interface Call {
   audio_format: null;
   call_date: null;
-  call_type: 'incoming' | 'outgoing';
+  call_type: CallType;
   client_name: string | null;
   created_at: string;
   duration_seconds: number | null;
@@ -42,19 +43,43 @@ interface Call {
 
 // ============================================================================
 
+export type CallsParams = {
+  dateFrom?: string | null;
+  dateTo?: string | null;
+  callType?: CallType | null;
+  search?: string;
+};
 export type CallsItem = Call;
 
 export const useCallsQuery = (
+  params?: CallsParams,
   queryOptions?: Partial<UseQueryOptions<CallsItem[], PostgrestError>>,
 ) => {
   return useQuery({
-    queryKey: ['calls'],
+    queryKey: ['calls', params],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { dateFrom, dateTo, callType, search } = params || {};
+
+      let query = supabase
         .from('calls')
         .select('*')
         .order('created_at', { ascending: false });
 
+      if (dateFrom) {
+        query = query.gte('created_at', dateFrom);
+      }
+      if (dateTo) {
+        query = query.lte('created_at', dateTo);
+      }
+      if (callType) {
+        query = query.eq('call_type', callType);
+      }
+      if (search) {
+        query = query.or(
+          `client_name.ilike.%${search}%,phone_number.ilike.%${search}%,manager_name.ilike.%${search}%`,
+        );
+      }
+      const { data, error } = await query;
       if (error) throw error;
 
       return data;
@@ -195,7 +220,7 @@ export const useCallAnalysisQuery = (
 export interface UploadCallParams {
   file: File;
   managerName: string;
-  callType: 'incoming' | 'outgoing';
+  callType: CallType;
   phoneNumber?: string;
   clientName?: string;
 }

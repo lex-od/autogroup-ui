@@ -15,7 +15,7 @@ export const uploadCallSchema = z.object({
   managerName: z.string().trim().min(5, { message: 'Минимум 5 символов' }),
   callType: z.string().nonempty({ message: 'Обязательно' }),
   phoneNumber: z.string().trim().min(10, { message: 'Минимум 10 символов' }),
-  clientName: z.string().trim().min(5, { message: 'Минимум 5 символов' }),
+  clientName: z.string(),
 });
 
 export const callTypeOptions: SelectFieldOption[] = [
