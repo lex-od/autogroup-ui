@@ -44,15 +44,12 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import {
-  DateRangePicker,
-  type DateRange,
-} from '@/components/ui/date-range-picker.legacy';
-import {
   useDeleteCall,
   useDeleteCalls,
 } from '@/services/api/queries/calls.queries';
 import { CallsItem, useCallsQuery } from '@/services/api/calls-api';
 import CallTableSkeleton from './call-table-skeleton';
+import CallJournalFilters from './call-journal-filters/call-journal-filters';
 
 const CallJournal = () => {
   const router = useRouter();
@@ -61,14 +58,6 @@ const CallJournal = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    status: 'all',
-    type: 'all',
-    sentiment: 'all',
-    manager: 'all',
-    dateFrom: '',
-    dateTo: '',
-  });
 
   const { data: calls, isPending: callsPending } = useCallsQuery({
     dateFrom: null,
@@ -85,18 +74,6 @@ const CallJournal = () => {
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
-  };
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleDateRangeChange = (range: DateRange) => {
-    setFilters((prev) => ({
-      ...prev,
-      dateFrom: range.from,
-      dateTo: range.to,
-    }));
   };
 
   const handleSelectCall = (callId: string) => {
@@ -297,94 +274,13 @@ const CallJournal = () => {
         {/* Выпадающий блок с фильтрами */}
         <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
           <CollapsibleContent>
-            <Card className="bg-muted/30">
-              <CardContent className="p-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
-                  {/* Период дат - двойной календарь */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Период</label>
-                    <DateRangePicker
-                      value={{
-                        from: filters.dateFrom,
-                        to: filters.dateTo,
-                      }}
-                      onChange={handleDateRangeChange}
-                      placeholder="Выберите период"
-                      className="w-full"
-                    />
-                  </div>
-
-                  {/* Статус */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Статус</label>
-                    <select
-                      className="w-full rounded-md border bg-background p-2 text-sm"
-                      value={filters.status}
-                      onChange={(e) =>
-                        handleFilterChange('status', e.target.value)
-                      }
-                    >
-                      <option value="all">Все статусы</option>
-                      <option value="completed">Завершенные</option>
-                      <option value="missed">Пропущенные</option>
-                      <option value="in-progress">В процессе</option>
-                    </select>
-                  </div>
-
-                  {/* Тип */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Тип</label>
-                    <select
-                      className="w-full rounded-md border bg-background p-2 text-sm"
-                      value={filters.type}
-                      onChange={(e) =>
-                        handleFilterChange('type', e.target.value)
-                      }
-                    >
-                      <option value="all">Все типы</option>
-                      <option value="incoming">Входящие</option>
-                      <option value="outgoing">Исходящие</option>
-                    </select>
-                  </div>
-
-                  {/* Настроение */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Настроение</label>
-                    <select
-                      className="w-full rounded-md border bg-background p-2 text-sm"
-                      value={filters.sentiment}
-                      onChange={(e) =>
-                        handleFilterChange('sentiment', e.target.value)
-                      }
-                    >
-                      <option value="all">Любое</option>
-                      <option value="positive">Позитивное</option>
-                      <option value="neutral">Нейтральное</option>
-                      <option value="negative">Негативное</option>
-                    </select>
-                  </div>
-
-                  {/* Менеджер */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Менеджер</label>
-                    <select
-                      className="w-full rounded-md border bg-background p-2 text-sm"
-                      value={filters.manager}
-                      onChange={(e) =>
-                        handleFilterChange('manager', e.target.value)
-                      }
-                    >
-                      <option value="all">Все менеджеры</option>
-                      <option value="Анна Смирнова">Анна Смирнова</option>
-                      <option value="Иван Петров">Иван Петров</option>
-                      <option value="Петр Иванов">Петр Иванов</option>
-                      <option value="Елена Кузнецова">Елена Кузнецова</option>
-                      <option value="Сергей Волков">Сергей Волков</option>
-                    </select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <CallJournalFilters
+              dateFrom=""
+              dateTo=""
+              onDateRangeChange={() => null}
+              callType="all"
+              onCallTypeChange={() => null}
+            />
           </CollapsibleContent>
         </Collapsible>
 
