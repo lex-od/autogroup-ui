@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { DateRange } from 'react-day-picker';
-import { ChevronDownIcon } from 'lucide-react';
+import { ru } from 'react-day-picker/locale';
+import { CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
@@ -16,6 +17,7 @@ export interface DateRangePickerProps {
   dateRange?: DateRange;
   onDateRangeChange: (dateRange?: DateRange) => void;
   label?: string;
+  placeholder?: string;
 }
 
 const DateRangePicker: FC<DateRangePickerProps> = ({
@@ -24,6 +26,7 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
   dateRange,
   onDateRangeChange,
   label,
+  placeholder = 'Выберите период',
 }) => {
   return (
     <div className="flex flex-col gap-2">
@@ -33,11 +36,12 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="w-48 justify-between font-normal"
+            className="w-full justify-between font-normal"
           >
-            {/* {date ? date.toLocaleDateString() : 'Select date'} */}
-            Select date
-            <ChevronDownIcon />
+            {dateRange?.from && dateRange?.to
+              ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
+              : placeholder}
+            <CalendarIcon />
           </Button>
         </PopoverTrigger>
 
@@ -48,6 +52,7 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
             selected={dateRange}
             onSelect={onDateRangeChange}
             numberOfMonths={2}
+            locale={ru}
           />
         </PopoverContent>
       </Popover>
