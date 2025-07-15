@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { VariantProps } from 'class-variance-authority';
+import { DateRange } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge, badgeVariants } from '@/components/ui/badge';
@@ -47,7 +48,7 @@ import {
   useDeleteCall,
   useDeleteCalls,
 } from '@/services/api/queries/calls.queries';
-import { CallsItem, useCallsQuery } from '@/services/api/calls-api';
+import { CallsItem, CallType, useCallsQuery } from '@/services/api/calls-api';
 import CallTableSkeleton from './call-table-skeleton';
 import CallJournalFilters from './call-journal-filters/call-journal-filters';
 
@@ -58,6 +59,11 @@ const CallJournal = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(2025, 5, 12),
+    to: new Date(2025, 6, 15),
+  });
+  const [callType, setCallType] = useState<CallType | 'all'>('all');
 
   const { data: calls, isPending: callsPending } = useCallsQuery({
     dateFrom: null,
@@ -275,11 +281,10 @@ const CallJournal = () => {
         <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
           <CollapsibleContent>
             <CallJournalFilters
-              dateFrom=""
-              dateTo=""
-              onDateRangeChange={() => null}
-              callType="all"
-              onCallTypeChange={() => null}
+              dateRange={dateRange}
+              onDateRangeChange={setDateRange}
+              callType={callType}
+              onCallTypeChange={setCallType}
             />
           </CollapsibleContent>
         </Collapsible>
