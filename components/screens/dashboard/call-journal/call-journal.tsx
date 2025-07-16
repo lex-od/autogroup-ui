@@ -48,7 +48,7 @@ import {
   useDeleteCall,
   useDeleteCalls,
 } from '@/services/api/queries/calls.queries';
-import { CallsItem, CallType, useCallsQuery } from '@/services/api/calls-api';
+import { CallsItem, useCallsQuery } from '@/services/api/calls-api';
 import CallTableSkeleton from './call-table-skeleton';
 import CallJournalFilters from './call-journal-filters/call-journal-filters';
 
@@ -63,7 +63,7 @@ const CallJournal = () => {
     from: new Date(2025, 5, 12),
     to: new Date(2025, 6, 15),
   });
-  const [callType, setCallType] = useState<CallType | 'all'>('all');
+  const [callType, setCallType] = useState('all');
 
   const { data: calls, isPending: callsPending } = useCallsQuery({
     dateFrom: null,

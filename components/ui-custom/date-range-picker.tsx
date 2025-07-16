@@ -10,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 export interface DateRangePickerProps {
   open: boolean;
@@ -18,6 +19,7 @@ export interface DateRangePickerProps {
   onDateRangeChange: (dateRange?: DateRange) => void;
   label?: string;
   placeholder?: string;
+  className?: string;
 }
 
 const DateRangePicker: FC<DateRangePickerProps> = ({
@@ -27,16 +29,17 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
   onDateRangeChange,
   label,
   placeholder = 'Выберите период',
+  className,
 }) => {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn('flex flex-col gap-2', className)}>
       {label && <Label className="px-1">{label}</Label>}
 
       <Popover open={open} onOpenChange={onOpenChange}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="w-full justify-between font-normal"
+            className="w-full justify-between font-normal hover:bg-background"
           >
             {dateRange?.from && dateRange?.to
               ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
