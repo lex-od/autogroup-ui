@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   Search,
   Filter,
@@ -21,6 +21,7 @@ import {
 import { toast } from 'sonner';
 import { VariantProps } from 'class-variance-authority';
 import { DateRange } from 'react-day-picker';
+import { endOfDay } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge, badgeVariants } from '@/components/ui/badge';
@@ -48,35 +49,69 @@ import {
   useDeleteCall,
   useDeleteCalls,
 } from '@/services/api/queries/calls.queries';
-import { CallsItem, useCallsQuery } from '@/services/api/calls-api';
+import { CallsItem, CallType, useCallsQuery } from '@/services/api/calls-api';
 import CallTableSkeleton from './call-table-skeleton';
 import CallJournalFilters from './call-journal-filters/call-journal-filters';
 
 const CallJournal = () => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: new Date(2025, 5, 12),
-    to: new Date(2025, 6, 15),
-  });
-  const [callType, setCallType] = useState('all');
+
+  const urlDateFrom = searchParams.get('from');
+  const urlDateTo = searchParams.get('to');
+  const urlCallType = searchParams.get('type') as CallType | null;
+  const totalPages = 1;
 
   const { data: calls, isPending: callsPending } = useCallsQuery({
-    dateFrom: null,
-    dateTo: null,
-    callType: null,
+    dateFrom: urlDateFrom,
+    dateTo: urlDateTo,
+    callType: urlCallType,
     search: '',
   });
-
-  // Мутации
   const deleteCallMutation = useDeleteCall();
   const deleteCallsMutation = useDeleteCalls();
 
-  const totalPages = 1;
+  const dateRange = useMemo(() => {
+    if (!urlDateFrom || !urlDateTo) {
+      return undefined;
+    }
+    return {
+      from: new Date(urlDateFrom),
+      to: new Date(urlDateTo),
+    };
+  }, [urlDateFrom, urlDateTo]);
+
+  const callType = urlCallType || 'all';
+
+  const setDateRangeToUrl = (range?: DateRange) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (range?.from && range?.to) {
+      params.set('from', range.from.toISOString());
+      params.set('to', endOfDay(range.to).toISOString());
+    } else {
+      params.delete('from');
+      params.delete('to');
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const setCallTypeToUrl = (type: string) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (type !== 'all') {
+      params.set('type', type);
+    } else {
+      params.delete('type');
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
@@ -282,9 +317,9 @@ const CallJournal = () => {
           <CollapsibleContent>
             <CallJournalFilters
               dateRange={dateRange}
-              onDateRangeChange={setDateRange}
+              onDateRangeChange={setDateRangeToUrl}
               callType={callType}
-              onCallTypeChange={setCallType}
+              onCallTypeChange={setCallTypeToUrl}
             />
           </CollapsibleContent>
         </Collapsible>
