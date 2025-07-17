@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   useMutation,
   UseMutationOptions,
   useQuery,
@@ -84,6 +85,7 @@ export const useCallsQuery = (
 
       return data;
     },
+    placeholderData: keepPreviousData,
     ...queryOptions,
   });
 };
