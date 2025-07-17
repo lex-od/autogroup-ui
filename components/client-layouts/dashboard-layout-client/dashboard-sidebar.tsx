@@ -6,12 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Phone,
-  BarChart3,
-  Users,
   Settings,
-  Brain,
-  FileText,
-  Calendar,
   ChevronLeft,
   ChevronRight,
   CloudUpload,
@@ -75,36 +70,36 @@ const DashboardSidebar = ({
       icon: CloudUpload,
       current: pathname === '/dashboard/upload-call',
     },
-    {
-      name: 'Аналитика',
-      href: '#',
-      icon: BarChart3,
-      current: pathname === '/dashboard/analytics',
-    },
-    {
-      name: 'Менеджеры',
-      href: '#',
-      icon: Users,
-      current: pathname === '/dashboard/managers',
-    },
-    {
-      name: 'AI Анализ',
-      href: '#',
-      icon: Brain,
-      current: pathname === '/dashboard/ai-analysis',
-    },
-    {
-      name: 'Отчеты',
-      href: '#',
-      icon: FileText,
-      current: pathname === '/dashboard/reports',
-    },
-    {
-      name: 'Планировщик',
-      href: '#',
-      icon: Calendar,
-      current: pathname === '/dashboard/scheduler',
-    },
+    // {
+    //   name: 'Аналитика',
+    //   href: '#',
+    //   icon: BarChart3,
+    //   current: pathname === '/dashboard/analytics',
+    // },
+    // {
+    //   name: 'Менеджеры',
+    //   href: '#',
+    //   icon: Users,
+    //   current: pathname === '/dashboard/managers',
+    // },
+    // {
+    //   name: 'AI Анализ',
+    //   href: '#',
+    //   icon: Brain,
+    //   current: pathname === '/dashboard/ai-analysis',
+    // },
+    // {
+    //   name: 'Отчеты',
+    //   href: '#',
+    //   icon: FileText,
+    //   current: pathname === '/dashboard/reports',
+    // },
+    // {
+    //   name: 'Планировщик',
+    //   href: '#',
+    //   icon: Calendar,
+    //   current: pathname === '/dashboard/scheduler',
+    // },
   ];
 
   const secondaryNavigation = [
