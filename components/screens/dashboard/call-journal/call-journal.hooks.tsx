@@ -1,8 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState } from 'react';
+import {
+  ReadonlyURLSearchParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
 import { DateRange } from 'react-day-picker';
 import { endOfDay } from 'date-fns';
-import { useDebounceValue } from 'usehooks-ts';
+import { useDebounceCallback } from 'usehooks-ts';
 import { CallType } from '@/services/api/calls-api';
 
 export const useCallSearchParams = () => {
@@ -16,9 +21,6 @@ export const useCallSearchParams = () => {
   const urlCallType = searchParams.get('type') as CallType | null;
 
   const [search, setSearch] = useState(urlSearch || '');
-
-  const isFirstRender = useRef(true);
-  const [debouncedSearch] = useDebounceValue(search, 400);
 
   const dateRange = useMemo(() => {
     if (!urlDateFrom || !urlDateTo) {
@@ -56,27 +58,31 @@ export const useCallSearchParams = () => {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  const setSearchToUrl = (search: string) => {
-    const params = new URLSearchParams(searchParams);
+  const setSearchToUrl = useCallback(
+    (search: string, searchParams: ReadonlyURLSearchParams) => {
+      const params = new URLSearchParams(searchParams);
 
-    if (search) {
-      params.set('search', search);
+      if (search) {
+        params.set('search', search);
+      } else {
+        params.delete('search');
+      }
+      router.replace(`${pathname}?${params.toString()}`);
+    },
+    [pathname, router],
+  );
+
+  const setSearchToUrlDebounced = useDebounceCallback(setSearchToUrl, 400);
+
+  const handleSearchChange = (search: string) => {
+    setSearch(search);
+
+    if (search.length !== 1) {
+      setSearchToUrlDebounced(search, searchParams);
     } else {
-      params.delete('search');
+      setSearchToUrlDebounced.cancel();
     }
-    router.replace(`${pathname}?${params.toString()}`);
   };
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    if (debouncedSearch.length !== 1) {
-      setSearchToUrl(debouncedSearch);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch]);
 
   return {
     urlSearch,
@@ -84,7 +90,7 @@ export const useCallSearchParams = () => {
     urlDateTo,
     urlCallType,
     search,
-    setSearch,
+    handleSearchChange,
     dateRange,
     callType,
     setDateRangeToUrl,

@@ -36,7 +36,7 @@ const CallJournal = () => {
     urlDateTo,
     urlCallType,
     search,
-    setSearch,
+    handleSearchChange,
     dateRange,
     callType,
     setDateRangeToUrl,
@@ -121,7 +121,7 @@ const CallJournal = () => {
         {/* Поиск и компактная кнопка фильтров */}
         <div className="flex items-center space-x-3">
           {/* Поиск */}
-          <CallSearchInput value={search} onChange={setSearch} />
+          <CallSearchInput value={search} onChange={handleSearchChange} />
 
           {/* Компактная кнопка фильтров */}
           <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
