@@ -1,9 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
-  Search,
   Filter,
   Phone,
   User,
@@ -15,8 +14,8 @@ import {
 import { toast } from 'sonner';
 import { DateRange } from 'react-day-picker';
 import { endOfDay } from 'date-fns';
+import { useDebounceValue } from 'usehooks-ts';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Collapsible,
@@ -27,26 +26,31 @@ import { useDeleteCalls } from '@/services/api/queries/calls.queries';
 import { CallType, useCallsQuery } from '@/services/api/calls-api';
 import CallJournalFilters from './call-journal-filters/call-journal-filters';
 import CallTable from './call-table/call-table';
+import CallSearchInput from './call-search-input';
 
 const CallJournal = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const urlDateFrom = searchParams.get('from');
+  const urlDateTo = searchParams.get('to');
+  const urlCallType = searchParams.get('type') as CallType | null;
+  const urlSearch = searchParams.get('search');
+
+  const [search, setSearch] = useState(urlSearch || '');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  const urlDateFrom = searchParams.get('from');
-  const urlDateTo = searchParams.get('to');
-  const urlCallType = searchParams.get('type') as CallType | null;
+  const isFirstRender = useRef(true);
+  const [debouncedSearch] = useDebounceValue(search, 400);
 
   const { data: calls, isPending: callsPending } = useCallsQuery({
     dateFrom: urlDateFrom,
     dateTo: urlDateTo,
     callType: urlCallType,
-    search: '',
+    search: urlSearch,
   });
   const deleteCallsMutation = useDeleteCalls();
 
@@ -72,7 +76,7 @@ const CallJournal = () => {
       params.delete('from');
       params.delete('to');
     }
-    router.push(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
   const setCallTypeToUrl = (type: string) => {
@@ -83,8 +87,30 @@ const CallJournal = () => {
     } else {
       params.delete('type');
     }
-    router.push(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`);
   };
+
+  const setSearchToUrl = (search: string) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (search) {
+      params.set('search', search);
+    } else {
+      params.delete('search');
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (debouncedSearch.length !== 1) {
+      setSearchToUrl(debouncedSearch);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
 
   const handleDeleteSelected = async () => {
     if (selectedCalls.length === 0) return;
@@ -156,15 +182,7 @@ const CallJournal = () => {
         {/* Поиск и компактная кнопка фильтров */}
         <div className="flex items-center space-x-3">
           {/* Поиск */}
-          <div className="relative flex-1">
-            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
-            <Input
-              placeholder="Поиск по номеру телефона, имени клиента или менеджеру..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+          <CallSearchInput value={search} onChange={setSearch} />
 
           {/* Компактная кнопка фильтров */}
           <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>

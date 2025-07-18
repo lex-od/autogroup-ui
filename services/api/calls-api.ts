@@ -48,7 +48,7 @@ export type CallsParams = {
   dateFrom?: string | null;
   dateTo?: string | null;
   callType?: CallType | null;
-  search?: string;
+  search?: string | null;
 };
 export type CallsItem = Call;
 
