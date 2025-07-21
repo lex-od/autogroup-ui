@@ -40,7 +40,7 @@ interface Props {
   calls?: CallsResponse;
   pending: boolean;
   currentPage: number;
-  onCurrentPageChange: React.Dispatch<React.SetStateAction<number>>;
+  onCurrentPageChange: (currentPage: number) => void;
   selectedCalls: string[];
   setSelectedCalls: React.Dispatch<React.SetStateAction<string[]>>;
 }
@@ -290,9 +290,7 @@ const CallTable: FC<Props> = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
-                          onCurrentPageChange((prev) => Math.max(1, prev - 1))
-                        }
+                        onClick={() => onCurrentPageChange(currentPage - 1)}
                         disabled={currentPage === 1}
                       >
                         <ChevronLeft className="h-4 w-4" />
@@ -326,11 +324,7 @@ const CallTable: FC<Props> = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
-                          onCurrentPageChange((prev) =>
-                            Math.min(totalPages, prev + 1),
-                          )
-                        }
+                        onClick={() => onCurrentPageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
                       >
                         Вперед

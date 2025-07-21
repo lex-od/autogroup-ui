@@ -27,19 +27,21 @@ import CallSearchInput from './call-search-input';
 import useCallSearchParams from './use-call-search-params';
 
 const CallJournal = () => {
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const {
+    urlCurrentPage,
     urlDateFrom,
     urlDateTo,
     urlCallType,
     urlSearch,
     search,
+    currentPage,
+    callType,
     isFiltersSet,
     dateRange,
-    callType,
+    setCurrentPageToUrl,
     setDateRangeToUrl,
     setCallTypeToUrl,
     handleSearchChange,
@@ -47,6 +49,7 @@ const CallJournal = () => {
   } = useCallSearchParams();
 
   const { data: calls, isPending: callsPending } = useCallsQuery({
+    page: urlCurrentPage ? Number(urlCurrentPage) : 1,
     dateFrom: urlDateFrom,
     dateTo: urlDateTo,
     callType: urlCallType,
@@ -176,7 +179,7 @@ const CallJournal = () => {
           calls={calls}
           pending={callsPending}
           currentPage={currentPage}
-          onCurrentPageChange={setCurrentPage}
+          onCurrentPageChange={setCurrentPageToUrl}
           selectedCalls={selectedCalls}
           setSelectedCalls={setSelectedCalls}
         />

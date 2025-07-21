@@ -15,6 +15,7 @@ const useCallSearchParams = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const urlCurrentPage = searchParams.get('page');
   const urlDateFrom = searchParams.get('from');
   const urlDateTo = searchParams.get('to');
   const urlCallType = searchParams.get('type') as CallType | null;
@@ -22,6 +23,8 @@ const useCallSearchParams = () => {
 
   const [search, setSearch] = useState(urlSearch || '');
 
+  const currentPage = urlCurrentPage ? Number(urlCurrentPage) : 1;
+  const callType = urlCallType || 'all';
   const isFiltersSet = urlDateFrom || urlDateTo || urlCallType || urlSearch;
 
   const dateRange = useMemo(() => {
@@ -34,7 +37,16 @@ const useCallSearchParams = () => {
     };
   }, [urlDateFrom, urlDateTo]);
 
-  const callType = urlCallType || 'all';
+  const setCurrentPageToUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (page > 1) {
+      params.set('page', String(page));
+    } else {
+      params.delete('page');
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
   const setDateRangeToUrl = (range?: DateRange) => {
     const params = new URLSearchParams(searchParams);
@@ -46,6 +58,7 @@ const useCallSearchParams = () => {
       params.delete('from');
       params.delete('to');
     }
+    params.delete('page');
     router.replace(`${pathname}?${params.toString()}`);
   };
 
@@ -57,6 +70,7 @@ const useCallSearchParams = () => {
     } else {
       params.delete('type');
     }
+    params.delete('page');
     router.replace(`${pathname}?${params.toString()}`);
   };
 
@@ -69,6 +83,7 @@ const useCallSearchParams = () => {
       } else {
         params.delete('search');
       }
+      params.delete('page');
       router.replace(`${pathname}?${params.toString()}`);
     },
     [pathname, router],
@@ -95,18 +110,22 @@ const useCallSearchParams = () => {
     params.delete('to');
     params.delete('type');
     params.delete('search');
+    params.delete('page');
     router.replace(`${pathname}?${params.toString()}`);
   };
 
   return {
+    urlCurrentPage,
     urlDateFrom,
     urlDateTo,
     urlCallType,
     urlSearch,
     search,
+    currentPage,
+    callType,
     isFiltersSet,
     dateRange,
-    callType,
+    setCurrentPageToUrl,
     setDateRangeToUrl,
     setCallTypeToUrl,
     handleSearchChange,
