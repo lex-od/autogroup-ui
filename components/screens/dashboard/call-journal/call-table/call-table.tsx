@@ -33,11 +33,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useDeleteCall } from '@/services/api/queries/calls.queries';
-import { CallsItem } from '@/services/api/calls-api';
+import { CallsItem, CallsResponse } from '@/services/api/calls-api';
 import CallTableSkeleton from './call-table-skeleton';
 
 interface Props {
-  calls?: CallsItem[];
+  calls?: CallsResponse;
   pending: boolean;
   currentPage: number;
   onCurrentPageChange: React.Dispatch<React.SetStateAction<number>>;
@@ -57,7 +57,7 @@ const CallTable: FC<Props> = ({
 
   const deleteCallMutation = useDeleteCall();
 
-  const totalPages = 1;
+  const totalPages = Math.ceil((calls?.total || 0) / 10);
 
   const handleSelectCall = (callId: string) => {
     setSelectedCalls((prev) =>
@@ -68,13 +68,13 @@ const CallTable: FC<Props> = ({
   };
 
   const handleSelectAll = () => {
-    if (!calls?.length) return;
+    if (!calls?.data.length) return;
 
-    if (selectedCalls.length === calls.length) {
+    if (selectedCalls.length === calls?.data.length) {
       setSelectedCalls([]);
       return;
     }
-    setSelectedCalls(calls.map((call) => call.id));
+    setSelectedCalls(calls?.data.map((call) => call.id));
   };
 
   const handleViewCall = (callId: string) => {
@@ -158,14 +158,15 @@ const CallTable: FC<Props> = ({
 
         {!pending && (
           <>
-            {!calls?.length && (
+            {!calls?.data.length && (
               <div className="py-12 text-center text-muted-foreground">
                 <Phone className="mx-auto mb-2 h-12 w-12 opacity-50" />
                 <p>Звонки не найдены</p>
                 <p className="text-sm">Попробуйте изменить критерии поиска</p>
               </div>
             )}
-            {!!calls?.length && (
+
+            {!!calls?.data.length && (
               <div className="space-y-4">
                 <div className="overflow-x-auto">
                   <Table>
@@ -174,10 +175,7 @@ const CallTable: FC<Props> = ({
                         <TableHead className="w-12">
                           <input
                             type="checkbox"
-                            checked={
-                              selectedCalls.length === calls.length &&
-                              calls.length > 0
-                            }
+                            checked={selectedCalls.length === calls.data.length}
                             onChange={handleSelectAll}
                             className="rounded"
                           />
@@ -192,7 +190,7 @@ const CallTable: FC<Props> = ({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {calls.map((call) => (
+                      {calls.data.map((call) => (
                         <TableRow
                           key={call.id}
                           className="cursor-default border-b border-border/40 hover:bg-muted/50"

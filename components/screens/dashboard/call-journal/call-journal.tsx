@@ -61,9 +61,8 @@ const CallJournal = () => {
       await deleteCallsMutation.mutateAsync(selectedCalls);
       toast.success(`Удалено звонков: ${selectedCalls.length}`);
       setSelectedCalls([]);
-    } catch (error) {
+    } catch {
       toast.error('Ошибка при удалении звонков');
-      console.error('Delete calls error:', error);
     }
   };
 
@@ -133,7 +132,8 @@ const CallJournal = () => {
               onClick={handleDeleteSelected}
               disabled={deleteCallsMutation.isPending}
             >
-              <Trash2 /> Удалить ({selectedCalls.length})
+              <Trash2 />
+              Удалить ({selectedCalls.length})
             </Button>
           )}
 
