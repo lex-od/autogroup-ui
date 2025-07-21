@@ -35,6 +35,7 @@ import {
 import { useDeleteCall } from '@/services/api/queries/calls.queries';
 import { CallsItem, CallsResponse } from '@/services/api/calls-api';
 import CallTableSkeleton from './call-table-skeleton';
+import CallTablePagination from './call-table-pagination';
 
 interface Props {
   calls?: CallsResponse;
@@ -281,7 +282,7 @@ const CallTable: FC<Props> = ({
                 </div>
 
                 {/* Пагинация */}
-                {totalPages > 1 && (
+                {/* {totalPages > 1 && (
                   <div className="flex items-center justify-between border-t p-4">
                     <div className="text-sm text-muted-foreground">
                       Страница {currentPage} из {totalPages}
@@ -332,6 +333,13 @@ const CallTable: FC<Props> = ({
                       </Button>
                     </div>
                   </div>
+                )} */}
+                {totalPages > 1 && (
+                  <CallTablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onCurrentPageChange={onCurrentPageChange}
+                  />
                 )}
               </div>
             )}
