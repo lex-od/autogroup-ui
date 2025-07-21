@@ -10,17 +10,19 @@ import { endOfDay } from 'date-fns';
 import { useDebounceCallback } from 'usehooks-ts';
 import { CallType } from '@/services/api/calls-api';
 
-export const useCallSearchParams = () => {
+const useCallSearchParams = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const urlSearch = searchParams.get('search');
   const urlDateFrom = searchParams.get('from');
   const urlDateTo = searchParams.get('to');
   const urlCallType = searchParams.get('type') as CallType | null;
+  const urlSearch = searchParams.get('search');
 
   const [search, setSearch] = useState(urlSearch || '');
+
+  const isFiltersSet = urlDateFrom || urlDateTo || urlCallType || urlSearch;
 
   const dateRange = useMemo(() => {
     if (!urlDateFrom || !urlDateTo) {
@@ -84,16 +86,32 @@ export const useCallSearchParams = () => {
     }
   };
 
+  const unsetAllFilters = () => {
+    setSearch('');
+    setSearchToUrlDebounced.cancel();
+
+    const params = new URLSearchParams(searchParams);
+    params.delete('from');
+    params.delete('to');
+    params.delete('type');
+    params.delete('search');
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
   return {
-    urlSearch,
     urlDateFrom,
     urlDateTo,
     urlCallType,
+    urlSearch,
     search,
-    handleSearchChange,
+    isFiltersSet,
     dateRange,
     callType,
     setDateRangeToUrl,
     setCallTypeToUrl,
+    handleSearchChange,
+    unsetAllFilters,
   };
 };
+
+export default useCallSearchParams;

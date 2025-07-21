@@ -9,6 +9,7 @@ import {
   Calendar,
   Trash2,
   ChevronDown,
+  FunnelX,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,7 @@ import { useCallsQuery } from '@/services/api/calls-api';
 import CallJournalFilters from './call-journal-filters/call-journal-filters';
 import CallTable from './call-table/call-table';
 import CallSearchInput from './call-search-input';
-import { useCallSearchParams } from './call-journal.hooks';
+import useCallSearchParams from './use-call-search-params';
 
 const CallJournal = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,16 +32,18 @@ const CallJournal = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const {
-    urlSearch,
     urlDateFrom,
     urlDateTo,
     urlCallType,
+    urlSearch,
     search,
-    handleSearchChange,
+    isFiltersSet,
     dateRange,
     callType,
     setDateRangeToUrl,
     setCallTypeToUrl,
+    handleSearchChange,
+    unsetAllFilters,
   } = useCallSearchParams();
 
   const { data: calls, isPending: callsPending } = useCallsQuery({
@@ -119,9 +122,32 @@ const CallJournal = () => {
         </div>
 
         {/* Поиск и компактная кнопка фильтров */}
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Поиск */}
           <CallSearchInput value={search} onChange={handleSearchChange} />
+
+          {/* Кнопка удаления выбранных */}
+          {selectedCalls.length > 0 && (
+            <Button
+              variant="secondary"
+              onClick={handleDeleteSelected}
+              disabled={deleteCallsMutation.isPending}
+            >
+              <Trash2 /> Удалить ({selectedCalls.length})
+            </Button>
+          )}
+
+          {/* Очистить фильтры и поиск */}
+          {isFiltersSet && (
+            <Button
+              variant="secondary"
+              size="icon"
+              title="Очистить все"
+              onClick={unsetAllFilters}
+            >
+              <FunnelX />
+            </Button>
+          )}
 
           {/* Компактная кнопка фильтров */}
           <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
@@ -131,19 +157,6 @@ const CallJournal = () => {
               <ChevronDown className="ml-2 h-4 w-4" />
             </CollapsibleTrigger>
           </Collapsible>
-
-          {/* Кнопка удаления выбранных */}
-          {selectedCalls.length > 0 && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteSelected}
-              disabled={deleteCallsMutation.isPending}
-            >
-              <Trash2 className="mr-1 h-4 w-4" />
-              Удалить ({selectedCalls.length})
-            </Button>
-          )}
         </div>
 
         {/* Выпадающий блок с фильтрами */}
