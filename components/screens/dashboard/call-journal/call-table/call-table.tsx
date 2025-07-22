@@ -5,8 +5,6 @@ import {
   User,
   Clock,
   Calendar,
-  ChevronLeft,
-  ChevronRight,
   Brain,
   MoreVertical,
   Trash2,
@@ -39,7 +37,7 @@ import CallTablePagination from './call-table-pagination';
 
 interface Props {
   calls?: CallsResponse;
-  pending: boolean;
+  callsPending: boolean;
   currentPage: number;
   onCurrentPageChange: (currentPage: number) => void;
   selectedCalls: string[];
@@ -48,7 +46,7 @@ interface Props {
 
 const CallTable: FC<Props> = ({
   calls,
-  pending,
+  callsPending,
   currentPage,
   onCurrentPageChange,
   selectedCalls,
@@ -153,11 +151,11 @@ const CallTable: FC<Props> = ({
   };
 
   return (
-    <Card>
+    <Card className="py-3">
       <CardContent className="p-0">
-        {pending && <CallTableSkeleton />}
+        {callsPending && <CallTableSkeleton />}
 
-        {!pending && (
+        {!callsPending && (
           <>
             {!calls?.data.length && (
               <div className="py-12 text-center text-muted-foreground">
@@ -190,6 +188,7 @@ const CallTable: FC<Props> = ({
                         <TableHead className="w-16">Действия</TableHead>
                       </TableRow>
                     </TableHeader>
+
                     <TableBody>
                       {calls.data.map((call) => (
                         <TableRow
@@ -282,58 +281,6 @@ const CallTable: FC<Props> = ({
                 </div>
 
                 {/* Пагинация */}
-                {/* {totalPages > 1 && (
-                  <div className="flex items-center justify-between border-t p-4">
-                    <div className="text-sm text-muted-foreground">
-                      Страница {currentPage} из {totalPages}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onCurrentPageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                        Назад
-                      </Button>
-                      <div className="flex items-center space-x-1">
-                        {Array.from(
-                          { length: Math.min(5, totalPages) },
-                          (_, i) => {
-                            const pageNum =
-                              currentPage <= 3 ? i + 1 : currentPage - 2 + i;
-                            if (pageNum > totalPages) return null;
-                            return (
-                              <Button
-                                key={pageNum}
-                                variant={
-                                  currentPage === pageNum
-                                    ? 'default'
-                                    : 'outline'
-                                }
-                                size="sm"
-                                onClick={() => onCurrentPageChange(pageNum)}
-                                className="h-8 w-8 p-0"
-                              >
-                                {pageNum}
-                              </Button>
-                            );
-                          },
-                        )}
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onCurrentPageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                      >
-                        Вперед
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                )} */}
                 {totalPages > 1 && (
                   <CallTablePagination
                     currentPage={currentPage}

@@ -74,7 +74,7 @@ const CallJournal = () => {
       <div className="mx-auto max-w-full space-y-4 p-4 lg:p-6">
         {/* Компактные KPI карточки */}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <Card className="bg-card/50 py-4">
+          <Card className="bg-card/50 py-3">
             <CardContent>
               <div className="flex items-center justify-between">
                 <div>
@@ -86,7 +86,7 @@ const CallJournal = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50 py-4">
+          <Card className="bg-card/50 py-3">
             <CardContent>
               <div className="flex items-center justify-between">
                 <div>
@@ -98,7 +98,7 @@ const CallJournal = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50 py-4">
+          <Card className="bg-card/50 py-3">
             <CardContent>
               <div className="flex items-center justify-between">
                 <div>
@@ -110,7 +110,7 @@ const CallJournal = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50 py-4">
+          <Card className="bg-card/50 py-3">
             <CardContent>
               <div className="flex items-center justify-between">
                 <div>
@@ -177,7 +177,7 @@ const CallJournal = () => {
         {/* Таблица звонков */}
         <CallTable
           calls={calls}
-          pending={callsPending}
+          callsPending={callsPending}
           currentPage={currentPage}
           onCurrentPageChange={setCurrentPageToUrl}
           selectedCalls={selectedCalls}

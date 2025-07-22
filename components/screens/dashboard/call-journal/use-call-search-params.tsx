@@ -25,7 +25,7 @@ const useCallSearchParams = () => {
 
   const currentPage = urlCurrentPage ? Number(urlCurrentPage) : 1;
   const callType = urlCallType || 'all';
-  const isFiltersSet = urlDateFrom || urlDateTo || urlCallType || urlSearch;
+  const isFiltersSet = !!(urlDateFrom || urlDateTo || urlCallType || urlSearch);
 
   const dateRange = useMemo(() => {
     if (!urlDateFrom || !urlDateTo) {
@@ -37,42 +37,51 @@ const useCallSearchParams = () => {
     };
   }, [urlDateFrom, urlDateTo]);
 
-  const setCurrentPageToUrl = (page: number) => {
-    const params = new URLSearchParams(searchParams);
+  const setCurrentPageToUrl = useCallback(
+    (page: number) => {
+      const params = new URLSearchParams(searchParams);
 
-    if (page > 1) {
-      params.set('page', String(page));
-    } else {
+      if (page > 1) {
+        params.set('page', String(page));
+      } else {
+        params.delete('page');
+      }
+      router.replace(`${pathname}?${params.toString()}`);
+    },
+    [pathname, router, searchParams],
+  );
+
+  const setDateRangeToUrl = useCallback(
+    (range?: DateRange) => {
+      const params = new URLSearchParams(searchParams);
+
+      if (range?.from && range?.to) {
+        params.set('from', range.from.toISOString());
+        params.set('to', endOfDay(range.to).toISOString());
+      } else {
+        params.delete('from');
+        params.delete('to');
+      }
       params.delete('page');
-    }
-    router.replace(`${pathname}?${params.toString()}`);
-  };
+      router.replace(`${pathname}?${params.toString()}`);
+    },
+    [pathname, router, searchParams],
+  );
 
-  const setDateRangeToUrl = (range?: DateRange) => {
-    const params = new URLSearchParams(searchParams);
+  const setCallTypeToUrl = useCallback(
+    (type: string) => {
+      const params = new URLSearchParams(searchParams);
 
-    if (range?.from && range?.to) {
-      params.set('from', range.from.toISOString());
-      params.set('to', endOfDay(range.to).toISOString());
-    } else {
-      params.delete('from');
-      params.delete('to');
-    }
-    params.delete('page');
-    router.replace(`${pathname}?${params.toString()}`);
-  };
-
-  const setCallTypeToUrl = (type: string) => {
-    const params = new URLSearchParams(searchParams);
-
-    if (type !== 'all') {
-      params.set('type', type);
-    } else {
-      params.delete('type');
-    }
-    params.delete('page');
-    router.replace(`${pathname}?${params.toString()}`);
-  };
+      if (type !== 'all') {
+        params.set('type', type);
+      } else {
+        params.delete('type');
+      }
+      params.delete('page');
+      router.replace(`${pathname}?${params.toString()}`);
+    },
+    [pathname, router, searchParams],
+  );
 
   const setSearchToUrl = useCallback(
     (search: string, searchParams: ReadonlyURLSearchParams) => {
@@ -91,17 +100,20 @@ const useCallSearchParams = () => {
 
   const setSearchToUrlDebounced = useDebounceCallback(setSearchToUrl, 400);
 
-  const handleSearchChange = (search: string) => {
-    setSearch(search);
+  const handleSearchChange = useCallback(
+    (search: string) => {
+      setSearch(search);
 
-    if (search.length !== 1) {
-      setSearchToUrlDebounced(search, searchParams);
-    } else {
-      setSearchToUrlDebounced.cancel();
-    }
-  };
+      if (search.length !== 1) {
+        setSearchToUrlDebounced(search, searchParams);
+      } else {
+        setSearchToUrlDebounced.cancel();
+      }
+    },
+    [searchParams, setSearchToUrlDebounced],
+  );
 
-  const unsetAllFilters = () => {
+  const unsetAllFilters = useCallback(() => {
     setSearch('');
     setSearchToUrlDebounced.cancel();
 
@@ -112,7 +124,7 @@ const useCallSearchParams = () => {
     params.delete('search');
     params.delete('page');
     router.replace(`${pathname}?${params.toString()}`);
-  };
+  }, [pathname, router, searchParams, setSearchToUrlDebounced]);
 
   return {
     urlCurrentPage,

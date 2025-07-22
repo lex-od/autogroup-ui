@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import {
   Pagination,
   PaginationButton,
@@ -20,7 +20,7 @@ const CallTablePagination: FC<Props> = ({
   totalPages,
   onCurrentPageChange,
 }) => {
-  const getPageNumbers = () => {
+  const pageStructure = useMemo(() => {
     const pages: (number | 'ellipsis')[] = [];
     // Всегда добавляем первую страницу
     pages.push(1);
@@ -67,36 +67,40 @@ const CallTablePagination: FC<Props> = ({
       pages.push(totalPages);
     }
     return pages;
-  };
+  }, [currentPage, totalPages]);
 
   return (
     <Pagination>
       <PaginationContent>
-        <PaginationItem>
+        <PaginationItem className="hidden sm:list-item">
           <PaginationPrevButton
             onClick={() => onCurrentPageChange(currentPage - 1)}
             disabled={currentPage === 1}
           />
         </PaginationItem>
 
-        {getPageNumbers().map((page, index) => (
-          <PaginationItem key={index}>
-            {page === 'ellipsis' ? (
-              <PaginationEllipsis />
-            ) : (
-              <PaginationButton
-                className="disabled:opacity-100"
-                isActive={page === currentPage}
-                disabled={page === currentPage}
-                onClick={() => onCurrentPageChange(page)}
-              >
-                {page}
-              </PaginationButton>
-            )}
-          </PaginationItem>
-        ))}
+        {pageStructure.map((page, index) => {
+          const isActive = page === currentPage;
 
-        <PaginationItem>
+          return (
+            <PaginationItem key={index}>
+              {page === 'ellipsis' ? (
+                <PaginationEllipsis />
+              ) : (
+                <PaginationButton
+                  className="disabled:opacity-100"
+                  isActive={isActive}
+                  disabled={isActive}
+                  onClick={() => onCurrentPageChange(page)}
+                >
+                  {page}
+                </PaginationButton>
+              )}
+            </PaginationItem>
+          );
+        })}
+
+        <PaginationItem className="hidden sm:list-item">
           <PaginationNextButton
             onClick={() => onCurrentPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
