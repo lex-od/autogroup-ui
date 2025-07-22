@@ -45,26 +45,41 @@ interface Call {
 // ============================================================================
 
 export type CallsParams = {
+  page?: number;
+  pageSize?: number;
   dateFrom?: string | null;
   dateTo?: string | null;
   callType?: CallType | null;
-  search?: string;
+  search?: string | null;
 };
 export type CallsItem = Call;
 
+export type CallsResponse = {
+  data: CallsItem[];
+  total: number;
+};
+
 export const useCallsQuery = (
   params?: CallsParams,
-  queryOptions?: Partial<UseQueryOptions<CallsItem[], PostgrestError>>,
+  queryOptions?: Partial<UseQueryOptions<CallsResponse, PostgrestError>>,
 ) => {
   return useQuery({
     queryKey: ['calls', params],
     queryFn: async () => {
-      const { dateFrom, dateTo, callType, search } = params || {};
+      const {
+        page = 1,
+        pageSize = 10,
+        dateFrom,
+        dateTo,
+        callType,
+        search,
+      } = params || {};
 
       let query = supabase
         .from('calls')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range((page - 1) * pageSize, page * pageSize - 1);
 
       if (dateFrom) {
         query = query.gte('created_at', dateFrom);
@@ -80,10 +95,13 @@ export const useCallsQuery = (
           `client_name.ilike.%${search}%,phone_number.ilike.%${search}%,manager_name.ilike.%${search}%`,
         );
       }
-      const { data, error } = await query;
+      const { data, error, count } = await query;
       if (error) throw error;
 
-      return data;
+      return {
+        data,
+        total: count as number,
+      };
     },
     placeholderData: keepPreviousData,
     ...queryOptions,
