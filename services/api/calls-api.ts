@@ -287,3 +287,49 @@ export const useUploadCallMutation = (
     ...mutationOptions,
   });
 };
+
+// ============================================================================
+
+export type CallCommentsParams = {
+  callId: string;
+  page?: number;
+  pageSize?: number;
+};
+export type CallCommentsItem = {
+  call_id: string;
+  comment_text: string;
+  created_at: string;
+  id: string;
+  user_id: string;
+};
+export type CallCommentsResponse = {
+  comments: CallCommentsItem[];
+  count: number;
+};
+
+export const useCallCommentsQuery = (
+  params: CallCommentsParams,
+  queryOptions?: Partial<UseQueryOptions<CallCommentsResponse, PostgrestError>>,
+) => {
+  return useQuery({
+    queryKey: ['call-comments', params],
+    queryFn: async () => {
+      const { callId, page = 1, pageSize = 10 } = params;
+
+      const { data, error, count } = await supabase
+        .from('call_comments')
+        .select('*', { count: 'exact' })
+        .eq('call_id', callId)
+        .order('created_at', { ascending: false })
+        .range((page - 1) * pageSize, page * pageSize - 1);
+
+      if (error) throw error;
+
+      return {
+        comments: data,
+        count: count as number,
+      };
+    },
+    ...queryOptions,
+  });
+};

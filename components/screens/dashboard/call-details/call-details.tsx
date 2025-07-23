@@ -2,16 +2,9 @@
 
 import { useState, useRef } from 'react';
 import Link from 'next/link';
-import {
-  Download,
-  ArrowLeft,
-  Clock,
-  User,
-  Phone,
-  MessageSquare,
-} from 'lucide-react';
+import { Download, ArrowLeft, Clock, User, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   TranscriptSegmentItem,
   useCallAnalysisQuery,
@@ -23,6 +16,7 @@ import { formatDuration } from './call-details.utils';
 import CallTranscript from './call-transcript/call-transcript';
 import AiAnalysis from './ai-analysis/ai-analysis';
 import AudioPlayer, { AudioPlayerHandle } from './audio-player/audio-player';
+import CallComments from './call-comments/call-comments';
 
 interface CallDetailsProps {
   callId: string;
@@ -173,23 +167,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
           <AiAnalysis analysis={analysis} analysisPending={analysisPending} />
 
           {/* Заметки */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <MessageSquare className="h-5 w-5" />
-                <span>Заметки</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <textarea
-                className="h-32 w-full resize-none rounded-md border p-3 text-sm"
-                placeholder="Добавьте заметки к этому звонку..."
-              />
-              <Button className="mt-3 w-full" size="sm">
-                Сохранить заметки
-              </Button>
-            </CardContent>
-          </Card>
+          <CallComments callId={callId} />
         </div>
       </div>
     </div>
