@@ -21,29 +21,27 @@ const CallJournalFilters: FC<Props> = ({
   const [isRangeOpen, setIsRangeOpen] = useState(false);
 
   return (
-    <Card className="bg-muted/30 py-4">
-      <CardContent className="px-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
-          {/* Период */}
-          <DateRangePicker
-            open={isRangeOpen}
-            onOpenChange={setIsRangeOpen}
-            dateRange={dateRange}
-            onDateRangeChange={onDateRangeChange}
-            label="Период"
-            placeholder="Все время"
-          />
+    <div className="bg-muted/30 rounded-lg p-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Период */}
+        <DateRangePicker
+          open={isRangeOpen}
+          onOpenChange={setIsRangeOpen}
+          dateRange={dateRange}
+          onDateRangeChange={onDateRangeChange}
+          label="Период"
+          placeholder="Все время"
+        />
 
-          {/* Тип звонка */}
-          <SelectBasic
-            value={callType}
-            onValueChange={onCallTypeChange}
-            options={callTypeOptions}
-            label="Тип звонка"
-          />
-        </div>
-      </CardContent>
-    </Card>
+        {/* Тип звонка */}
+        <SelectBasic
+          value={callType}
+          onValueChange={onCallTypeChange}
+          options={callTypeOptions}
+          label="Тип звонка"
+        />
+      </div>
+    </div>
   );
 };
 

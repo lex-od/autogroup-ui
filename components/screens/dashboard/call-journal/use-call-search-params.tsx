@@ -62,7 +62,7 @@ const useCallSearchParams = () => {
         params.delete('from');
         params.delete('to');
       }
-      params.delete('page');
+      // Не сбрасываем страницу при изменении фильтров
       router.replace(`${pathname}?${params.toString()}`);
     },
     [pathname, router, searchParams],
@@ -77,7 +77,7 @@ const useCallSearchParams = () => {
       } else {
         params.delete('type');
       }
-      params.delete('page');
+      // Не сбрасываем страницу при изменении фильтров
       router.replace(`${pathname}?${params.toString()}`);
     },
     [pathname, router, searchParams],
@@ -92,6 +92,7 @@ const useCallSearchParams = () => {
       } else {
         params.delete('search');
       }
+      // Сбрасываем страницу только при поиске
       params.delete('page');
       router.replace(`${pathname}?${params.toString()}`);
     },

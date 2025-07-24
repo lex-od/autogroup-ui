@@ -1,48 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-interface RouteParams {
-  params: Promise<{ id: string }>;
-}
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export async function POST(request: NextRequest, context: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
   try {
-    const { id: callId } = await context.params;
-
-    // В реальном приложении здесь будет:
-    // 1. Получение записи звонка
-    // 2. Отправка на AI сервис для анализа
-    // 3. Сохранение результатов в базу данных
-
-    // Имитируем процесс AI анализа
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    const mockAnalysis = {
-      id: `ai-${callId}`,
-      callId,
-      sentiment: 'positive',
-      sentimentScore: 0.75,
-      keyTopics: ['продажи', 'консультация', 'автомобиль'],
-      summary:
-        'Клиент проявил интерес к покупке автомобиля и получил подробную консультацию.',
-      actionItems: [
-        'Отправить коммерческое предложение',
-        'Назначить тест-драйв',
-      ],
-      leadQuality: 'warm',
-      satisfaction: 4,
-      transcription: 'Здравствуйте! Я хотел бы узнать о ваших автомобилях...',
-    };
-
-    return NextResponse.json({
-      success: true,
-      analysis: mockAnalysis,
-      message: 'AI анализ успешно завершен',
+    const { id } = context.params;
+    const authHeader = request.headers.get('Authorization');
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: {
+          Authorization: authHeader || ''
+        }
+      }
     });
+
+    // Получаем AI-анализ звонка
+    const { data: analysis, error: analysisError } = await supabase
+      .from('ai_analysis')
+      .select('*')
+      .eq('call_id', id)
+      .single();
+
+    if (analysisError) {
+      console.error('Error fetching AI analysis:', analysisError);
+      if (analysisError.code === 'PGRST116') {
+        return NextResponse.json(
+          { error: 'AI-анализ не найден' },
+          { status: 404 }
+        );
+      }
+      throw analysisError;
+    }
+
+    return NextResponse.json(analysis);
   } catch (error) {
-    console.error('Error starting AI analysis:', error);
+    console.error('AI Analysis API error:', error);
     return NextResponse.json(
-      { error: 'Failed to start AI analysis' },
-      { status: 500 },
+      { error: 'Внутренняя ошибка сервера' },
+      { status: 500 }
     );
   }
 }

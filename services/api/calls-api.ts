@@ -8,40 +8,61 @@ import {
 import { PostgrestError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { supabaseUrl } from '@/lib/environment';
+import { axiosBase as axiosClient } from '@/lib/axios-config';
 
 // General types
 export type CallType = 'incoming' | 'outgoing';
 
-interface Call {
-  audio_format: null;
-  call_date: null;
-  call_type: CallType;
-  client_name: string | null;
-  created_at: string;
-  duration_seconds: number | null;
-  error_details: null;
-  error_message: string | null;
-  file_size_bytes: number;
+export interface Call {
   id: string;
-  manager_name: string | null;
-  original_filename: string | null;
-  phone_number: string | null;
-  priority: 'normal';
-  processing_completed_at: string | null;
-  processing_started_at: string | null;
-  status:
-    | 'uploaded'
-    | 'processing'
-    | 'transcribing'
-    | 'analyzing'
-    | 'completed'
-    | 'failed';
-  storage_path: string;
-  tags: unknown[];
-  updated_at: string | null;
-  user_id: string | null;
+  phoneNumber: string | null;
+  clientName: string | null;
+  managerName: string | null;
+  duration: number | null;
+  callDate: string | null;
+  createdAt: string;
+  callType: CallType;
+  status: 'uploaded' | 'processing' | 'transcribing' | 'analyzing' | 'completed' | 'failed';
+  storagePath?: string;
+  aiAnalysis?: any;
 }
 
+// ============================================================================
+// Calls Stats API
+// ============================================================================
+
+export interface CallStats {
+  totalCalls: number;
+  todayCalls: number;
+  completedCalls: number;
+  failedCalls: number;
+  avgDuration: number;
+  avgServiceQuality: number;
+  topSentiments: Array<{ sentiment: string; count: number }>;
+  topTopics: Array<{ topic: string; count: number }>;
+  managerStats: Array<{
+    manager: string;
+    calls: number;
+    avgQuality: number;
+  }>;
+}
+
+export const useCallStatsQuery = (
+  queryOptions?: Partial<UseQueryOptions<CallStats, Error>>,
+) => {
+  return useQuery({
+    queryKey: ['call-stats'],
+    queryFn: async () => {
+      const response = await axiosClient.get('/calls/stats');
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000, // 5 минут
+    ...queryOptions,
+  });
+};
+
+// ============================================================================
+// Calls List API (updated to use API endpoint)
 // ============================================================================
 
 export type CallsParams = {
@@ -51,17 +72,22 @@ export type CallsParams = {
   dateTo?: string | null;
   callType?: CallType | null;
   search?: string | null;
+  status?: Call['status'] | null;
+  manager?: string | null;
+  sentiment?: string | null;
 };
 export type CallsItem = Call;
 
 export type CallsResponse = {
   data: CallsItem[];
   total: number;
+  page: number;
+  totalPages: number;
 };
 
 export const useCallsQuery = (
   params?: CallsParams,
-  queryOptions?: Partial<UseQueryOptions<CallsResponse, PostgrestError>>,
+  queryOptions?: Partial<UseQueryOptions<CallsResponse, Error>>,
 ) => {
   return useQuery({
     queryKey: ['calls', params],
@@ -73,37 +99,46 @@ export const useCallsQuery = (
         dateTo,
         callType,
         search,
+        status,
+        manager,
+        sentiment,
       } = params || {};
 
-      let query = supabase
-        .from('calls')
-        .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
-        .range((page - 1) * pageSize, page * pageSize - 1);
+      // Используем новый API endpoint для поиска, если есть поисковый запрос или фильтры
+      if (search || status || manager || sentiment || dateFrom || dateTo || callType) {
+        const searchParams = new URLSearchParams();
+        if (search) searchParams.append('q', search);
+        if (status) searchParams.append('status', status);
+        if (manager) searchParams.append('manager', manager);
+        if (sentiment) searchParams.append('sentiment', sentiment);
+        if (dateFrom) searchParams.append('dateFrom', dateFrom);
+        if (dateTo) searchParams.append('dateTo', dateTo);
+        if (callType) searchParams.append('type', callType);
+        searchParams.append('limit', pageSize.toString());
+        searchParams.append('offset', ((page - 1) * pageSize).toString());
 
-      if (dateFrom) {
-        query = query.gte('created_at', dateFrom);
-      }
-      if (dateTo) {
-        query = query.lte('created_at', dateTo);
-      }
-      if (callType) {
-        query = query.eq('call_type', callType);
-      }
-      if (search) {
-        query = query.or(
-          `client_name.ilike.%${search}%,phone_number.ilike.%${search}%,manager_name.ilike.%${search}%`,
+        const response = await axiosClient.get(`/calls/search?${searchParams.toString()}`);
+        return {
+          data: response.data.results,
+          total: response.data.total,
+          page,
+          totalPages: Math.ceil(response.data.total / pageSize),
+        };
+      } else {
+        // Используем API для получения последних звонков с корректной пагинацией
+        const response = await axiosClient.get(
+          `/calls/recent?limit=${pageSize}&offset=${(page - 1) * pageSize}`
         );
+        return {
+          data: response.data.calls,
+          total: response.data.total,
+          page,
+          totalPages: Math.ceil(response.data.total / pageSize),
+        };
       }
-      const { data, error, count } = await query;
-      if (error) throw error;
-
-      return {
-        data,
-        total: count as number,
-      };
     },
     placeholderData: keepPreviousData,
+    staleTime: 30 * 1000, // 30 секунд
     ...queryOptions,
   });
 };
@@ -114,20 +149,13 @@ export type CallDetailsResponse = Call;
 
 export const useCallDetailsQuery = (
   id: string,
-  queryOptions?: Partial<UseQueryOptions<CallDetailsResponse, PostgrestError>>,
+  queryOptions?: Partial<UseQueryOptions<CallDetailsResponse, Error>>,
 ) => {
   return useQuery({
     queryKey: ['call-details', id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('calls')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-
-      return data;
+      const response = await axiosClient.get(`/calls/${id}`);
+      return response.data;
     },
     ...queryOptions,
   });
@@ -163,21 +191,14 @@ export type CallTranscriptResponse = {
 export const useCallTranscriptQuery = (
   id: string,
   queryOptions?: Partial<
-    UseQueryOptions<CallTranscriptResponse, PostgrestError>
+    UseQueryOptions<CallTranscriptResponse, Error>
   >,
 ) => {
   return useQuery({
     queryKey: ['call-transcript', id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('transcripts')
-        .select('*')
-        .eq('call_id', id)
-        .single();
-
-      if (error) throw error;
-
-      return data;
+      const response = await axiosClient.get(`/calls/${id}/transcript`);
+      return response.data;
     },
     ...queryOptions,
   });
@@ -214,20 +235,13 @@ export type CallAnalysisResponse = {
 
 export const useCallAnalysisQuery = (
   id: string,
-  queryOptions?: Partial<UseQueryOptions<CallAnalysisResponse, PostgrestError>>,
+  queryOptions?: Partial<UseQueryOptions<CallAnalysisResponse, Error>>,
 ) => {
   return useQuery({
     queryKey: ['call-analysis', id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('ai_analysis')
-        .select('*')
-        .eq('call_id', id)
-        .single();
-
-      if (error) throw error;
-
-      return data;
+      const response = await axiosClient.get(`/calls/${id}/ai-analysis`);
+      return response.data;
     },
     ...queryOptions,
   });

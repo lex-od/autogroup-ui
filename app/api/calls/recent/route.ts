@@ -1,111 +1,138 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import { Call } from '@/services/api/queries/calls.queries';
+import { toCamelCase } from '@/utils/toCamelCase';
 
-// Mock данные для демонстрации
-const mockCalls: Call[] = [
-  {
-    id: '1',
-    phoneNumber: '+3 (067) 123-45-67',
-    clientName: 'Михаил Козлов',
-    managerName: 'Анна Смирнова',
-    duration: 420,
-    date: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 минут назад
-    type: 'incoming',
-    status: 'completed',
-    recordingUrl: '/recordings/call-1.mp3',
-    aiAnalysis: {
-      id: 'ai-1',
-      callId: '1',
-      sentiment: 'positive',
-      sentimentScore: 0.82,
-      keyTopics: ['покупка автомобиля', 'кредит', 'trade-in'],
-      summary: 'Клиент заинтересован в покупке нового автомобиля. Обсуждались условия кредитования и возможность trade-in текущего авто.',
-      actionItems: ['Подготовить коммерческое предложение', 'Связаться с кредитным отделом'],
-      leadQuality: 'hot',
-      satisfaction: 4,
-    },
-  },
-  {
-    id: '2',
-    phoneNumber: '+7 (903) 987-65-43',
-    clientName: 'Елена Петрова',
-    managerName: 'Иван Петров',
-    duration: 180,
-    date: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // 45 минут назад
-    type: 'outgoing',
-    status: 'completed',
-    recordingUrl: '/recordings/call-2.mp3',
-    aiAnalysis: {
-      id: 'ai-2',
-      callId: '2',
-      sentiment: 'neutral',
-      sentimentScore: 0.15,
-      keyTopics: ['сервисное обслуживание', 'запись на ремонт'],
-      summary: 'Звонок по поводу планового технического обслуживания автомобиля.',
-      actionItems: ['Записать на ближайшую свободную дату'],
-      leadQuality: 'warm',
-      satisfaction: 3,
-    },
-  },
-  {
-    id: '3',
-    phoneNumber: '+7 (916) 555-77-88',
-    clientName: 'Александр Новиков',
-    managerName: 'Петр Иванов',
-    duration: 90,
-    date: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 час назад
-    type: 'incoming',
-    status: 'missed',
-  },
-  {
-    id: '4',
-    phoneNumber: '+3 (067) 777-88-99',
-    clientName: 'Ольга Сидорова',
-    managerName: 'Елена Кузнецова',
-    duration: 650,
-    date: new Date(Date.now() - 1000 * 60 * 90).toISOString(), // 1.5 часа назад
-    type: 'incoming',
-    status: 'completed',
-    recordingUrl: '/recordings/call-4.mp3',
-    aiAnalysis: {
-      id: 'ai-4',
-      callId: '4',
-      sentiment: 'negative',
-      sentimentScore: -0.45,
-      keyTopics: ['жалоба', 'качество обслуживания', 'возврат денег'],
-      summary: 'Клиент недоволен качеством ремонта и требует возврат денежных средств.',
-      actionItems: ['Связаться с руководителем сервиса', 'Проверить качество выполненных работ'],
-      leadQuality: 'cold',
-      satisfaction: 1,
-    },
-  },
-  {
-    id: '5',
-    phoneNumber: '+7 (925) 333-22-11',
-    clientName: 'Дмитрий Волков',
-    managerName: 'Сергей Волков',
-    duration: 240,
-    date: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2 часа назад
-    type: 'outgoing',
-    status: 'completed',
-    recordingUrl: '/recordings/call-5.mp3',
-  },
-];
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '10');
+    const offset = parseInt(searchParams.get('offset') || '0');
     
-    // В реальном приложении здесь будет запрос к базе данных
-    // с учетом лимита и других фильтров
-    
-    // Добавляем небольшую задержку для имитации реального API
-    await new Promise(resolve => setTimeout(resolve, 300));
+    const authHeader = request.headers.get('Authorization');
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: {
+          Authorization: authHeader || ''
+        }
+      }
+    });
 
-    const limitedCalls = mockCalls.slice(0, limit);
-    
-    return NextResponse.json(limitedCalls);
+    // Получаем последние звонки с основными данными с поддержкой пагинации
+    const { data: callsData, error: callsError } = await supabase
+      .from('calls')
+      .select(`
+        id,
+        phone_number,
+        client_name,
+        manager_name,
+        duration_seconds,
+        call_date,
+        call_type,
+        status,
+        storage_path,
+        created_at
+      `)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (callsError) {
+      console.error('Error fetching calls:', callsError);
+      throw callsError;
+    }
+
+    if (!callsData || callsData.length === 0) {
+      return NextResponse.json({
+        calls: [],
+        total: 0
+      });
+    }
+
+    // Получаем AI анализ для этих звонков
+    const callIds = callsData.map(call => call.id);
+    const { data: analysisData, error: analysisError } = await supabase
+      .from('ai_analysis')
+      .select(`
+        call_id,
+        sentiment_label,
+        sentiment_score,
+        topics,
+        summary_text,
+        action_items_for_manager,
+        client_satisfaction_score
+      `)
+      .in('call_id', callIds);
+
+    if (analysisError) {
+      console.error('Error fetching AI analysis:', analysisError);
+      // Не бросаем ошибку, просто логируем - анализ может отсутствовать
+    }
+
+    // Формируем массив звонков с camelCase ключами
+    const formattedCalls = callsData.map(call => {
+      const analysis = analysisData?.find(a => a.call_id === call.id);
+      const formattedPhone = call.phone_number 
+        ? call.phone_number.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '+$1 ($2) $3-$4-$5')
+        : 'Неизвестно';
+      const formattedCall: any = {
+        id: call.id,
+        phoneNumber: formattedPhone,
+        clientName: call.client_name || 'Неизвестно',
+        managerName: call.manager_name || 'Неизвестно',
+        duration: call.duration_seconds || 0,
+        callDate: call.call_date || call.created_at,
+        callType: call.call_type,
+        status: call.status,
+        recordingUrl: call.storage_path ? `/api/audio/${call.id}` : undefined
+      };
+      if (analysis) {
+        let sentiment = 'neutral';
+        if (analysis.sentiment_score !== null) {
+          if (analysis.sentiment_score > 0.2) sentiment = 'positive';
+          else if (analysis.sentiment_score < -0.2) sentiment = 'negative';
+        }
+        let leadQuality = 'warm';
+        if (analysis.sentiment_score !== null && analysis.client_satisfaction_score !== null) {
+          if (analysis.sentiment_score > 0.5 && analysis.client_satisfaction_score >= 4) {
+            leadQuality = 'hot';
+          } else if (analysis.sentiment_score < -0.2 || analysis.client_satisfaction_score <= 2) {
+            leadQuality = 'cold';
+          }
+        }
+        formattedCall.aiAnalysis = {
+          id: `ai-${call.id}`,
+          callId: call.id,
+          sentiment,
+          sentimentScore: analysis.sentiment_score || 0,
+          keyTopics: Array.isArray(analysis.topics) ? analysis.topics : [],
+          summary: analysis.summary_text || 'Анализ недоступен',
+          actionItems: Array.isArray(analysis.action_items_for_manager) 
+            ? analysis.action_items_for_manager 
+            : [],
+          leadQuality,
+          satisfaction: analysis.client_satisfaction_score || 3,
+          transcription: undefined
+        };
+      }
+      return formattedCall;
+    });
+
+    // Получаем общее количество звонков для пагинации
+    const { count, error: countError } = await supabase
+      .from('calls')
+      .select('*', { count: 'exact', head: true });
+
+    if (countError) {
+      console.error('Error counting calls:', countError);
+    }
+
+    return NextResponse.json({
+      calls: formattedCalls,
+      total: count || formattedCalls.length
+    });
   } catch (error) {
     console.error('Error fetching recent calls:', error);
     return NextResponse.json(
