@@ -10,6 +10,12 @@ import {
   ChevronLeft,
   ChevronRight,
   CloudUpload,
+  Shield,
+  Plug,
+  BarChart3,
+  FileText,
+  Users,
+  Brain,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -62,7 +68,7 @@ const DashboardSidebar = ({
       name: 'Звонки',
       href: '/dashboard/calls',
       icon: Phone,
-      current: pathname.startsWith('/dashboard/calls'),
+      current: pathname.startsWith('/dashboard/calls') && !pathname.includes('/admin'),
     },
     {
       name: 'Загрузка звонка',
@@ -70,42 +76,42 @@ const DashboardSidebar = ({
       icon: CloudUpload,
       current: pathname === '/dashboard/upload-call',
     },
-    // {
-    //   name: 'Аналитика',
-    //   href: '#',
-    //   icon: BarChart3,
-    //   current: pathname === '/dashboard/analytics',
-    // },
-    // {
-    //   name: 'Менеджеры',
-    //   href: '#',
-    //   icon: Users,
-    //   current: pathname === '/dashboard/managers',
-    // },
-    // {
-    //   name: 'AI Анализ',
-    //   href: '#',
-    //   icon: Brain,
-    //   current: pathname === '/dashboard/ai-analysis',
-    // },
-    // {
-    //   name: 'Отчеты',
-    //   href: '#',
-    //   icon: FileText,
-    //   current: pathname === '/dashboard/reports',
-    // },
-    // {
-    //   name: 'Планировщик',
-    //   href: '#',
-    //   icon: Calendar,
-    //   current: pathname === '/dashboard/scheduler',
-    // },
+    {
+      name: 'Аналитика',
+      href: '/dashboard/analytics',
+      icon: BarChart3,
+      current: pathname === '/dashboard/analytics',
+    },
+    {
+      name: 'Отчеты',
+      href: '/dashboard/reports',
+      icon: FileText,
+      current: pathname === '/dashboard/reports',
+    },
+    {
+      name: 'Менеджеры',
+      href: '/dashboard/managers',
+      icon: Users,
+      current: pathname === '/dashboard/managers',
+    },
   ];
 
   const secondaryNavigation = [
     {
+      name: 'Интеграции',
+      href: '/dashboard/integrations',
+      icon: Plug,
+      current: pathname === '/dashboard/integrations',
+    },
+    {
+      name: 'Админ-панель',
+      href: '/dashboard/admin',
+      icon: Shield,
+      current: pathname.startsWith('/dashboard/admin'),
+    },
+    {
       name: 'Настройки',
-      href: '#',
+      href: '/dashboard/settings',
       icon: Settings,
       current: pathname === '/dashboard/settings',
     },

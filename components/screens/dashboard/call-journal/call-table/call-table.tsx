@@ -10,6 +10,12 @@ import {
   Trash2,
   PhoneIncoming,
   PhoneOutgoing,
+  Upload,
+  Loader2,
+  FileText,
+  BrainCircuit,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { VariantProps } from 'class-variance-authority';
@@ -30,10 +36,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import CallStatusBadge from '@/components/ui/call-status-badge';
+import CallTypeBadge from '@/components/ui/call-type-badge';
 import { useDeleteCall } from '@/services/api/queries/calls.queries';
 import { CallsItem, CallsResponse } from '@/services/api/calls-api';
 import CallTableSkeleton from './call-table-skeleton';
-import CallTablePagination from './call-table-pagination';
 
 interface Props {
   calls?: CallsResponse;
@@ -42,6 +49,7 @@ interface Props {
   onCurrentPageChange: (currentPage: number) => void;
   selectedCalls: string[];
   setSelectedCalls: React.Dispatch<React.SetStateAction<string[]>>;
+  visibleColumns?: Record<string, boolean>;
 }
 
 const CallTable: FC<Props> = ({
@@ -51,12 +59,16 @@ const CallTable: FC<Props> = ({
   onCurrentPageChange,
   selectedCalls,
   setSelectedCalls,
+  visibleColumns = {},
 }) => {
   const router = useRouter();
 
   const deleteCallMutation = useDeleteCall();
 
-  const totalPages = Math.ceil((calls?.total || 0) / 10);
+  // Функция для проверки видимости колонки
+  const isColumnVisible = (columnId: string) => {
+    return visibleColumns[columnId] !== false; // По умолчанию видима, если не указано иное
+  };
 
   const handleSelectCall = (callId: string) => {
     setSelectedCalls((prev) =>
@@ -91,13 +103,15 @@ const CallTable: FC<Props> = ({
     }
   };
 
-  const formatDuration = (seconds: number) => {
+  const formatDuration = (seconds: number | null) => {
+    if (!seconds) return '--:--';
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '--';
     const date = new Date(dateString);
     return date.toLocaleDateString('ru-RU', {
       day: '2-digit',
@@ -108,36 +122,12 @@ const CallTable: FC<Props> = ({
     });
   };
 
-  const getStatusBadge = (status: CallsItem['status']) => {
-    const variants: Record<
-      CallsItem['status'],
-      VariantProps<typeof badgeVariants>['variant']
-    > = {
-      uploaded: 'secondary',
-      processing: 'secondary',
-      transcribing: 'secondary',
-      analyzing: 'secondary',
-      completed: 'default',
-      failed: 'destructive',
-    };
-    const labels: Record<CallsItem['status'], string> = {
-      uploaded: 'Загружен',
-      processing: 'Обработка',
-      transcribing: 'Транскрибация',
-      analyzing: 'Анализ',
-      completed: 'Завершен',
-      failed: 'Ошибка',
-    };
-    return (
-      <Badge variant={variants[status]} className="text-xs">
-        {status === 'completed' && <Brain className="mr-1 h-3 w-3" />}
-        {labels[status]}
-      </Badge>
-    );
+  const getStatusBadge = (status: string) => {
+    return <CallStatusBadge status={status} />;
   };
 
-  const getCallTypeIcon = (type: CallsItem['call_type']) => {
-    return type === 'incoming' ? (
+  const getCallTypeIcon = (callType: CallsItem['callType']) => {
+    return callType === 'incoming' ? (
       <div className="flex items-center space-x-1 text-green-600">
         <PhoneIncoming className="h-3 w-3" />
         <span className="text-xs">Входящий</span>
@@ -151,27 +141,27 @@ const CallTable: FC<Props> = ({
   };
 
   return (
-    <Card className="py-3">
+    <Card className="py-0.5">
       <CardContent className="p-0">
         {callsPending && <CallTableSkeleton />}
 
         {!callsPending && (
           <>
             {!calls?.data.length && (
-              <div className="py-12 text-center text-muted-foreground">
-                <Phone className="mx-auto mb-2 h-12 w-12 opacity-50" />
-                <p>Звонки не найдены</p>
-                <p className="text-sm">Попробуйте изменить критерии поиска</p>
+              <div className="py-4 text-center text-muted-foreground">
+                <Phone className="mx-auto mb-2 h-8 w-8 opacity-50" />
+                <p className="text-sm">Звонки не найдены</p>
+                <p className="text-xs">Попробуйте изменить критерии поиска</p>
               </div>
             )}
 
             {!!calls?.data.length && (
-              <div className="space-y-4">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-b">
-                        <TableHead className="w-12">
+              <div className="space-y-1">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-b">
+                      {isColumnVisible('select') && (
+                        <TableHead className="w-10">
                           <input
                             type="checkbox"
                             checked={selectedCalls.length === calls.data.length}
@@ -179,23 +169,25 @@ const CallTable: FC<Props> = ({
                             className="rounded"
                           />
                         </TableHead>
-                        <TableHead>Тип</TableHead>
-                        <TableHead>Клиент / Телефон</TableHead>
-                        <TableHead>Менеджер</TableHead>
-                        <TableHead>Дата и время</TableHead>
-                        <TableHead>Длительность</TableHead>
-                        <TableHead>Статус</TableHead>
-                        <TableHead className="w-16">Действия</TableHead>
-                      </TableRow>
-                    </TableHeader>
+                      )}
+                      {isColumnVisible('type') && <TableHead className="w-20">Тип</TableHead>}
+                      {isColumnVisible('client') && <TableHead>Клиент / Телефон</TableHead>}
+                      {isColumnVisible('manager') && <TableHead>Менеджер</TableHead>}
+                      {isColumnVisible('date') && <TableHead>Дата и время</TableHead>}
+                      {isColumnVisible('duration') && <TableHead>Длительность</TableHead>}
+                      {isColumnVisible('status') && <TableHead>Статус</TableHead>}
+                      {isColumnVisible('actions') && <TableHead className="w-16">Действия</TableHead>}
+                    </TableRow>
+                  </TableHeader>
 
-                    <TableBody>
-                      {calls.data.map((call) => (
-                        <TableRow
-                          key={call.id}
-                          className="cursor-default border-b border-border/40 hover:bg-muted/50"
-                          onClick={() => handleViewCall(call.id)}
-                        >
+                  <TableBody>
+                    {calls.data.map((call) => (
+                      <TableRow
+                        key={call.id}
+                        className="cursor-default border-b border-border/40 hover:bg-muted/50"
+                        onClick={() => handleViewCall(call.id)}
+                      >
+                        {isColumnVisible('select') && (
                           <TableCell
                             onClick={(e: React.MouseEvent) =>
                               e.stopPropagation()
@@ -208,46 +200,60 @@ const CallTable: FC<Props> = ({
                               className="rounded"
                             />
                           </TableCell>
+                        )}
+                        {isColumnVisible('type') && (
                           <TableCell>
-                            {getCallTypeIcon(call.call_type)}
+                            <CallTypeBadge callType={call.callType} />
                           </TableCell>
-                          <TableCell>
-                            <div>
-                              <p className="font-medium">{call.client_name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {call.phone_number}
-                              </p>
+                        )}
+                        {isColumnVisible('client') && (
+                          <TableCell className="py-1">
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-1">
+                                <User className="h-3 w-3 text-muted-foreground" />
+                                <span className="text-sm font-medium">{call.clientName || '—'}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Phone className="h-3 w-3 text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground">{call.phoneNumber || '—'}</span>
+                              </div>
                             </div>
                           </TableCell>
-                          <TableCell>
+                        )}
+                        {isColumnVisible('manager') && (
+                          <TableCell className="py-1">
                             <div className="flex items-center space-x-2">
-                              <User className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-sm">
-                                {call.manager_name}
+                              <span className="inline-flex items-center gap-1 px-1 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                                <User className="h-3 w-3" />
+                                {call.managerName || 'Unknown'}
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            {call.call_date && (
-                              <div className="flex items-center space-x-2">
-                                <Calendar className="h-3 w-3 text-muted-foreground" />
-                                <span className="text-sm">
-                                  {formatDate(call.call_date)}
-                                </span>
-                              </div>
-                            )}
+                        )}
+                        {isColumnVisible('date') && (
+                          <TableCell className="py-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="inline-flex items-center gap-1 px-1 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                                <Calendar className="h-3 w-3" />
+                                {formatDate(call.callDate || call.createdAt)}
+                              </span>
+                            </div>
                           </TableCell>
-                          <TableCell>
-                            {call.duration_seconds !== null && (
-                              <div className="flex items-center space-x-2">
-                                <Clock className="h-3 w-3 text-muted-foreground" />
-                                <span className="text-sm">
-                                  {formatDuration(call.duration_seconds)}
-                                </span>
-                              </div>
-                            )}
+                        )}
+                        {isColumnVisible('duration') && (
+                          <TableCell className="py-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="inline-flex items-center gap-1 px-1 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800 border border-teal-200">
+                                <Clock className="h-3 w-3" />
+                                {formatDuration(call.duration)}
+                              </span>
+                            </div>
                           </TableCell>
+                        )}
+                        {isColumnVisible('status') && (
                           <TableCell>{getStatusBadge(call.status)}</TableCell>
+                        )}
+                        {isColumnVisible('actions') && (
                           <TableCell
                             onClick={(e: React.MouseEvent) =>
                               e.stopPropagation()
@@ -258,7 +264,7 @@ const CallTable: FC<Props> = ({
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 w-8 p-0"
+                                  className="h-7 w-7 p-0"
                                 >
                                   <MoreVertical className="h-4 w-4" />
                                 </Button>
@@ -268,26 +274,16 @@ const CallTable: FC<Props> = ({
                                   onClick={() => handleDeleteCall(call.id)}
                                   className="text-destructive"
                                 >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Удалить
+                                  <Trash2 className="mr-2 h-4 w-4" /> Удалить
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                {/* Пагинация */}
-                {totalPages > 1 && (
-                  <CallTablePagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onCurrentPageChange={onCurrentPageChange}
-                  />
-                )}
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             )}
           </>

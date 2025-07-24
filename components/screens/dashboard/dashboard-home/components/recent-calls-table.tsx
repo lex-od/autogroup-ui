@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { Play, Brain, Phone, Clock, User } from 'lucide-react';
+import { FC, useState } from 'react';
+import { Phone, User, Clock, Play, Brain } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Call } from '@/services/api/queries/calls.queries';
+import CallStatusBadge from '@/components/ui/call-status-badge';
+import CallTypeBadge from '@/components/ui/call-type-badge';
+import { Call } from '@/services/api/calls-api';
 
 interface RecentCallsTableProps {
   calls?: Call[];
@@ -63,23 +65,7 @@ const RecentCallsTable = ({
   };
 
   const getStatusBadge = (status: Call['status']) => {
-    const variants = {
-      completed: 'success',
-      missed: 'destructive',
-      'in-progress': 'warning',
-    } as const;
-
-    const labels = {
-      completed: 'Завершен',
-      missed: 'Пропущен',
-      'in-progress': 'В процессе',
-    };
-
-    return (
-      <Badge variant={variants[status]}>
-        {labels[status]}
-      </Badge>
-    );
+    return <CallStatusBadge status={status} />;
   };
 
   const getSentimentBadge = (sentiment?: 'positive' | 'negative' | 'neutral') => {
@@ -104,12 +90,8 @@ const RecentCallsTable = ({
     );
   };
 
-  const getCallTypeIcon = (type: Call['type']) => {
-    return type === 'incoming' ? (
-      <Phone className="h-4 w-4 text-green-500" />
-    ) : (
-      <Phone className="h-4 w-4 text-blue-500 rotate-12" />
-    );
+  const getCallTypeIcon = (type: Call['callType']) => {
+    return <CallTypeBadge callType={type} />;
   };
 
   return (
@@ -133,7 +115,7 @@ const RecentCallsTable = ({
               >
                 {/* Иконка типа звонка */}
                 <div className="flex-shrink-0">
-                  {getCallTypeIcon(call.type)}
+                  {getCallTypeIcon(call.callType)}
                 </div>
 
                 {/* Основная информация */}
@@ -153,24 +135,25 @@ const RecentCallsTable = ({
                     </span>
                     <span className="flex items-center space-x-1">
                       <Clock className="h-3 w-3" />
-                      <span>{formatDuration(call.duration)}</span>
+                      <span>{formatDuration(call.duration || 0)}</span>
                     </span>
-                    <span>{formatDate(call.date)}</span>
+                    <span>{formatDate(call.callDate || call.createdAt)}</span>
                   </div>
                 </div>
 
                 {/* Действия */}
-                <div className="flex space-x-2">
-                  {call.recordingUrl && (
+                <div className="flex items-center space-x-2">
+                  {call.storagePath && (
                     <Button
+                      variant="ghost"
                       size="sm"
-                      variant="outline"
                       onClick={(e) => {
                         e.stopPropagation();
                         onPlayRecording?.(call.id);
                       }}
+                      className="h-8 w-8 p-0"
                     >
-                      <Play className="h-3 w-3" />
+                      <Play className="h-4 w-4" />
                     </Button>
                   )}
                   
@@ -215,7 +198,7 @@ const RecentCallsTable = ({
                     <div>
                       <span className="text-muted-foreground">Тип звонка:</span>
                       <p className="font-medium">
-                        {call.type === 'incoming' ? 'Входящий' : 'Исходящий'}
+                        {call.callType === 'incoming' ? 'Входящий' : 'Исходящий'}
                       </p>
                     </div>
                   </div>
@@ -227,12 +210,12 @@ const RecentCallsTable = ({
                         {call.aiAnalysis.summary}
                       </p>
                       
-                      {call.aiAnalysis.keyTopics.length > 0 && (
-                        <div>
-                          <span className="text-xs text-muted-foreground">Ключевые темы:</span>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {call.aiAnalysis.keyTopics.map((topic, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
+                      {call.aiAnalysis?.topics && call.aiAnalysis.topics.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-xs text-muted-foreground mb-1">Темы:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {call.aiAnalysis.topics.map((topic: string, index: number) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
                                 {topic}
                               </Badge>
                             ))}

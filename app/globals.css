@@ -218,3 +218,77 @@
     }
   }
 }
+
+/* Фиксированный хедер и скролл контента */
+@layer components {
+  /* Основной контейнер с фиксированным хедером */
+  .dashboard-layout {
+    @apply flex h-screen overflow-hidden bg-background;
+  }
+
+  /* Фиксированный хедер */
+  .dashboard-header-fixed {
+    @apply sticky top-0 z-40 bg-background border-b shadow-sm;
+    /* Плавная анимация при скролле */
+    transition: box-shadow 0.2s ease-in-out;
+  }
+
+  /* Прокручиваемый контент */
+  .dashboard-content-scrollable {
+    @apply flex-1 overflow-y-auto;
+    /* Плавный скролл */
+    scroll-behavior: smooth;
+    /* Скрываем скроллбар на WebKit браузерах */
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  /* Кастомный скроллбар для WebKit браузеров */
+  .dashboard-content-scrollable::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .dashboard-content-scrollable::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .dashboard-content-scrollable::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .dashboard-content-scrollable::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground));
+  }
+
+  /* Тень для хедера при скролле (добавляется через JavaScript) */
+  .dashboard-header-shadow {
+    @apply shadow-md;
+  }
+}
+
+/* Кастомный скроллбар для таблицы */
+@layer components {
+  /* Горизонтальный скроллбар для таблицы */
+  .table-scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .table-scroll-container::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .table-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .table-scroll-container::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .table-scroll-container::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground));
+  }
+}

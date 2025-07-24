@@ -1,27 +1,25 @@
 import axios from 'axios';
+import { supabase } from './supabase';
 
 export const axiosBase = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
 });
 
-// export const setupAxiosInterceptors = (
-//   authStoreApi: AuthStoreApi,
-//   queryClient: QueryClient,
-// ) => {
-//   axiosBase.interceptors.request.use((config) => {
-//     const token = authStoreApi.getState().token;
+// Интерцептор для добавления токена аутентификации
+axiosBase.interceptors.request.use(async (config) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (session?.access_token) {
+    config.headers.Authorization = `Bearer ${session.access_token}`;
+  }
+  return config;
+});
 
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   });
-
-//   axiosBase.interceptors.response.use(undefined, (error) => {
-//     if (error.response?.status === 401) {
-//       authStoreApi.getState().unsetToken();
-//       queryClient.clear();
-//     }
-//     throw error;
-//   });
-// };
+// Интерцептор для обработки ошибок аутентификации
+axiosBase.interceptors.response.use(undefined, (error) => {
+  if (error.response?.status === 401) {
+    // Перенаправляем на страницу входа при ошибке аутентификации
+    window.location.href = '/auth/login';
+  }
+  throw error;
+});
