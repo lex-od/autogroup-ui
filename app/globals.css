@@ -199,19 +199,19 @@
       display: none;
     }
   }
-  
+
   .xs\:inline-flex {
     @media (min-width: 475px) {
       display: inline-flex;
     }
   }
-  
+
   .xs\:flex {
     @media (min-width: 475px) {
       display: flex;
     }
   }
-  
+
   .xs\:block {
     @media (min-width: 475px) {
       display: block;
