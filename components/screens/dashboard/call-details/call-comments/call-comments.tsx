@@ -3,7 +3,6 @@ import { MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCallCommentsQuery } from '@/services/api/calls-api';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import CallCommentsItem from './call-comments-item';
 
 interface Props {
@@ -26,7 +25,7 @@ const CallComments: FC<Props> = ({ callId }) => {
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="flex max-h-32 flex-col">
+      <CardContent>
         {commentingType && (
           <div>
             <textarea
@@ -40,11 +39,11 @@ const CallComments: FC<Props> = ({ callId }) => {
         )}
 
         {!commentingType && !isPending && data && (
-          <ScrollArea className="grow">
+          <div className="">
             {data.comments.map((comment) => (
               <CallCommentsItem key={comment.id} item={comment} />
             ))}
-          </ScrollArea>
+          </div>
         )}
       </CardContent>
     </Card>
