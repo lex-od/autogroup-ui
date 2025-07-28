@@ -10,9 +10,7 @@ interface Props {
 }
 
 const CallComments: FC<Props> = ({ callId }) => {
-  const [commentingType, setCommentingType] = useState<'add' | 'edit' | null>(
-    null,
-  );
+  const [commentingType] = useState<'add' | 'edit' | null>(null);
 
   const { data, isPending } = useCallCommentsQuery({ callId, pageSize: 100 });
 
