@@ -15,7 +15,7 @@ const CallComments: FC<Props> = ({ callId }) => {
   const { data, isPending } = useCallCommentsQuery({ callId, pageSize: 100 });
 
   return (
-    <Card>
+    <Card className="gap-3">
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <MessageSquare className="h-5 w-5" />
@@ -37,7 +37,7 @@ const CallComments: FC<Props> = ({ callId }) => {
         )}
 
         {!commentingType && !isPending && data && (
-          <div className="">
+          <div className="max-h-96 scrollbar-thin overflow-y-auto pr-2">
             {data.comments.map((comment) => (
               <CallCommentsItem key={comment.id} item={comment} />
             ))}
