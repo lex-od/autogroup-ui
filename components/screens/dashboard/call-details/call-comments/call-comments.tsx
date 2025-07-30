@@ -1,16 +1,16 @@
 import { FC, useState } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useCallCommentsQuery } from '@/services/api/calls-api';
 import CallCommentsItem from './call-comments-item';
+import CallCommentsEditor from './call-comments-editor';
 
 interface Props {
   callId: string;
 }
 
 const CallComments: FC<Props> = ({ callId }) => {
-  const [commentingType] = useState<'add' | 'edit' | null>(null);
+  const [commentingType] = useState<'add' | 'edit' | null>('add');
 
   const { data, isPending } = useCallCommentsQuery({ callId, pageSize: 100 });
 
@@ -25,15 +25,10 @@ const CallComments: FC<Props> = ({ callId }) => {
 
       <CardContent>
         {commentingType && (
-          <div>
-            <textarea
-              className="h-32 w-full resize-none rounded-md border p-3 text-sm"
-              placeholder="Добавьте заметки к этому звонку..."
-            />
-            <Button className="mt-3 w-full" size="sm">
-              Сохранить заметки
-            </Button>
-          </div>
+          <CallCommentsEditor
+            textareaProps={{ className: 'min-h-24' }}
+            onSuccess={() => null}
+          />
         )}
 
         {!commentingType && !isPending && data && (
