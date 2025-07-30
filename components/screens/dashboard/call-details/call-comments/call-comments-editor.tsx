@@ -1,18 +1,23 @@
 import { FC, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { LoaderCircle } from 'lucide-react';
 
 interface Props {
+  isPending: boolean;
+  onSuccess: (text: string) => void;
   initText?: string;
   textareaProps?: React.ComponentProps<typeof Textarea>;
-  onSuccess: (text: string) => void;
+  successBtnText?: string;
   onCancel?: () => void;
 }
 
 const CallCommentsEditor: FC<Props> = ({
+  isPending,
+  onSuccess,
   initText,
   textareaProps,
-  onSuccess,
+  successBtnText,
   onCancel,
 }) => {
   const [text, setText] = useState(initText || '');
@@ -30,14 +35,18 @@ const CallCommentsEditor: FC<Props> = ({
         <Button
           size="sm"
           className="grow"
-          disabled={!text}
+          disabled={!text || isPending}
           onClick={() => onSuccess(text)}
         >
-          Сохранить
+          {isPending && <LoaderCircle className="animate-spin" />}
+          {isPending ? 'Подождите' : successBtnText || 'Сохранить'}
         </Button>
-        <Button variant="outline" size="sm" onClick={onCancel}>
-          Отмена
-        </Button>
+
+        {onCancel && (
+          <Button variant="outline" size="sm" onClick={onCancel}>
+            Отмена
+          </Button>
+        )}
       </div>
     </div>
   );
