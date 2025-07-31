@@ -10,7 +10,7 @@ import {
   useCallAnalysisQuery,
   useCallDetailsQuery,
   useCallTranscriptQuery,
-} from '@/services/api/calls-api';
+} from '@/services/api/calls.api';
 import { getPublicUrl } from '@/lib/supabase';
 import { formatDuration } from './call-details.utils';
 import CallTranscript from './call-transcript/call-transcript';

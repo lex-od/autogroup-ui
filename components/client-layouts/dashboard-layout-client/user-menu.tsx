@@ -14,7 +14,7 @@ import {
 import {
   useCurrentUserQuery,
   useLogoutMutation,
-} from '@/services/api/auth-api';
+} from '@/services/api/auth.api';
 
 interface UserInfoProps {
   compact?: boolean;

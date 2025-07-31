@@ -3,7 +3,7 @@ import { Brain, Star } from 'lucide-react';
 import { VariantProps } from 'class-variance-authority';
 import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CallAnalysisResponse } from '@/services/api/calls-api';
+import { CallAnalysisResponse } from '@/services/api/calls.api';
 import { cn } from '@/lib/utils';
 
 interface Props {

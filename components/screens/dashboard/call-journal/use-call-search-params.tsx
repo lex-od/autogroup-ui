@@ -8,7 +8,7 @@ import {
 import { DateRange } from 'react-day-picker';
 import { endOfDay } from 'date-fns';
 import { useDebounceCallback } from 'usehooks-ts';
-import { CallType } from '@/services/api/calls-api';
+import { CallType } from '@/services/api/calls.api';
 
 const useCallSearchParams = () => {
   const router = useRouter();
