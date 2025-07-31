@@ -20,7 +20,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { useDeleteCalls } from '@/services/api/queries/calls.queries';
-import { useCallsQuery } from '@/services/api/calls-api';
+import { useCallsQuery } from '@/services/api/calls.api';
 import CallJournalFilters from './call-journal-filters/call-journal-filters';
 import CallTable from './call-table/call-table';
 import CallSearchInput from './call-search-input';

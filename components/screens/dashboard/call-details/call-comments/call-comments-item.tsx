@@ -6,9 +6,9 @@ import {
   useDeleteCallCommentMutation,
   useUpdateCallCommentMutation,
   type CallCommentsItem,
-} from '@/services/api/calls-api';
+} from '@/services/api/calls.api';
 import { Button } from '@/components/ui/button';
-import { useCurrentUserQuery } from '@/services/api/auth-api';
+import { useCurrentUserQuery } from '@/services/api/auth.api';
 import CallCommentsEditor from './call-comments-editor';
 
 interface Props {

@@ -31,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useDeleteCall } from '@/services/api/queries/calls.queries';
-import { CallsItem, CallsResponse } from '@/services/api/calls-api';
+import { CallsItem, CallsResponse } from '@/services/api/calls.api';
 import CallTableSkeleton from './call-table-skeleton';
 import CallTablePagination from './call-table-pagination';
 

@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import {
   UploadCallParams,
   useUploadCallMutation,
-} from '@/services/api/calls-api';
+} from '@/services/api/calls.api';
 import {
   UploadCallForm,
   uploadCallSchema,

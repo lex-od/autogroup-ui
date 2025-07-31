@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   useAddCallCommentMutation,
   useCallCommentsQuery,
-} from '@/services/api/calls-api';
+} from '@/services/api/calls.api';
 import { Button } from '@/components/ui/button';
 import CallCommentsItem from './call-comments-item';
 import CallCommentsEditor from './call-comments-editor';

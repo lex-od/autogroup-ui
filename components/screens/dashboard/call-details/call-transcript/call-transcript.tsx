@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   CallTranscriptResponse,
   TranscriptSegmentItem,
-} from '@/services/api/calls-api';
+} from '@/services/api/calls.api';
 import { formatDuration } from '../call-details.utils';
 import { cn } from '@/lib/utils';
 
@@ -36,7 +36,7 @@ const CallTranscript: FC<Props> = ({
             {!transcript && <p>Нет данных</p>}
 
             {transcript && (
-              <div className="max-h-96 space-y-4 overflow-y-auto">
+              <div className="scrollbar-thin max-h-96 space-y-4 overflow-y-auto">
                 {transcript.segments.map((segment) => (
                   <div
                     key={segment.start_ms}
