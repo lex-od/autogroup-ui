@@ -1,7 +1,11 @@
 import { FC, useEffect, useState } from 'react';
 import { MessageSquare, SquarePlus } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useCallCommentsQuery } from '@/services/api/calls-api';
+import {
+  useAddCallCommentMutation,
+  useCallCommentsQuery,
+} from '@/services/api/calls-api';
 import { Button } from '@/components/ui/button';
 import CallCommentsItem from './call-comments-item';
 import CallCommentsEditor from './call-comments-editor';
@@ -11,21 +15,33 @@ interface Props {
 }
 
 const CallComments: FC<Props> = ({ callId }) => {
+  const queryClient = useQueryClient();
+
   const [isAddition, setIsAddition] = useState(false);
 
-  const { data, isPending } = useCallCommentsQuery({ callId, pageSize: 100 });
+  const { data: comments, isPending: commentsPending } = useCallCommentsQuery({
+    callId,
+    pageSize: 100,
+  });
+  const { mutate: addComment, isPending: addCommentPending } =
+    useAddCallCommentMutation({
+      onSuccess: () => {
+        setIsAddition(false);
+        queryClient.invalidateQueries({ queryKey: ['call-comments'] });
+      },
+    });
 
-  const isCommentsLength = !!data?.comments.length;
+  const isCommentsLength = !!comments?.comments.length;
 
   const toggleIsAddition = () => {
     setIsAddition((state) => !state);
   };
 
   useEffect(() => {
-    if (!isPending && !isCommentsLength) {
+    if (!commentsPending && !isCommentsLength) {
       setIsAddition(true);
     }
-  }, [isPending, isCommentsLength]);
+  }, [commentsPending, isCommentsLength]);
 
   return (
     <Card className="gap-3">
@@ -53,8 +69,8 @@ const CallComments: FC<Props> = ({ callId }) => {
       <CardContent className="space-y-3">
         {isAddition && (
           <CallCommentsEditor
-            isPending={false}
-            onSuccess={() => null}
+            isPending={addCommentPending}
+            onSuccess={(text) => addComment({ callId, text })}
             textareaProps={{ className: 'min-h-24' }}
             successBtnText="Добавить заметку"
             onCancel={isCommentsLength ? toggleIsAddition : undefined}
@@ -62,8 +78,8 @@ const CallComments: FC<Props> = ({ callId }) => {
         )}
 
         {!isAddition && isCommentsLength && (
-          <div className="max-h-96 scrollbar-thin overflow-y-auto pr-2">
-            {data.comments.map((comment) => (
+          <div className="scrollbar-thin max-h-96 overflow-y-auto pr-2">
+            {comments.comments.map((comment) => (
               <CallCommentsItem key={comment.id} item={comment} />
             ))}
           </div>

@@ -333,3 +333,121 @@ export const useCallCommentsQuery = (
     ...queryOptions,
   });
 };
+
+// ============================================================================
+// Add Call Comment Mutation
+// Invalidate: ['call-comments']
+
+export interface AddCallCommentParams {
+  callId: string;
+  text: string;
+}
+
+export const useAddCallCommentMutation = (
+  mutationOptions?: UseMutationOptions<void, Error, AddCallCommentParams>,
+) => {
+  return useMutation({
+    mutationFn: async (params) => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        throw new Error('No active session');
+      }
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/add-call-comment`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            call_id: params.callId,
+            comment_text: params.text,
+          }),
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`Status: ${response.status}`);
+      }
+    },
+    ...mutationOptions,
+  });
+};
+
+// ============================================================================
+// Update Call Comment Mutation
+// Invalidate: ['call-comments']
+
+export interface UpdateCallCommentParams {
+  commentId: string;
+  text: string;
+}
+
+export const useUpdateCallCommentMutation = (
+  mutationOptions?: UseMutationOptions<void, Error, UpdateCallCommentParams>,
+) => {
+  return useMutation({
+    mutationFn: async (params) => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        throw new Error('No active session');
+      }
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/update-call-comment`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            comment_id: params.commentId,
+            comment_text: params.text,
+          }),
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`Status: ${response.status}`);
+      }
+    },
+    ...mutationOptions,
+  });
+};
+
+// ============================================================================
+// Delete Call Comment Mutation
+// Invalidate: ['call-comments']
+
+export const useDeleteCallCommentMutation = (
+  mutationOptions?: UseMutationOptions<void, Error, string>,
+) => {
+  return useMutation({
+    mutationFn: async (comment_id) => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        throw new Error('No active session');
+      }
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/delete-call-comment`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ comment_id }),
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`Status: ${response.status}`);
+      }
+    },
+    ...mutationOptions,
+  });
+};
