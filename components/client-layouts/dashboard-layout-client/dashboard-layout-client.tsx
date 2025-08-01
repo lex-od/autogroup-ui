@@ -7,7 +7,6 @@ import DashboardHeader from './dashboard-header';
 import DashboardHeaderMobile from './dashboard-header-mobile';
 
 const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
-  const [totalCalls] = useState(248);
   const [isExporting, setIsExporting] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -56,7 +55,6 @@ const DashboardLayoutClient: FC<PropsWithChildren> = ({ children }) => {
         <div className="hidden lg:block">
           <DashboardHeader
             pageTitle={pageTitle}
-            totalCalls={totalCalls}
             onExport={handleExport}
             isExporting={isExporting}
             showExportMenu={isCallsJournalPage}

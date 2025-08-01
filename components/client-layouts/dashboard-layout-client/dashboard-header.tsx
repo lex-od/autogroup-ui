@@ -1,7 +1,6 @@
 'use client';
 
 import { CalendarDays, MoreVertical, Download } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -13,7 +12,6 @@ import UserMenu from './user-menu';
 
 interface HeaderProps {
   pageTitle: string;
-  totalCalls: number;
   onExport: (format: 'csv' | 'xlsx') => void;
   isExporting: boolean;
   showExportMenu: boolean;
@@ -21,7 +19,6 @@ interface HeaderProps {
 
 const DashboardHeader = ({
   pageTitle,
-  totalCalls,
   onExport,
   isExporting,
   showExportMenu,
@@ -45,12 +42,7 @@ const DashboardHeader = ({
             <h1 className="truncate text-base leading-none font-semibold tracking-tight">
               {pageTitle}
             </h1>
-            <Badge
-              variant="secondary"
-              className="flex h-5 items-center px-2 py-0.5 text-xs"
-            >
-              {totalCalls} звонков
-            </Badge>
+
             <div className="hidden h-full items-center space-x-1 text-xs text-muted-foreground lg:flex">
               <CalendarDays className="h-4 w-4" />
               <span className="truncate leading-none">
