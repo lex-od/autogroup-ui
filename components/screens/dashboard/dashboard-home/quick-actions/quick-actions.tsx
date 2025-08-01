@@ -1,12 +1,12 @@
 'use client';
 
-import { 
-  Upload, 
-  FileText, 
+import {
+  Upload,
+  FileText,
   Calendar,
   Users,
   BarChart3,
-  Brain
+  Brain,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,28 +71,30 @@ const QuickActions = ({ onActionClick }: QuickActionsProps) => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <div className="w-2 h-2 bg-primary rounded-full"></div>
+          <div className="h-2 w-2 rounded-full bg-primary"></div>
           <span>Быстрые действия</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {actions.map((action) => {
             const IconComponent = action.icon;
             return (
               <Button
                 key={action.id}
                 variant="ghost"
-                className="h-auto p-4 justify-start group hover:bg-muted/50"
+                className="group h-auto justify-start p-4 hover:bg-muted/50"
                 onClick={() => onActionClick?.(action.id)}
               >
-                <div className="flex items-center space-x-3 w-full">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${action.color} ${action.hoverColor}`}>
+                <div className="flex w-full items-center space-x-3">
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${action.color} ${action.hoverColor}`}
+                  >
                     <IconComponent className="h-5 w-5" />
                   </div>
-                  <div className="text-left flex-1 min-w-0">
-                    <div className="font-medium text-sm">{action.title}</div>
-                    <div className="text-xs text-muted-foreground truncate">
+                  <div className="min-w-0 flex-1 text-left">
+                    <div className="text-sm font-medium">{action.title}</div>
+                    <div className="truncate text-xs text-muted-foreground">
                       {action.description}
                     </div>
                   </div>
@@ -106,4 +108,4 @@ const QuickActions = ({ onActionClick }: QuickActionsProps) => {
   );
 };
 
-export default QuickActions; 
+export default QuickActions;

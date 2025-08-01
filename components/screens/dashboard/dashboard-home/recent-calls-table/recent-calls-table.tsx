@@ -14,11 +14,11 @@ interface RecentCallsTableProps {
   onPlayRecording?: (callId: string) => void;
 }
 
-const RecentCallsTable = ({ 
-  calls, 
-  isLoading, 
-  onAnalyzeCall, 
-  onPlayRecording 
+const RecentCallsTable = ({
+  calls,
+  isLoading,
+  onAnalyzeCall,
+  onPlayRecording,
 }: RecentCallsTableProps) => {
   const [selectedCall] = useState<string | null>(null);
 
@@ -31,13 +31,16 @@ const RecentCallsTable = ({
         <CardContent>
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex items-center space-x-4 p-3 rounded-lg animate-pulse">
-                <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+              <div
+                key={i}
+                className="flex animate-pulse items-center space-x-4 rounded-lg p-3"
+              >
+                <div className="h-10 w-10 rounded-full bg-gray-200"></div>
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 w-1/4 rounded bg-gray-200"></div>
+                  <div className="h-3 w-1/2 rounded bg-gray-200"></div>
                 </div>
-                <div className="w-20 h-6 bg-gray-200 rounded"></div>
+                <div className="h-6 w-20 rounded bg-gray-200"></div>
               </div>
             ))}
           </div>
@@ -75,14 +78,12 @@ const RecentCallsTable = ({
       'in-progress': 'В процессе',
     };
 
-    return (
-      <Badge variant={variants[status]}>
-        {labels[status]}
-      </Badge>
-    );
+    return <Badge variant={variants[status]}>{labels[status]}</Badge>;
   };
 
-  const getSentimentBadge = (sentiment?: 'positive' | 'negative' | 'neutral') => {
+  const getSentimentBadge = (
+    sentiment?: 'positive' | 'negative' | 'neutral',
+  ) => {
     if (!sentiment) return null;
 
     const variants = {
@@ -108,7 +109,7 @@ const RecentCallsTable = ({
     return type === 'incoming' ? (
       <Phone className="h-4 w-4 text-green-500" />
     ) : (
-      <Phone className="h-4 w-4 text-blue-500 rotate-12" />
+      <Phone className="h-4 w-4 rotate-12 text-blue-500" />
     );
   };
 
@@ -126,8 +127,10 @@ const RecentCallsTable = ({
             calls.map((call) => (
               <div
                 key={call.id}
-                className={`flex items-center space-x-4 p-3 rounded-lg border transition-colors hover:bg-muted/50 cursor-pointer ${
-                  selectedCall === call.id ? 'bg-muted border-primary' : 'bg-background'
+                className={`flex cursor-pointer items-center space-x-4 rounded-lg border p-3 transition-colors hover:bg-muted/50 ${
+                  selectedCall === call.id
+                    ? 'border-primary bg-muted'
+                    : 'bg-background'
                 }`}
                 onClick={() => onPlayRecording?.(call.id)}
               >
@@ -137,16 +140,16 @@ const RecentCallsTable = ({
                 </div>
 
                 {/* Основная информация */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center space-x-2">
-                    <p className="text-sm font-medium truncate">
+                    <p className="truncate text-sm font-medium">
                       {call.clientName || call.phoneNumber}
                     </p>
                     {getStatusBadge(call.status)}
                     {getSentimentBadge(call.aiAnalysis?.sentiment)}
                   </div>
-                  
-                  <div className="flex items-center space-x-4 text-xs text-muted-foreground mt-1">
+
+                  <div className="mt-1 flex items-center space-x-4 text-xs text-muted-foreground">
                     <span className="flex items-center space-x-1">
                       <User className="h-3 w-3" />
                       <span>{call.managerName}</span>
@@ -173,7 +176,7 @@ const RecentCallsTable = ({
                       <Play className="h-3 w-3" />
                     </Button>
                   )}
-                  
+
                   <Button
                     size="sm"
                     variant="outline"
@@ -189,8 +192,8 @@ const RecentCallsTable = ({
               </div>
             ))
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <Phone className="h-12 w-12 mx-auto mb-2 opacity-50" />
+            <div className="py-8 text-center text-muted-foreground">
+              <Phone className="mx-auto mb-2 h-12 w-12 opacity-50" />
               <p>Нет звонков для отображения</p>
             </div>
           )}
@@ -198,18 +201,20 @@ const RecentCallsTable = ({
 
         {/* Детали выбранного звонка */}
         {selectedCall && calls && (
-          <div className="mt-4 p-4 bg-muted rounded-lg">
+          <div className="mt-4 rounded-lg bg-muted p-4">
             {(() => {
-              const call = calls.find(c => c.id === selectedCall);
+              const call = calls.find((c) => c.id === selectedCall);
               if (!call) return null;
 
               return (
                 <div className="space-y-3">
                   <h4 className="font-medium">Детали звонка</h4>
-                  
+
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-muted-foreground">Номер телефона:</span>
+                      <span className="text-muted-foreground">
+                        Номер телефона:
+                      </span>
                       <p className="font-medium">{call.phoneNumber}</p>
                     </div>
                     <div>
@@ -222,17 +227,23 @@ const RecentCallsTable = ({
 
                   {call.aiAnalysis && (
                     <div className="space-y-2">
-                      <h5 className="font-medium text-sm">AI Анализ</h5>
+                      <h5 className="text-sm font-medium">AI Анализ</h5>
                       <p className="text-sm text-muted-foreground">
                         {call.aiAnalysis.summary}
                       </p>
-                      
+
                       {call.aiAnalysis.keyTopics.length > 0 && (
                         <div>
-                          <span className="text-xs text-muted-foreground">Ключевые темы:</span>
-                          <div className="flex flex-wrap gap-1 mt-1">
+                          <span className="text-xs text-muted-foreground">
+                            Ключевые темы:
+                          </span>
+                          <div className="mt-1 flex flex-wrap gap-1">
                             {call.aiAnalysis.keyTopics.map((topic, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="text-xs"
+                              >
                                 {topic}
                               </Badge>
                             ))}
@@ -251,4 +262,4 @@ const RecentCallsTable = ({
   );
 };
 
-export default RecentCallsTable; 
+export default RecentCallsTable;

@@ -15,7 +15,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CallStats } from '@/services/api/queries/calls.queries';
@@ -29,14 +29,14 @@ interface AnalyticsChartsProps {
 const AnalyticsCharts = ({ stats, isLoading }: AnalyticsChartsProps) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {[...Array(4)].map((_, i) => (
           <Card key={i} className="animate-pulse">
             <CardHeader>
-              <div className="h-4 bg-gray-200 rounded w-32"></div>
+              <div className="h-4 w-32 rounded bg-gray-200"></div>
             </CardHeader>
             <CardContent>
-              <div className="h-64 bg-gray-200 rounded"></div>
+              <div className="h-64 rounded bg-gray-200"></div>
             </CardContent>
           </Card>
         ))}
@@ -65,16 +65,18 @@ const AnalyticsCharts = ({ stats, isLoading }: AnalyticsChartsProps) => {
   ];
 
   const generateManagerData = () => {
-    return stats?.topPerformers?.slice(0, 5).map(performer => ({
-      name: performer.managerName.split(' ')[0], // Только имя
-      calls: performer.callsCount,
-      satisfaction: performer.avgSentiment * 100,
-    })) || [];
+    return (
+      stats?.topPerformers?.slice(0, 5).map((performer) => ({
+        name: performer.managerName.split(' ')[0], // Только имя
+        calls: performer.callsCount,
+        satisfaction: performer.avgSentiment * 100,
+      })) || []
+    );
   };
 
   const generateWeeklyTrend = () => {
     const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-    return days.map(day => ({
+    return days.map((day) => ({
       day,
       calls: Math.floor(Math.random() * 50) + 20,
       conversion: Math.floor(Math.random() * 30) + 60,
@@ -91,11 +93,19 @@ const AnalyticsCharts = ({ stats, isLoading }: AnalyticsChartsProps) => {
     value: unknown;
     color: string;
   }
-  
-  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: TooltipEntry[]; label?: string }) => {
+
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: TooltipEntry[];
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-background border rounded-lg shadow-lg p-3">
+        <div className="rounded-lg border bg-background p-3 shadow-lg">
           <p className="font-medium">{`${label}`}</p>
           {payload.map((entry, index: number) => (
             <p key={index} style={{ color: entry.color }}>
@@ -109,7 +119,7 @@ const AnalyticsCharts = ({ stats, isLoading }: AnalyticsChartsProps) => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       {/* График звонков по времени */}
       <Card>
         <CardHeader>
@@ -122,11 +132,7 @@ const AnalyticsCharts = ({ stats, isLoading }: AnalyticsChartsProps) => {
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={timeSeriesData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="time" 
-                fontSize={12}
-                interval="preserveStartEnd"
-              />
+              <XAxis dataKey="time" fontSize={12} interval="preserveStartEnd" />
               <YAxis fontSize={12} />
               <Tooltip content={<CustomTooltip />} />
               <Area
@@ -166,7 +172,9 @@ const AnalyticsCharts = ({ stats, isLoading }: AnalyticsChartsProps) => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent).toFixed(0)}%`}
+                label={({ name, percent }) =>
+                  `${name} ${((percent as number) * 100).toFixed(0)}%`
+                }
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
@@ -240,4 +248,4 @@ const AnalyticsCharts = ({ stats, isLoading }: AnalyticsChartsProps) => {
   );
 };
 
-export default AnalyticsCharts; 
+export default AnalyticsCharts;
