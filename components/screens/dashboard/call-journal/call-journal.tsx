@@ -1,19 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Filter,
-  Phone,
-  User,
-  Clock,
-  Calendar,
-  Trash2,
-  ChevronDown,
-  FunnelX,
-} from 'lucide-react';
+import { Filter, Trash2, ChevronDown, FunnelX } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Collapsible,
   CollapsibleContent,
@@ -25,6 +15,7 @@ import CallJournalFilters from './call-journal-filters/call-journal-filters';
 import CallTable from './call-table/call-table';
 import CallSearchInput from './call-search-input';
 import useCallSearchParams from './use-call-search-params';
+import CallStats from './call-stats';
 
 const CallJournal = () => {
   const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
@@ -73,55 +64,7 @@ const CallJournal = () => {
     <div className="h-full w-full">
       <div className="mx-auto max-w-full space-y-4 p-4 lg:p-6">
         {/* Компактные KPI карточки */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <Card className="bg-card/50 py-3">
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Всего звонков</p>
-                  <p className="text-base font-bold">[no-data]</p>
-                </div>
-                <Phone className="h-3 w-3 text-muted-foreground" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card/50 py-3">
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Сегодня</p>
-                  <p className="text-base font-bold">[no-data]</p>
-                </div>
-                <Calendar className="h-3 w-3 text-muted-foreground" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card/50 py-3">
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Завершенные</p>
-                  <p className="text-base font-bold">[no-data]</p>
-                </div>
-                <User className="h-3 w-3 text-muted-foreground" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card/50 py-3">
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Пропущенные</p>
-                  <p className="text-base font-bold">[no-data]</p>
-                </div>
-                <Clock className="h-3 w-3 text-muted-foreground" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <CallStats />
 
         {/* Поиск и компактная кнопка фильтров */}
         <div className="flex flex-wrap items-center gap-3">
