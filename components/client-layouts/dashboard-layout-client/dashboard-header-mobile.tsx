@@ -3,6 +3,7 @@
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import UserMenu from './user-menu';
+import ThemeMenu from './theme-menu';
 
 interface MobileHeaderProps {
   pageTitle: string;
@@ -38,6 +39,7 @@ const DashboardHeaderMobile = ({
 
           {/* Правая часть - пользователь */}
           <div className="flex items-center">
+            <ThemeMenu />
             <UserMenu compact />
           </div>
         </div>

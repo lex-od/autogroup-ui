@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import UserMenu from './user-menu';
+import ThemeMenu from './theme-menu';
 
 interface HeaderProps {
   pageTitle: string;
@@ -85,6 +86,7 @@ const DashboardHeader = ({
               </DropdownMenu>
             )}
 
+            <ThemeMenu />
             <UserMenu />
           </div>
         </div>

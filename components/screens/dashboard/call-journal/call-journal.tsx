@@ -15,7 +15,7 @@ import CallJournalFilters from './call-journal-filters/call-journal-filters';
 import CallTable from './call-table/call-table';
 import CallSearchInput from './call-search-input';
 import useCallSearchParams from './use-call-search-params';
-import CallStats from './call-stats';
+import CallStatistics from './call-statistics';
 
 const CallJournal = () => {
   const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
@@ -64,7 +64,7 @@ const CallJournal = () => {
     <div className="h-full w-full">
       <div className="mx-auto max-w-full space-y-4 p-4 lg:p-6">
         {/* Компактные KPI карточки */}
-        <CallStats />
+        <CallStatistics />
 
         {/* Поиск и компактная кнопка фильтров */}
         <div className="flex flex-wrap items-center gap-3">

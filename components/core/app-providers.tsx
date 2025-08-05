@@ -1,9 +1,9 @@
 'use client';
 
+import { FC, PropsWithChildren, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { FC, PropsWithChildren, useRef } from 'react';
-
+import { ThemeProvider } from 'next-themes';
 import AuthStoreProvider from '@/stores/auth/auth-store-provider';
 import GlobalStoreProvider from '@/stores/global/global-store-provider';
 
@@ -26,7 +26,16 @@ const AppProviders: FC<PropsWithChildren> = ({ children }) => {
       <AuthStoreProvider
       // queryClient={queryClientRef.current}
       >
-        <GlobalStoreProvider>{children}</GlobalStoreProvider>
+        <GlobalStoreProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </GlobalStoreProvider>
       </AuthStoreProvider>
 
       <ReactQueryDevtools />
