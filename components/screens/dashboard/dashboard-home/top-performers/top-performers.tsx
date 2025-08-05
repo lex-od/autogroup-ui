@@ -1,5 +1,3 @@
-'use client';
-
 import { Award, TrendingUp, Star, Phone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -108,11 +106,7 @@ const TopPerformers = ({ stats, isLoading }: TopPerformersProps) => {
             {stats.topPerformers.slice(0, 5).map((performer, index) => (
               <div
                 key={performer.managerId}
-                className={`flex items-center space-x-3 rounded-lg p-3 transition-colors hover:bg-muted/50 ${
-                  index === 0
-                    ? 'border border-yellow-200 bg-yellow-50'
-                    : 'bg-muted/30'
-                }`}
+                className="flex items-center space-x-3 rounded-lg bg-muted/30 p-3 transition-colors hover:bg-muted/50"
               >
                 {/* Место в рейтинге */}
                 <div className="flex-shrink-0">{getRankIcon(index)}</div>

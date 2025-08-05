@@ -1,6 +1,3 @@
-'use client';
-
-import { useState } from 'react';
 import { Play, Brain, Phone, Clock, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,8 +17,6 @@ const RecentCallsTable = ({
   onAnalyzeCall,
   onPlayRecording,
 }: RecentCallsTableProps) => {
-  const [selectedCall] = useState<string | null>(null);
-
   if (isLoading) {
     return (
       <Card>
@@ -127,11 +122,7 @@ const RecentCallsTable = ({
             calls.map((call) => (
               <div
                 key={call.id}
-                className={`flex cursor-pointer items-center space-x-4 rounded-lg border p-3 transition-colors hover:bg-muted/50 ${
-                  selectedCall === call.id
-                    ? 'border-primary bg-muted'
-                    : 'bg-background'
-                }`}
+                className="flex items-center space-x-4 rounded-lg border p-3 transition-colors hover:bg-muted/50"
                 onClick={() => onPlayRecording?.(call.id)}
               >
                 {/* Иконка типа звонка */}
@@ -198,65 +189,6 @@ const RecentCallsTable = ({
             </div>
           )}
         </div>
-
-        {/* Детали выбранного звонка */}
-        {selectedCall && calls && (
-          <div className="mt-4 rounded-lg bg-muted p-4">
-            {(() => {
-              const call = calls.find((c) => c.id === selectedCall);
-              if (!call) return null;
-
-              return (
-                <div className="space-y-3">
-                  <h4 className="font-medium">Детали звонка</h4>
-
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">
-                        Номер телефона:
-                      </span>
-                      <p className="font-medium">{call.phoneNumber}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Тип звонка:</span>
-                      <p className="font-medium">
-                        {call.type === 'incoming' ? 'Входящий' : 'Исходящий'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {call.aiAnalysis && (
-                    <div className="space-y-2">
-                      <h5 className="text-sm font-medium">AI Анализ</h5>
-                      <p className="text-sm text-muted-foreground">
-                        {call.aiAnalysis.summary}
-                      </p>
-
-                      {call.aiAnalysis.keyTopics.length > 0 && (
-                        <div>
-                          <span className="text-xs text-muted-foreground">
-                            Ключевые темы:
-                          </span>
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {call.aiAnalysis.keyTopics.map((topic, index) => (
-                              <Badge
-                                key={index}
-                                variant="outline"
-                                className="text-xs"
-                              >
-                                {topic}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-          </div>
-        )}
       </CardContent>
     </Card>
   );
