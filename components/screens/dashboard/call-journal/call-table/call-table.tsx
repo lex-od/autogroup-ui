@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { VariantProps } from 'class-variance-authority';
+import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -91,21 +92,13 @@ const CallTable: FC<Props> = ({
     }
   };
 
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const formatDuration = (durationSeconds: number | null) => {
+    if (!durationSeconds) {
+      return '--:--';
+    }
+    const minutes = Math.floor(durationSeconds / 60);
+    const seconds = durationSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
   const getStatusBadge = (status: CallsItem['status']) => {
@@ -136,17 +129,17 @@ const CallTable: FC<Props> = ({
     );
   };
 
-  const getCallTypeIcon = (type: CallsItem['call_type']) => {
+  const getCallTypeBadge = (type: CallsItem['call_type']) => {
     return type === 'incoming' ? (
-      <div className="flex items-center space-x-1 text-green-600">
-        <PhoneIncoming className="h-3 w-3" />
-        <span className="text-xs">Входящий</span>
-      </div>
+      <Badge variant="green-1">
+        <PhoneIncoming />
+        <span>Входящий</span>
+      </Badge>
     ) : (
-      <div className="flex items-center space-x-1 text-blue-600">
-        <PhoneOutgoing className="h-3 w-3" />
-        <span className="text-xs">Исходящий</span>
-      </div>
+      <Badge variant="blue-1">
+        <PhoneOutgoing />
+        <span>Исходящий</span>
+      </Badge>
     );
   };
 
@@ -208,46 +201,61 @@ const CallTable: FC<Props> = ({
                               className="rounded"
                             />
                           </TableCell>
+
                           <TableCell>
-                            {getCallTypeIcon(call.call_type)}
+                            {getCallTypeBadge(call.call_type)}
                           </TableCell>
+
                           <TableCell>
                             <div>
-                              <p className="font-medium">{call.client_name}</p>
+                              {call.client_name && (
+                                <div className="flex items-center gap-1">
+                                  <User className="size-3 text-muted-foreground" />
+                                  <p className="font-medium">
+                                    {call.client_name}
+                                  </p>
+                                </div>
+                              )}
                               <p className="text-xs text-muted-foreground">
                                 {call.phone_number}
                               </p>
                             </div>
                           </TableCell>
+
                           <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <User className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-sm">
-                                {call.manager_name}
-                              </span>
-                            </div>
+                            {call.manager_name && (
+                              <div className="flex items-center gap-1">
+                                <User className="size-3 text-muted-foreground" />
+                                <p>{call.manager_name}</p>
+                              </div>
+                            )}
                           </TableCell>
+
                           <TableCell>
                             {call.call_date && (
-                              <div className="flex items-center space-x-2">
-                                <Calendar className="h-3 w-3 text-muted-foreground" />
-                                <span className="text-sm">
-                                  {formatDate(call.call_date)}
+                              <Badge className="border-orange-200 bg-orange-100 text-orange-800 dark:border-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                                <Calendar />
+                                <span>
+                                  {format(
+                                    parseISO(call.call_date),
+                                    'dd.MM.yyyy, HH:mm',
+                                  )}
                                 </span>
-                              </div>
+                              </Badge>
                             )}
                           </TableCell>
+
                           <TableCell>
-                            {call.duration_seconds !== null && (
-                              <div className="flex items-center space-x-2">
-                                <Clock className="h-3 w-3 text-muted-foreground" />
-                                <span className="text-sm">
-                                  {formatDuration(call.duration_seconds)}
-                                </span>
-                              </div>
-                            )}
+                            <Badge className="border-teal-200 bg-teal-100 text-teal-800 dark:border-teal-800 dark:bg-teal-900 dark:text-teal-200">
+                              <Clock />
+                              <span>
+                                {formatDuration(call.duration_seconds)}
+                              </span>
+                            </Badge>
                           </TableCell>
+
                           <TableCell>{getStatusBadge(call.status)}</TableCell>
+
                           <TableCell
                             onClick={(e: React.MouseEvent) =>
                               e.stopPropagation()

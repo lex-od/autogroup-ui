@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 const CallStatistics: FC = () => {
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
-      <Card className="border-blue-1-border bg-gradient-to-br from-blue-1-from to-blue-1-to py-4">
+      <Card className="border-blue-1-border bg-gradient-to-br from-blue-1-light to-blue-1 py-4">
         <CardContent className="px-4">
           <div className="flex items-center justify-between">
             <div>
@@ -39,7 +39,7 @@ const CallStatistics: FC = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-green-1-border bg-gradient-to-br from-green-1-from to-green-1-to py-4">
+      <Card className="border-green-1-border bg-gradient-to-br from-green-1-light to-green-1 py-4">
         <CardContent className="px-4">
           <div className="flex items-center justify-between">
             <div>
@@ -63,7 +63,7 @@ const CallStatistics: FC = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-emerald-1-border bg-gradient-to-br from-emerald-1-from to-emerald-1-to py-4">
+      <Card className="border-emerald-1-border bg-gradient-to-br from-emerald-1-light to-emerald-1 py-4">
         <CardContent className="px-4">
           <div className="flex items-center justify-between">
             <div>
@@ -84,7 +84,7 @@ const CallStatistics: FC = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-yellow-1-border bg-gradient-to-br from-yellow-1-from to-yellow-1-to py-4">
+      <Card className="border-yellow-1-border bg-gradient-to-br from-yellow-1-light to-yellow-1 py-4">
         <CardContent className="px-4">
           <div className="flex items-center justify-between">
             <div>
@@ -105,7 +105,7 @@ const CallStatistics: FC = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-red-1-border bg-gradient-to-br from-red-1-from to-red-1-to py-4">
+      <Card className="border-red-1-border bg-gradient-to-br from-red-1-light to-red-1 py-4">
         <CardContent className="px-4">
           <div className="flex items-center justify-between">
             <div>
@@ -124,7 +124,7 @@ const CallStatistics: FC = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-purple-1-border bg-gradient-to-br from-purple-1-from to-purple-1-to py-4">
+      <Card className="border-purple-1-border bg-gradient-to-br from-purple-1-light to-purple-1 py-4">
         <CardContent className="px-4">
           <div className="flex items-center justify-between">
             <div>
