@@ -61,72 +61,70 @@ const CallJournal = () => {
   };
 
   return (
-    <div className="h-full w-full">
-      <div className="mx-auto max-w-full space-y-4 p-4 lg:p-6">
-        {/* Компактные KPI карточки */}
-        <CallStatistics />
+    <div className="space-y-4 p-4 lg:p-6">
+      {/* Компактные KPI карточки */}
+      <CallStatistics />
 
-        {/* Поиск и компактная кнопка фильтров */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Поиск */}
-          <CallSearchInput value={search} onChange={handleSearchChange} />
+      {/* Поиск и компактная кнопка фильтров */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Поиск */}
+        <CallSearchInput value={search} onChange={handleSearchChange} />
 
-          {/* Кнопка удаления выбранных */}
-          {selectedCalls.length > 0 && (
-            <Button
-              variant="secondary"
-              onClick={handleDeleteSelected}
-              disabled={deleteCallsMutation.isPending}
-            >
-              <Trash2 />
-              Удалить ({selectedCalls.length})
-            </Button>
-          )}
+        {/* Кнопка удаления выбранных */}
+        {selectedCalls.length > 0 && (
+          <Button
+            variant="secondary"
+            onClick={handleDeleteSelected}
+            disabled={deleteCallsMutation.isPending}
+          >
+            <Trash2 />
+            Удалить ({selectedCalls.length})
+          </Button>
+        )}
 
-          {/* Очистить фильтры и поиск */}
-          {isFiltersSet && (
-            <Button
-              variant="secondary"
-              size="icon"
-              title="Очистить все"
-              onClick={unsetAllFilters}
-            >
-              <FunnelX />
-            </Button>
-          )}
+        {/* Очистить фильтры и поиск */}
+        {isFiltersSet && (
+          <Button
+            variant="secondary"
+            size="icon"
+            title="Очистить все"
+            onClick={unsetAllFilters}
+          >
+            <FunnelX />
+          </Button>
+        )}
 
-          {/* Компактная кнопка фильтров */}
-          <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-            <CollapsibleTrigger className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium whitespace-nowrap shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50">
-              <Filter className="mr-2 h-4 w-4" />
-              Фильтры
-              <ChevronDown className="ml-2 h-4 w-4" />
-            </CollapsibleTrigger>
-          </Collapsible>
-        </div>
-
-        {/* Выпадающий блок с фильтрами */}
+        {/* Компактная кнопка фильтров */}
         <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-          <CollapsibleContent>
-            <CallJournalFilters
-              dateRange={dateRange}
-              onDateRangeChange={setDateRangeToUrl}
-              callType={callType}
-              onCallTypeChange={setCallTypeToUrl}
-            />
-          </CollapsibleContent>
+          <CollapsibleTrigger className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium whitespace-nowrap shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50">
+            <Filter className="mr-2 h-4 w-4" />
+            Фильтры
+            <ChevronDown className="ml-2 h-4 w-4" />
+          </CollapsibleTrigger>
         </Collapsible>
-
-        {/* Таблица звонков */}
-        <CallTable
-          calls={calls}
-          callsPending={callsPending}
-          currentPage={currentPage}
-          onCurrentPageChange={setCurrentPageToUrl}
-          selectedCalls={selectedCalls}
-          setSelectedCalls={setSelectedCalls}
-        />
       </div>
+
+      {/* Выпадающий блок с фильтрами */}
+      <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+        <CollapsibleContent>
+          <CallJournalFilters
+            dateRange={dateRange}
+            onDateRangeChange={setDateRangeToUrl}
+            callType={callType}
+            onCallTypeChange={setCallTypeToUrl}
+          />
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Таблица звонков */}
+      <CallTable
+        calls={calls}
+        callsPending={callsPending}
+        currentPage={currentPage}
+        onCurrentPageChange={setCurrentPageToUrl}
+        selectedCalls={selectedCalls}
+        setSelectedCalls={setSelectedCalls}
+      />
     </div>
   );
 };

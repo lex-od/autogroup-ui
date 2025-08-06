@@ -85,7 +85,7 @@ const CallTablePagination: FC<Props> = ({
           return (
             <PaginationItem key={index}>
               {page === 'ellipsis' ? (
-                <PaginationEllipsis />
+                <PaginationEllipsis className="relative" />
               ) : (
                 <PaginationButton
                   className="disabled:opacity-100"

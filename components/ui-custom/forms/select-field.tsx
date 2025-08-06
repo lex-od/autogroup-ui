@@ -44,7 +44,7 @@ const SelectField = <TFieldValues extends FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="relative">
           <FormLabel>{label}</FormLabel>
 
           <Select onValueChange={field.onChange} value={field.value}>
