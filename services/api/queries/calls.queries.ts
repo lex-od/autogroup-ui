@@ -126,22 +126,6 @@ export const useStartAIAnalysis = () => {
 //   });
 // };
 
-export const useDeleteCall = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (callId: string) => {
-      const { data } = await axiosBase.delete(`/calls/${callId}`);
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['calls'] });
-      queryClient.invalidateQueries({ queryKey: ['recent-calls'] });
-      queryClient.invalidateQueries({ queryKey: ['call-stats'] });
-    },
-  });
-};
-
 export const useDeleteCalls = () => {
   const queryClient = useQueryClient();
 

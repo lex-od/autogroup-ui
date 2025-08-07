@@ -14,7 +14,7 @@ export type CallType = 'incoming' | 'outgoing';
 
 interface Call {
   audio_format: null;
-  call_date: null;
+  call_date: string | null;
   call_type: CallType;
   client_name: string | null;
   created_at: string;
