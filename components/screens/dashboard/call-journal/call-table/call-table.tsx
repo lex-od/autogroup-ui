@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Phone,
@@ -10,6 +10,11 @@ import {
   Trash2,
   PhoneIncoming,
   PhoneOutgoing,
+  Upload,
+  FileText,
+  CheckCircle,
+  XCircle,
+  LoaderCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { VariantProps } from 'class-variance-authority';
@@ -102,41 +107,65 @@ const CallTable: FC<Props> = ({
   };
 
   const getStatusBadge = (status: CallsItem['status']) => {
-    const variants: Record<
+    const configRecord: Record<
       CallsItem['status'],
-      VariantProps<typeof badgeVariants>['variant']
+      {
+        variant: VariantProps<typeof badgeVariants>['variant'];
+        icon: ReactNode;
+        label: string;
+      }
     > = {
-      uploaded: 'secondary',
-      processing: 'secondary',
-      transcribing: 'secondary',
-      analyzing: 'secondary',
-      completed: 'default',
-      failed: 'destructive',
+      uploaded: {
+        variant: 'tw-blue',
+        icon: <Upload />,
+        label: 'Загружен',
+      },
+      processing: {
+        variant: 'tw-cyan',
+        icon: <LoaderCircle className="animate-spin" />,
+        label: 'Обработка',
+      },
+      transcribing: {
+        variant: 'tw-yellow',
+        icon: <FileText />,
+        label: 'Транскрибация',
+      },
+      analyzing: {
+        variant: 'tw-purple',
+        icon: <Brain />,
+        label: 'Анализ',
+      },
+      completed: {
+        variant: 'tw-indigo',
+        icon: <CheckCircle />,
+        label: 'Завершен',
+      },
+      failed: {
+        variant: 'tw-red',
+        icon: <XCircle />,
+        label: 'Ошибка',
+      },
     };
-    const labels: Record<CallsItem['status'], string> = {
-      uploaded: 'Загружен',
-      processing: 'Обработка',
-      transcribing: 'Транскрибация',
-      analyzing: 'Анализ',
-      completed: 'Завершен',
-      failed: 'Ошибка',
-    };
+    const config = configRecord[status];
+    if (!config) {
+      return null;
+    }
     return (
-      <Badge variant={variants[status]} className="text-xs">
-        {status === 'completed' && <Brain className="mr-1 h-3 w-3" />}
-        {labels[status]}
+      <Badge variant={config.variant}>
+        {config.icon}
+        <span>{config.label}</span>
       </Badge>
     );
   };
 
   const getCallTypeBadge = (type: CallsItem['call_type']) => {
     return type === 'incoming' ? (
-      <Badge variant="green-1">
+      <Badge variant="tw-green">
         <PhoneIncoming />
         <span>Входящий</span>
       </Badge>
     ) : (
-      <Badge variant="blue-1">
+      <Badge variant="tw-blue">
         <PhoneOutgoing />
         <span>Исходящий</span>
       </Badge>
@@ -233,7 +262,7 @@ const CallTable: FC<Props> = ({
 
                           <TableCell>
                             {call.call_date && (
-                              <Badge className="border-orange-200 bg-orange-100 text-orange-800 dark:border-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                              <Badge variant="tw-orange">
                                 <Calendar />
                                 <span>
                                   {format(
@@ -246,7 +275,7 @@ const CallTable: FC<Props> = ({
                           </TableCell>
 
                           <TableCell>
-                            <Badge className="border-teal-200 bg-teal-100 text-teal-800 dark:border-teal-800 dark:bg-teal-900 dark:text-teal-200">
+                            <Badge variant="tw-teal">
                               <Clock />
                               <span>
                                 {formatDuration(call.duration_seconds)}
