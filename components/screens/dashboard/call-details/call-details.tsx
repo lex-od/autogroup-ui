@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import Link from 'next/link';
-import { Download, ArrowLeft, Clock, User, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Clock, User, Phone } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   TranscriptSegmentItem,
@@ -17,6 +15,7 @@ import CallTranscript from './call-transcript/call-transcript';
 import AiAnalysis from './ai-analysis/ai-analysis';
 import AudioPlayer, { AudioPlayerHandle } from './audio-player/audio-player';
 import CallComments from './call-comments/call-comments';
+import CallDetailsHeader from './call-details-header/call-details-header';
 
 interface CallDetailsProps {
   callId: string;
@@ -62,36 +61,8 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     return null;
   }
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-6">
-      {/* Хедер */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/dashboard/calls" className="cursor-default space-x-1">
-              <ArrowLeft className="h-4 w-4" />
-              <span>Назад к звонкам</span>
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">
-              Звонок {details.client_name || details.phone_number}
-            </h1>
-            <p className="text-muted-foreground">
-              {new Date(details.created_at).toLocaleString('ru-RU')}
-            </p>
-          </div>
-        </div>
-        <Button variant="outline" className="cursor-default" asChild>
-          <a
-            href={getPublicUrl('call-recordings', details.storage_path, {
-              download: true,
-            })}
-          >
-            <Download />
-            Скачать запись
-          </a>
-        </Button>
-      </div>
+    <div className="space-y-6 p-6">
+      <CallDetailsHeader details={details} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Основной контент */}
@@ -146,13 +117,10 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             </CardContent>
           </Card>
 
-          {/* Аудиоплеер */}
           <AudioPlayer
             src={getPublicUrl('call-recordings', details.storage_path)}
             ref={playerRef}
           />
-
-          {/* Транскрипция */}
           <CallTranscript
             transcript={transcript}
             transcriptPending={transcriptPending}
@@ -163,10 +131,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
 
         {/* Боковая панель с AI анализом */}
         <div className="space-y-6">
-          {/* AI Анализ */}
           <AiAnalysis analysis={analysis} analysisPending={analysisPending} />
-
-          {/* Заметки */}
           <CallComments callId={callId} />
         </div>
       </div>
