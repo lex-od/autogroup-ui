@@ -10,7 +10,17 @@ import { supabase } from '@/lib/supabase';
 import { supabaseUrl } from '@/lib/environment';
 
 // General types
+// We use them only in general components
+
 export type CallType = 'incoming' | 'outgoing';
+
+export type CallStatus =
+  | 'uploaded'
+  | 'processing'
+  | 'transcribing'
+  | 'analyzing'
+  | 'completed'
+  | 'failed';
 
 interface Call {
   audio_format: null;
@@ -29,13 +39,7 @@ interface Call {
   priority: 'normal';
   processing_completed_at: string | null;
   processing_started_at: string | null;
-  status:
-    | 'uploaded'
-    | 'processing'
-    | 'transcribing'
-    | 'analyzing'
-    | 'completed'
-    | 'failed';
+  status: CallStatus;
   storage_path: string;
   tags: unknown[];
   updated_at: string | null;

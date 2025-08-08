@@ -4,12 +4,14 @@ import { ArrowLeft, Download } from 'lucide-react';
 import { CallDetailsResponse } from '@/services/api/calls.api';
 import { Button } from '@/components/ui/button';
 import { getPublicUrl } from '@/lib/supabase';
+import CallStatusBadge from '@/components/ui-custom/call-status-badge';
+import CallDetailsActionsMenu from './call-details-actions-menu';
 
 interface Props {
-  details: CallDetailsResponse;
+  call: CallDetailsResponse;
 }
 
-const CallDetailsHeader: FC<Props> = ({ details }) => {
+const CallDetailsHeader: FC<Props> = ({ call }) => {
   return (
     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       {/* Left side */}
@@ -23,24 +25,28 @@ const CallDetailsHeader: FC<Props> = ({ details }) => {
 
         <div>
           <h1 className="text-2xl font-bold">
-            Звонок {details.client_name || details.phone_number}
+            Звонок {call.client_name || call.phone_number}
           </h1>
           <p className="text-muted-foreground">
-            {new Date(details.created_at).toLocaleString('ru-RU')}
+            {new Date(call.created_at).toLocaleString('ru-RU')}
           </p>
         </div>
       </div>
 
       {/* Right side */}
       <div className="flex items-center gap-x-2">
+        <CallStatusBadge status={call.status} className="py-1.5" />
+
+        <CallDetailsActionsMenu />
+
         <Button variant="outline" className="cursor-default" asChild>
           <a
-            href={getPublicUrl('call-recordings', details.storage_path, {
+            href={getPublicUrl('call-recordings', call.storage_path, {
               download: true,
             })}
           >
             <Download />
-            Скачать запись
+            <span>Скачать запись</span>
           </a>
         </Button>
       </div>
