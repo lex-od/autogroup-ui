@@ -35,7 +35,7 @@ const CallDetailsHeader: FC<Props> = ({ call }) => {
 
       {/* Right side */}
       <div className="flex items-center gap-x-2">
-        <CallStatusBadge status={call.status} className="py-1.5" />
+        <CallStatusBadge status={call.status} className="px-3 py-1.5" />
 
         <CallDetailsActionsMenu />
 

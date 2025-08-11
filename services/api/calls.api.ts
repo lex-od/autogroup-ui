@@ -209,7 +209,7 @@ export type CallAnalysisResponse = {
   processing_time_ms: number;
   sentiment_confidence: number; // 0.0 to 1.0
   sentiment_label: 'positive' | 'neutral' | 'negative';
-  sentiment_score: number; // -1.0 to 1.0
+  sentiment_score: number;
   service_quality_score: number; // 1-5
   summary: string;
   tokens_used: null;

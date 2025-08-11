@@ -26,8 +26,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
 
   const playerRef = useRef<AudioPlayerHandle>(null);
 
-  const { data: details, isPending: detailsPending } =
-    useCallDetailsQuery(callId);
+  const { data: call, isPending: callPending } = useCallDetailsQuery(callId);
   const { data: transcript, isPending: transcriptPending } =
     useCallTranscriptQuery(callId);
   const { data: analysis, isPending: analysisPending } =
@@ -39,7 +38,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     playerRef.current?.play();
   };
 
-  if (detailsPending) {
+  if (callPending) {
     return (
       <div className="container mx-auto p-6">
         <div className="animate-pulse">
@@ -55,19 +54,19 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
       </div>
     );
   }
-  if (!details) {
+  if (!call) {
     return null;
   }
   return (
     <div className="space-y-6 p-6">
-      <CallDetailsHeader call={details} />
+      <CallDetailsHeader call={call} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left side */}
         <div className="space-y-6 lg:col-span-2">
-          <CallInfo call={details} />
+          <CallInfo call={call} analysis={analysis} />
           <AudioPlayer
-            src={getPublicUrl('call-recordings', details.storage_path)}
+            src={getPublicUrl('call-recordings', call.storage_path)}
             ref={playerRef}
           />
           <CallTranscript

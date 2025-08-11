@@ -1,14 +1,6 @@
 import { FC } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  User,
-  Clock,
-  Calendar,
-  MoreVertical,
-  Trash2,
-  PhoneIncoming,
-  PhoneOutgoing,
-} from 'lucide-react';
+import { User, Clock, Calendar, MoreVertical, Trash2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { CallsItem } from '@/services/api/calls.api';
 import CallStatusBadge from '@/components/ui-custom/call-status-badge';
+import CallTypeBadge from '@/components/ui-custom/call-type-badge';
 
 interface Props {
   call: CallsItem;
@@ -40,20 +33,6 @@ const CallTableRow: FC<Props> = ({ call, isSelected, onChangeSelected }) => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const getCallTypeBadge = (type: CallsItem['call_type']) => {
-    return type === 'incoming' ? (
-      <Badge variant="tw-green">
-        <PhoneIncoming />
-        <span>Входящий</span>
-      </Badge>
-    ) : (
-      <Badge variant="tw-blue">
-        <PhoneOutgoing />
-        <span>Исходящий</span>
-      </Badge>
-    );
-  };
-
   return (
     <TableRow
       className="cursor-default border-b border-border/40 hover:bg-muted/50"
@@ -68,7 +47,9 @@ const CallTableRow: FC<Props> = ({ call, isSelected, onChangeSelected }) => {
         />
       </TableCell>
 
-      <TableCell>{getCallTypeBadge(call.call_type)}</TableCell>
+      <TableCell>
+        <CallTypeBadge callType={call.call_type} />
+      </TableCell>
 
       <TableCell>
         <div>
