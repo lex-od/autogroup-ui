@@ -55,7 +55,7 @@ const CallInfo: FC<Props> = ({ call, analysis }) => {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
+            <Info className="size-5" />
             Основная информация
           </div>
 
@@ -66,33 +66,32 @@ const CallInfo: FC<Props> = ({ call, analysis }) => {
       <CardContent>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="space-y-3">
               <CallTypeBadge
                 callType={call.call_type}
                 className="px-2.5 py-1"
               />
-            </div>
 
-            <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-muted-foreground" />
+                <User className="size-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Клиент:</span>
                 <span className="font-medium">{call.client_name || '—'}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-muted-foreground" />
+                <Phone className="size-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Телефон:</span>
                 <span className="font-medium">{call.phone_number || '—'}</span>
               </div>
+
               <div className="flex items-center gap-2">
-                <UserCheck className="h-4 w-4 text-muted-foreground" />
+                <UserCheck className="size-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Менеджер:</span>
                 <span className="font-medium">{call.manager_name}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-muted-foreground" />
+                <Building2 className="size-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Отдел:</span>
                 <span className="font-medium">
                   {!analysis && '—'}
@@ -133,9 +132,9 @@ const CallInfo: FC<Props> = ({ call, analysis }) => {
                     size="sm"
                     variant="outline"
                     onClick={scrollToChecklist}
-                    className="flex items-center gap-1 text-xs"
+                    className="gap-1 text-xs"
                   >
-                    <AwardIcon className="h-3 w-3" />
+                    <AwardIcon />
                     Перейти к чек-листу
                   </Button>
                 </div>
@@ -143,50 +142,46 @@ const CallInfo: FC<Props> = ({ call, analysis }) => {
             )}
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  Длительность:
-                </span>
-                <span className="font-medium">
-                  {typeof call.duration_seconds === 'number'
-                    ? formatDuration(call.duration_seconds)
-                    : '—'}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Timer className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  Время ожидания:
-                </span>
-                <span className="font-medium">5 сек *</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  Размер файла:
-                </span>
-                <span className="font-medium">0.24 MB *</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Headphones className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Формат:</span>
-                <span className="font-medium uppercase">mp3 *</span>
-              </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Clock className="size-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                Длительность:
+              </span>
+              <span className="font-medium">
+                {typeof call.duration_seconds === 'number'
+                  ? formatDuration(call.duration_seconds)
+                  : '—'}
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
-              <Tag className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Теги:</span>
-              <div className="flex gap-1">
-                <Badge variant="secondary">VIP *</Badge>
-                <Badge variant="secondary">Новый клиент *</Badge>
-              </div>
+              <Timer className="size-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                Время ожидания:
+              </span>
+              <span className="font-medium">5 сек *</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <FileText className="size-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                Размер файла:
+              </span>
+              <span className="font-medium">0.24 MB *</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Headphones className="size-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Формат:</span>
+              <span className="font-medium uppercase">mp3 *</span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1">
+              <Tag className="mr-1 size-4 text-muted-foreground" />
+              <span className="mr-1 text-sm text-muted-foreground">Теги:</span>
+              <Badge variant="secondary">VIP *</Badge>
+              <Badge variant="secondary">Новый клиент *</Badge>
             </div>
           </div>
         </div>
@@ -196,44 +191,3 @@ const CallInfo: FC<Props> = ({ call, analysis }) => {
 };
 
 export default CallInfo;
-
-// <Card>
-//   <CardContent className="pt-6">
-//     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-//       <div className="flex items-center space-x-3">
-//         <Phone className="h-5 w-5 text-muted-foreground" />
-//         <div>
-//           <p className="text-sm text-muted-foreground">Номер телефона</p>
-//           <p className="font-medium">{call.phone_number || 'Нет номера'}</p>
-//         </div>
-//       </div>
-//       <div className="flex items-center space-x-3">
-//         <User className="h-5 w-5 text-muted-foreground" />
-//         <div>
-//           <p className="text-sm text-muted-foreground">Клиент</p>
-//           <p className="font-medium">
-//             {call.client_name || 'Нет названия'}
-//           </p>
-//         </div>
-//       </div>
-//       <div className="flex items-center space-x-3">
-//         <User className="h-5 w-5 text-muted-foreground" />
-//         <div>
-//           <p className="text-sm text-muted-foreground">Менеджер</p>
-//           <p className="font-medium">{call.manager_name || 'Нет имени'}</p>
-//         </div>
-//       </div>
-//       <div className="flex items-center space-x-3">
-//         <Clock className="h-5 w-5 text-muted-foreground" />
-//         <div>
-//           <p className="text-sm text-muted-foreground">Длительность</p>
-//           <p className="font-medium">
-//             {call.duration_seconds
-//               ? formatDuration(call.duration_seconds)
-//               : 'Нет данных'}
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   </CardContent>
-// </Card>
