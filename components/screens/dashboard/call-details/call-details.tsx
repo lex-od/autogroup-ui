@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Clock, User, Phone } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   TranscriptSegmentItem,
   useCallAnalysisQuery,
@@ -10,12 +8,12 @@ import {
   useCallTranscriptQuery,
 } from '@/services/api/calls.api';
 import { getPublicUrl } from '@/lib/supabase';
-import { formatDuration } from './call-details.utils';
 import CallTranscript from './call-transcript/call-transcript';
 import AiAnalysis from './ai-analysis/ai-analysis';
 import AudioPlayer, { AudioPlayerHandle } from './audio-player/audio-player';
 import CallComments from './call-comments/call-comments';
 import CallDetailsHeader from './call-details-header/call-details-header';
+import CallInfo from './call-info/call-info';
 
 interface CallDetailsProps {
   callId: string;
@@ -65,58 +63,9 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
       <CallDetailsHeader call={details} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Основной контент */}
+        {/* Left side */}
         <div className="space-y-6 lg:col-span-2">
-          {/* Информация о звонке */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="flex items-center space-x-3">
-                  <Phone className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Номер телефона
-                    </p>
-                    <p className="font-medium">
-                      {details.phone_number || 'Нет номера'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Клиент</p>
-                    <p className="font-medium">
-                      {details.client_name || 'Нет названия'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Менеджер</p>
-                    <p className="font-medium">
-                      {details.manager_name || 'Нет имени'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Clock className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Длительность
-                    </p>
-                    <p className="font-medium">
-                      {details.duration_seconds
-                        ? formatDuration(details.duration_seconds)
-                        : 'Нет данных'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
+          <CallInfo call={details} />
           <AudioPlayer
             src={getPublicUrl('call-recordings', details.storage_path)}
             ref={playerRef}
@@ -129,7 +78,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
           />
         </div>
 
-        {/* Боковая панель с AI анализом */}
+        {/* Right side */}
         <div className="space-y-6">
           <AiAnalysis analysis={analysis} analysisPending={analysisPending} />
           <CallComments callId={callId} />
