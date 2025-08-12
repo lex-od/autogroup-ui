@@ -9,6 +9,7 @@ import {
 } from '@/services/api/calls.api';
 import { getPublicUrl } from '@/lib/supabase';
 import CallTranscript from './call-transcript/call-transcript';
+import NotUsedAiAnalysis from './(not-used)/ai-analysis';
 import AiAnalysis from './ai-analysis/ai-analysis';
 import AudioPlayer, { AudioPlayerHandle } from './audio-player/audio-player';
 import CallComments from './call-comments/call-comments';
@@ -80,6 +81,10 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
         {/* Right side */}
         <div className="space-y-6">
           <AiAnalysis analysis={analysis} analysisPending={analysisPending} />
+          <NotUsedAiAnalysis
+            analysis={analysis}
+            analysisPending={analysisPending}
+          />
           <CallComments callId={callId} />
         </div>
       </div>
