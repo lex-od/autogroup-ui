@@ -22,9 +22,9 @@ const AiAnalysis: FC<Props> = ({ analysis, analysisPending }) => {
 
       <CardContent className="space-y-4">
         {!analysisPending && !analysis && (
-          <div className="py-4 text-center">
-            <Brain className="mx-auto mb-2 size-12 text-muted-foreground" />
-            <p className="text-muted-foreground">AI анализ недоступен</p>
+          <div className="space-y-2 py-4 text-muted-foreground">
+            <Brain className="mx-auto size-8" />
+            <p className="text-center">AI анализ недоступен</p>
           </div>
         )}
 
