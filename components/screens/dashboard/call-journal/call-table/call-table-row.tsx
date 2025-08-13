@@ -1,24 +1,9 @@
-import { FC, ReactNode } from 'react';
+import { FC } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  User,
-  Clock,
-  Calendar,
-  Brain,
-  MoreVertical,
-  Trash2,
-  PhoneIncoming,
-  PhoneOutgoing,
-  Upload,
-  FileText,
-  CheckCircle,
-  XCircle,
-  LoaderCircle,
-} from 'lucide-react';
-import { VariantProps } from 'class-variance-authority';
+import { User, Clock, Calendar, MoreVertical, Trash2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Badge, badgeVariants } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { TableCell, TableRow } from '@/components/ui/table';
 import {
   DropdownMenu,
@@ -27,6 +12,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { CallsItem } from '@/services/api/calls.api';
+import CallStatusBadge from '@/components/ui-custom/call-status-badge';
+import CallTypeBadge from '@/components/ui-custom/call-type-badge';
 
 interface Props {
   call: CallsItem;
@@ -46,72 +33,6 @@ const CallTableRow: FC<Props> = ({ call, isSelected, onChangeSelected }) => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const getStatusBadge = (status: CallsItem['status']) => {
-    const configRecord: Record<
-      CallsItem['status'],
-      {
-        variant: VariantProps<typeof badgeVariants>['variant'];
-        icon: ReactNode;
-        label: string;
-      }
-    > = {
-      uploaded: {
-        variant: 'tw-blue',
-        icon: <Upload />,
-        label: 'Загружен',
-      },
-      processing: {
-        variant: 'tw-cyan',
-        icon: <LoaderCircle className="animate-spin" />,
-        label: 'Обработка',
-      },
-      transcribing: {
-        variant: 'tw-yellow',
-        icon: <FileText />,
-        label: 'Транскрибация',
-      },
-      analyzing: {
-        variant: 'tw-purple',
-        icon: <Brain />,
-        label: 'Анализ',
-      },
-      completed: {
-        variant: 'tw-indigo',
-        icon: <CheckCircle />,
-        label: 'Завершен',
-      },
-      failed: {
-        variant: 'tw-red',
-        icon: <XCircle />,
-        label: 'Ошибка',
-      },
-    };
-    const config = configRecord[status];
-    if (!config) {
-      return null;
-    }
-    return (
-      <Badge variant={config.variant}>
-        {config.icon}
-        <span>{config.label}</span>
-      </Badge>
-    );
-  };
-
-  const getCallTypeBadge = (type: CallsItem['call_type']) => {
-    return type === 'incoming' ? (
-      <Badge variant="tw-green">
-        <PhoneIncoming />
-        <span>Входящий</span>
-      </Badge>
-    ) : (
-      <Badge variant="tw-blue">
-        <PhoneOutgoing />
-        <span>Исходящий</span>
-      </Badge>
-    );
-  };
-
   return (
     <TableRow
       className="cursor-default border-b border-border/40 hover:bg-muted/50"
@@ -126,7 +47,9 @@ const CallTableRow: FC<Props> = ({ call, isSelected, onChangeSelected }) => {
         />
       </TableCell>
 
-      <TableCell>{getCallTypeBadge(call.call_type)}</TableCell>
+      <TableCell>
+        <CallTypeBadge callType={call.call_type} />
+      </TableCell>
 
       <TableCell>
         <div>
@@ -165,7 +88,9 @@ const CallTableRow: FC<Props> = ({ call, isSelected, onChangeSelected }) => {
         </Badge>
       </TableCell>
 
-      <TableCell>{getStatusBadge(call.status)}</TableCell>
+      <TableCell>
+        <CallStatusBadge status={call.status} />
+      </TableCell>
 
       <TableCell onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <DropdownMenu>
