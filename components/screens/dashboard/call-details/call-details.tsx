@@ -15,6 +15,7 @@ import AudioPlayer, { AudioPlayerHandle } from './audio-player/audio-player';
 import CallComments from './call-comments/call-comments';
 import CallDetailsHeader from './call-details-header/call-details-header';
 import CallInfo from './call-info/call-info';
+import CallSummary from './call-summary/call-summary';
 
 interface CallDetailsProps {
   callId: string;
@@ -69,6 +70,11 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
           <AudioPlayer
             src={getPublicUrl('call-recordings', call.storage_path)}
             ref={playerRef}
+          />
+          <CallSummary
+            analysis={analysis}
+            analysisPending={analysisPending}
+            call={call}
           />
           <CallTranscript
             transcript={transcript}
