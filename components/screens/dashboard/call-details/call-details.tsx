@@ -8,7 +8,7 @@ import {
   useCallTranscriptQuery,
 } from '@/services/api/calls.api';
 import { getPublicUrl } from '@/lib/supabase';
-import CallTranscript from './call-transcript/call-transcript';
+import TranscriptChat from './transcript-chat/transcript-chat';
 import AiAnalysis from './ai-analysis/ai-analysis';
 import AiAnalysisActions from './ai-analysis-actions/ai-analysis-actions';
 import AudioPlayer, { AudioPlayerHandle } from './audio-player/audio-player';
@@ -76,7 +76,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             analysisPending={analysisPending}
             call={call}
           />
-          <CallTranscript
+          <TranscriptChat
             transcript={transcript}
             transcriptPending={transcriptPending}
             selectedSegmentStart={selectedSegmentStart}
