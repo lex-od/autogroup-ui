@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import {
   TranscriptSegmentItem,
   useCallAnalysisQuery,
@@ -22,10 +22,6 @@ interface CallDetailsProps {
 }
 
 const CallDetails = ({ callId }: CallDetailsProps) => {
-  const [selectedSegmentStart, setSelectedSegmentStart] = useState<
-    number | null
-  >(null);
-
   const playerRef = useRef<AudioPlayerHandle>(null);
 
   const { data: call, isPending: callPending } = useCallDetailsQuery(callId);
@@ -34,8 +30,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
   const { data: analysis, isPending: analysisPending } =
     useCallAnalysisQuery(callId);
 
-  const handleSegmentClick = (segment: TranscriptSegmentItem) => {
-    setSelectedSegmentStart(segment.start_ms);
+  const handleSegmentPlayClick = (segment: TranscriptSegmentItem) => {
     playerRef.current?.seek(segment.start_ms / 1000);
     playerRef.current?.play();
   };
@@ -79,8 +74,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
           <TranscriptChat
             transcript={transcript}
             transcriptPending={transcriptPending}
-            selectedSegmentStart={selectedSegmentStart}
-            onSegmentClick={handleSegmentClick}
+            onSegmentPlayClick={handleSegmentPlayClick}
           />
         </div>
 

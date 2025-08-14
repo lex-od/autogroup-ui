@@ -142,6 +142,8 @@ export const useCallDetailsQuery = (
 export interface TranscriptSegmentItem {
   confidence: number | null;
   end_ms: number;
+  name: string | null;
+  role: string | null;
   speaker: string;
   start_ms: number;
   text: string;
