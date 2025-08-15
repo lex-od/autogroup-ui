@@ -16,6 +16,7 @@ import CallComments from './call-comments/call-comments';
 import CallDetailsHeader from './call-details-header/call-details-header';
 import CallInfo from './call-info/call-info';
 import CallSummary from './call-summary/call-summary';
+import ServiceChecklist from './service-checklist/service-checklist';
 
 interface CallDetailsProps {
   callId: string;
@@ -29,6 +30,10 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     useCallTranscriptQuery(callId);
   const { data: analysis, isPending: analysisPending } =
     useCallAnalysisQuery(callId);
+
+  const isServiceCall = analysis?.topics.some((topic) => {
+    return ['сервис', 'обслуживание', 'ТО'].includes(topic);
+  });
 
   const handleSegmentPlayClick = (segment: TranscriptSegmentItem) => {
     playerRef.current?.seek(segment.start_ms / 1000);
@@ -61,7 +66,11 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left side */}
         <div className="space-y-6 lg:col-span-2">
-          <CallInfo call={call} analysis={analysis} />
+          <CallInfo
+            call={call}
+            analysis={analysis}
+            isServiceCall={isServiceCall}
+          />
           <AudioPlayer
             src={getPublicUrl('call-recordings', call.storage_path)}
             ref={playerRef}
@@ -76,6 +85,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             transcriptPending={transcriptPending}
             onSegmentPlayClick={handleSegmentPlayClick}
           />
+          {isServiceCall && <ServiceChecklist />}
         </div>
 
         {/* Right side */}
