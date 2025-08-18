@@ -4,6 +4,7 @@ import { useCallback, useRef } from 'react';
 import {
   TranscriptSegmentItem,
   useCallAnalysisQuery,
+  useCallCommentsQuery,
   useCallDetailsQuery,
   useCallTranscriptQuery,
 } from '@/services/api/calls.api';
@@ -26,10 +27,18 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
   const playerRef = useRef<AudioPlayerHandle>(null);
 
   const { data: call, isPending: callPending } = useCallDetailsQuery(callId);
-  const { data: transcript, isPending: transcriptPending } =
-    useCallTranscriptQuery(callId);
-  const { data: analysis, isPending: analysisPending } =
-    useCallAnalysisQuery(callId);
+  const { data: transcript, isLoading: transcriptLoading } =
+    useCallTranscriptQuery(callId, {
+      enabled: call?.status === 'completed',
+    });
+  const { data: analysis, isLoading: analysisLoading } = useCallAnalysisQuery(
+    callId,
+    { enabled: call?.status === 'completed' },
+  );
+  const { data: comments, isLoading: commentsLoading } = useCallCommentsQuery(
+    { callId, pageSize: 100 },
+    { enabled: !!call },
+  );
 
   const isServiceCall = analysis?.topics.some((topic) => {
     return ['сервис', 'обслуживание', 'ТО'].includes(topic);
@@ -43,7 +52,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     [],
   );
 
-  if (callPending) {
+  if (callPending || transcriptLoading || analysisLoading || commentsLoading) {
     return (
       <div className="container mx-auto p-6">
         <div className="animate-pulse">
@@ -95,7 +104,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
 
           {analysis && <AiAnalysisActions actions={analysis.action_items} />}
 
-          <CallComments callId={callId} />
+          <CallComments comments={comments} callId={callId} />
         </div>
       </div>
     </div>

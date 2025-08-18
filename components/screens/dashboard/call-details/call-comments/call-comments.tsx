@@ -3,26 +3,23 @@ import { MessageSquare, SquarePlus } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
+  CallCommentsResponse,
   useAddCallCommentMutation,
-  useCallCommentsQuery,
 } from '@/services/api/calls.api';
 import { Button } from '@/components/ui/button';
 import CallCommentsItem from './call-comments-item';
 import CallCommentsEditor from './call-comments-editor';
 
 interface Props {
+  comments?: CallCommentsResponse;
   callId: string;
 }
 
-const CallComments: FC<Props> = ({ callId }) => {
+const CallComments: FC<Props> = ({ comments, callId }) => {
   const queryClient = useQueryClient();
 
   const [isAddition, setIsAddition] = useState(false);
 
-  const { data: comments, isPending: commentsPending } = useCallCommentsQuery({
-    callId,
-    pageSize: 100,
-  });
   const { mutate: addComment, isPending: addCommentPending } =
     useAddCallCommentMutation({
       onSuccess: () => {
@@ -38,10 +35,10 @@ const CallComments: FC<Props> = ({ callId }) => {
   };
 
   useEffect(() => {
-    if (!commentsPending && !isCommentsLength) {
+    if (!isCommentsLength) {
       setIsAddition(true);
     }
-  }, [commentsPending, isCommentsLength]);
+  }, [isCommentsLength]);
 
   return (
     <Card className="gap-3">
