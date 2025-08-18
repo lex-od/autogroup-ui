@@ -26,12 +26,10 @@ import { formatDuration } from '../call-details.utils';
 interface Props {
   call: CallDetailsResponse;
   analysis?: CallAnalysisResponse;
+  isServiceCall?: boolean;
 }
 
-const CallInfo: FC<Props> = ({ call, analysis }) => {
-  const isServiceCall = analysis?.topics.some((topic) => {
-    return ['сервис', 'обслуживание', 'ТО'].includes(topic);
-  });
+const CallInfo: FC<Props> = ({ call, analysis, isServiceCall }) => {
   const serviceScore = 16;
   const maxServiceScore = 20;
   const serviceRatio = maxServiceScore ? serviceScore / maxServiceScore : 0;
@@ -44,9 +42,9 @@ const CallInfo: FC<Props> = ({ call, analysis }) => {
     })();
 
   const scrollToChecklist = () => {
-    const checklistElement = document.getElementById('service-checklist');
-    if (checklistElement) {
-      checklistElement.scrollIntoView({ behavior: 'smooth' });
+    const element = document.getElementById('service-checklist');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -92,10 +90,10 @@ const CallInfo: FC<Props> = ({ call, analysis }) => {
 
               <div className="flex items-center gap-2">
                 <Building2 className="size-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Отдел:</span>
+                <span className="text-sm text-muted-foreground">* Отдел:</span>
                 <span className="font-medium">
                   {!analysis && '—'}
-                  {analysis && (isServiceCall ? 'Сервис *' : 'Продажи *')}
+                  {analysis && (isServiceCall ? 'Сервис' : 'Продажи')}
                 </span>
               </div>
             </div>
@@ -120,12 +118,12 @@ const CallInfo: FC<Props> = ({ call, analysis }) => {
             {isServiceCall && (
               <div className="space-y-2">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Итоговая оценка сервиса:
+                  * Итоговая оценка сервиса:
                 </span>
                 <div className="flex items-center gap-2">
                   <Badge variant={serviceBadgeVariant} className="text-sm">
                     {serviceScore}/{maxServiceScore} баллов (
-                    {(serviceRatio * 100).toFixed(0)}%) *
+                    {(serviceRatio * 100).toFixed(0)}%)
                   </Badge>
 
                   <Button
@@ -135,7 +133,7 @@ const CallInfo: FC<Props> = ({ call, analysis }) => {
                     className="gap-1 text-xs"
                   >
                     <AwardIcon />
-                    Перейти к чек-листу
+                    Чек-лист
                   </Button>
                 </div>
               </div>
@@ -158,30 +156,32 @@ const CallInfo: FC<Props> = ({ call, analysis }) => {
             <div className="flex items-center gap-2">
               <Timer className="size-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                Время ожидания:
+                * Время ожидания:
               </span>
-              <span className="font-medium">5 сек *</span>
+              <span className="font-medium">5 сек</span>
             </div>
 
             <div className="flex items-center gap-2">
               <FileText className="size-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                Размер файла:
+                * Размер файла:
               </span>
-              <span className="font-medium">0.24 MB *</span>
+              <span className="font-medium">0.24 MB</span>
             </div>
 
             <div className="flex items-center gap-2">
               <Headphones className="size-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Формат:</span>
-              <span className="font-medium uppercase">mp3 *</span>
+              <span className="text-sm text-muted-foreground">* Формат:</span>
+              <span className="font-medium uppercase">mp3</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-1">
               <Tag className="mr-1 size-4 text-muted-foreground" />
-              <span className="mr-1 text-sm text-muted-foreground">Теги:</span>
-              <Badge variant="secondary">VIP *</Badge>
-              <Badge variant="secondary">Новый клиент *</Badge>
+              <span className="mr-1 text-sm text-muted-foreground">
+                * Теги:
+              </span>
+              <Badge variant="secondary">VIP</Badge>
+              <Badge variant="secondary">Новый клиент</Badge>
             </div>
           </div>
         </div>

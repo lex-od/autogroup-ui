@@ -41,6 +41,8 @@ const badgeVariants = cva(
           'border-indigo-200 bg-indigo-100 text-indigo-800 dark:border-indigo-950 dark:bg-indigo-950/80 dark:text-indigo-200',
         'tw-red':
           'border-red-200 bg-red-100 text-red-800 dark:border-red-950 dark:bg-red-950/80 dark:text-red-200',
+        'tw-gray':
+          'border-gray-200 bg-gray-100 text-gray-800 dark:border-gray-950 dark:bg-gray-950/80 dark:text-gray-200',
       },
     },
     defaultVariants: {
