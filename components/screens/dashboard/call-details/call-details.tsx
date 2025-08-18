@@ -18,6 +18,7 @@ import CallDetailsHeader from './call-details-header/call-details-header';
 import CallInfo from './call-info/call-info';
 import CallSummary from './call-summary/call-summary';
 import ServiceChecklist from './service-checklist/service-checklist';
+import CallDetailsSkeleton from './call-details-skeleton';
 
 interface CallDetailsProps {
   callId: string;
@@ -53,20 +54,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
   );
 
   if (callPending || transcriptLoading || analysisLoading || commentsLoading) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="animate-pulse">
-          <div className="mb-6 h-8 w-48 rounded bg-gray-200"></div>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="space-y-6 lg:col-span-2">
-              <div className="h-32 rounded bg-gray-200"></div>
-              <div className="h-96 rounded bg-gray-200"></div>
-            </div>
-            <div className="h-96 rounded bg-gray-200"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <CallDetailsSkeleton />;
   }
   if (!call) {
     return null;
