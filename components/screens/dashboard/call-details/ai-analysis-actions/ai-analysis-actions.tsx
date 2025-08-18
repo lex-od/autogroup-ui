@@ -6,11 +6,10 @@ import { CallAnalysisResponse } from '@/services/api/calls.api';
 import AiAnalysisActionItem from './ai-analysis-action-item';
 
 interface Props {
-  actions?: CallAnalysisResponse['action_items'];
-  actionsPending: boolean;
+  actions: CallAnalysisResponse['action_items'];
 }
 
-const AiAnalysisActions: FC<Props> = ({ actions, actionsPending }) => {
+const AiAnalysisActions: FC<Props> = ({ actions }) => {
   return (
     <Card>
       <CardHeader>
@@ -21,38 +20,27 @@ const AiAnalysisActions: FC<Props> = ({ actions, actionsPending }) => {
       </CardHeader>
 
       <CardContent>
-        {!actionsPending && !actions?.length && (
-          <div className="space-y-2 py-4 text-muted-foreground">
-            <Target className="mx-auto size-8" />
-            <p className="text-center">Нет доступных действий</p>
-          </div>
-        )}
+        <div className="space-y-3">
+          {actions.map((action) => (
+            <AiAnalysisActionItem
+              key={action}
+              title={action}
+              priority="medium"
+              isCompleted={false}
+            />
+          ))}
+        </div>
 
-        {!actionsPending && !!actions?.length && (
-          <>
-            <div className="space-y-3">
-              {actions.map((action) => (
-                <AiAnalysisActionItem
-                  key={action}
-                  title={action}
-                  priority="medium"
-                  isCompleted={false}
-                />
-              ))}
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-2 border-t pt-4">
-              <Button size="sm" variant="outline" className="flex-1">
-                <Mail />
-                Отправить *
-              </Button>
-              <Button size="sm" variant="outline" className="flex-1">
-                <Calendar />
-                Запланировать *
-              </Button>
-            </div>
-          </>
-        )}
+        <div className="mt-4 flex flex-wrap gap-2 border-t pt-4">
+          <Button size="sm" variant="outline" className="flex-1">
+            <Mail />
+            Отправить *
+          </Button>
+          <Button size="sm" variant="outline" className="flex-1">
+            <Calendar />
+            Запланировать *
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

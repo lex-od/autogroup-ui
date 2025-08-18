@@ -8,12 +8,11 @@ import {
 } from '@/services/api/calls.api';
 
 interface Props {
-  analysis?: CallAnalysisResponse;
-  analysisPending: boolean;
+  analysis: CallAnalysisResponse;
   call: CallDetailsResponse;
 }
 
-const CallSummary: FC<Props> = ({ analysis, analysisPending, call }) => {
+const CallSummary: FC<Props> = ({ analysis, call }) => {
   return (
     <Card>
       <CardHeader>
@@ -23,62 +22,51 @@ const CallSummary: FC<Props> = ({ analysis, analysisPending, call }) => {
         </CardTitle>
       </CardHeader>
 
-      <CardContent>
-        {!analysisPending && !analysis && (
-          <div className="space-y-2 py-4 text-muted-foreground">
-            <FileText className="mx-auto size-8" />
-            <p className="text-center">Нет данных</p>
-          </div>
-        )}
+      <CardContent className="space-y-4">
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          {analysis.summary}
+        </p>
 
-        {analysis && (
-          <div className="space-y-4">
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {analysis.summary}
-            </p>
-
-            <div className="grid gap-4 border-t pt-4 md:grid-cols-2">
-              <div className="flex gap-2">
-                <Target className="mt-0.5 size-4 text-muted-foreground" />
-                <div>
-                  <span className="text-xs font-medium text-muted-foreground">
-                    Цель звонка *
-                  </span>
-                  <p className="text-sm">Консультация</p>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Clock className="mt-0.5 size-4 text-muted-foreground" />
-                <div>
-                  <span className="text-xs font-medium text-muted-foreground">
-                    Результат *
-                  </span>
-                  <p className="text-sm">Консультация завершена успешно</p>
-                </div>
-              </div>
+        <div className="grid gap-4 border-t pt-4 md:grid-cols-2">
+          <div className="flex gap-2">
+            <Target className="mt-0.5 size-4 text-muted-foreground" />
+            <div>
+              <span className="text-xs font-medium text-muted-foreground">
+                Цель звонка *
+              </span>
+              <p className="text-sm">Консультация</p>
             </div>
+          </div>
 
-            <div className="border-t pt-4">
-              <div className="flex gap-2">
-                <User className="mt-0.5 size-4 text-muted-foreground" />
-                <div className="space-y-1">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    Участники
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">
-                      Менеджер: {call.manager_name || 'Нет имени'}
-                    </Badge>
-                    <Badge variant="outline">
-                      Клиент: {call.client_name || 'Нет имени'}
-                    </Badge>
-                  </div>
-                </div>
+          <div className="flex gap-2">
+            <Clock className="mt-0.5 size-4 text-muted-foreground" />
+            <div>
+              <span className="text-xs font-medium text-muted-foreground">
+                Результат *
+              </span>
+              <p className="text-sm">Консультация завершена успешно</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t pt-4">
+          <div className="flex gap-2">
+            <User className="mt-0.5 size-4 text-muted-foreground" />
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-muted-foreground">
+                Участники
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline">
+                  Менеджер: {call.manager_name || 'Нет имени'}
+                </Badge>
+                <Badge variant="outline">
+                  Клиент: {call.client_name || 'Нет имени'}
+                </Badge>
               </div>
             </div>
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );

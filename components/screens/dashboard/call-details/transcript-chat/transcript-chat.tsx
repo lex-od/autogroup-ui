@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { FileText } from 'lucide-react';
+import { Brain, Clock, DollarSign, FileText, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   CallTranscriptResponse,
@@ -9,16 +9,11 @@ import { Badge } from '@/components/ui/badge';
 import TranscriptChatItem from './transcript-chat-item/transcript-chat-item';
 
 interface Props {
-  transcript?: CallTranscriptResponse;
-  transcriptPending: boolean;
+  transcript: CallTranscriptResponse;
   onSegmentPlayClick: (segment: TranscriptSegmentItem) => void;
 }
 
-const TranscriptChat: FC<Props> = ({
-  transcript,
-  transcriptPending,
-  onSegmentPlayClick,
-}) => {
+const TranscriptChat: FC<Props> = ({ transcript, onSegmentPlayClick }) => {
   return (
     <Card>
       <CardHeader>
@@ -28,7 +23,7 @@ const TranscriptChat: FC<Props> = ({
             <h2>Транскрипция</h2>
           </div>
 
-          {transcript?.overall_confidence && (
+          {transcript.overall_confidence && (
             <Badge variant="secondary">
               Точность: {(transcript.overall_confidence * 100).toFixed(0)}%
             </Badge>
@@ -36,27 +31,36 @@ const TranscriptChat: FC<Props> = ({
         </CardTitle>
       </CardHeader>
 
-      <CardContent>
-        {!transcriptPending && !transcript && (
-          <div className="space-y-2 py-4 text-muted-foreground">
-            <FileText className="mx-auto size-8" />
-            <p className="text-center">Нет транскрипции</p>
-          </div>
-        )}
+      <CardContent className="space-y-4">
+        <div className="scrollbar-thin max-h-96 space-y-3 overflow-y-auto pr-2">
+          {transcript.segments.map((segment) => (
+            <TranscriptChatItem
+              key={segment.start_ms}
+              segment={segment}
+              onPlayClick={onSegmentPlayClick}
+            />
+          ))}
+        </div>
 
-        {transcript && (
-          <div className="space-y-4">
-            <div className="scrollbar-thin max-h-96 space-y-3 overflow-y-auto pr-2">
-              {transcript.segments.map((segment) => (
-                <TranscriptChatItem
-                  key={segment.start_ms}
-                  segment={segment}
-                  onPlayClick={onSegmentPlayClick}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Metadata */}
+        <div className="flex items-center gap-4 border-t pt-4 text-xs text-muted-foreground">
+          <p className="flex items-center gap-1">
+            <Brain className="size-3" />
+            Модель: {transcript.model_used}
+          </p>
+          <p className="flex items-center gap-1">
+            <Clock className="size-3" />
+            Время обработки: {transcript.processing_time_ms} мс
+          </p>
+          <p className="flex items-center gap-1">
+            <Zap className="size-3" />
+            Токены: 800*
+          </p>
+          <p className="flex items-center gap-1">
+            <DollarSign className="size-3" />
+            Стоимость: 0.08* грн
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

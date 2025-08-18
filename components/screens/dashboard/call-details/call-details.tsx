@@ -78,26 +78,23 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             src={getPublicUrl('call-recordings', call.storage_path)}
             ref={playerRef}
           />
-          <CallSummary
-            analysis={analysis}
-            analysisPending={analysisPending}
-            call={call}
-          />
-          <TranscriptChat
-            transcript={transcript}
-            transcriptPending={transcriptPending}
-            onSegmentPlayClick={handleSegmentPlayClick}
-          />
+          {analysis && <CallSummary analysis={analysis} call={call} />}
+
+          {transcript && (
+            <TranscriptChat
+              transcript={transcript}
+              onSegmentPlayClick={handleSegmentPlayClick}
+            />
+          )}
           {isServiceCall && <ServiceChecklist />}
         </div>
 
         {/* Right side */}
         <div className="space-y-6">
-          <AiAnalysis analysis={analysis} analysisPending={analysisPending} />
-          <AiAnalysisActions
-            actions={analysis?.action_items}
-            actionsPending={analysisPending}
-          />
+          {analysis && <AiAnalysis analysis={analysis} />}
+
+          {analysis && <AiAnalysisActions actions={analysis.action_items} />}
+
           <CallComments callId={callId} />
         </div>
       </div>
