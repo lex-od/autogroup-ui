@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import {
   TranscriptSegmentItem,
   useCallAnalysisQuery,
@@ -35,10 +35,13 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     return ['сервис', 'обслуживание', 'ТО'].includes(topic);
   });
 
-  const handleSegmentPlayClick = (segment: TranscriptSegmentItem) => {
-    playerRef.current?.seek(segment.start_ms / 1000);
-    playerRef.current?.play();
-  };
+  const handleSegmentPlayClick = useCallback(
+    (segment: TranscriptSegmentItem) => {
+      playerRef.current?.seek(segment.start_ms / 1000);
+      playerRef.current?.play();
+    },
+    [],
+  );
 
   if (callPending) {
     return (
