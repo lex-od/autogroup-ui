@@ -42,7 +42,7 @@ const CallDetailsHeader: FC<Props> = ({ call }) => {
         {call.storage_path && (
           <Button variant="outline" className="cursor-default" asChild>
             <a
-              href={getPublicUrl('call-recordings', call.storage_path, {
+              href={getPublicUrl('audio-files', call.storage_path, {
                 download: true,
               })}
             >

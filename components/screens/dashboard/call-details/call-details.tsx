@@ -73,7 +73,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
           />
           {call.storage_path && (
             <AudioPlayer
-              src={getPublicUrl('call-recordings', call.storage_path)}
+              src={getPublicUrl('audio-files', call.storage_path)}
               ref={playerRef}
             />
           )}
