@@ -71,10 +71,12 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             analysis={analysis}
             isServiceCall={isServiceCall}
           />
-          <AudioPlayer
-            src={getPublicUrl('call-recordings', call.storage_path)}
-            ref={playerRef}
-          />
+          {call.storage_path && (
+            <AudioPlayer
+              src={getPublicUrl('call-recordings', call.storage_path)}
+              ref={playerRef}
+            />
+          )}
           {analysis && <CallSummary analysis={analysis} call={call} />}
 
           {transcript && (

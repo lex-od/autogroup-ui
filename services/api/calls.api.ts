@@ -24,26 +24,48 @@ export type CallStatus =
 
 interface Call {
   audio_format: null;
+  binotel_account_id: null;
+  binotel_status: null;
   call_date: string | null;
+  call_ended_at: string | null;
+  call_started_at: string | null;
+  call_transfer_info: null;
   call_type: CallType;
   client_name: string | null;
+  company_number: string | null;
+  company_number_name: string | null;
   created_at: string;
+  customer_number: null;
+  dst: null;
   duration_seconds: number | null;
+  employee_info: null;
   error_details: null;
   error_message: string | null;
-  file_size_bytes: number;
+  event_type: 'call_recording_ready' | 'call_end' | 'incoming_call' | null;
+  external_id: null;
+  file_size_bytes: number | null;
   id: string;
-  manager_name: string | null;
+  internal_number: null;
+  manager_name: string | null; // ? string
+  missed_call_reason: null;
   original_filename: string | null;
+  original_link: string | null;
   phone_number: string | null;
   priority: 'normal';
   processing_completed_at: string | null;
   processing_started_at: string | null;
+  raw_webhook_data: null;
+  recording_status: 'pending';
+  source: 'manual';
   status: CallStatus;
-  storage_path: string;
+  storage_path: string | null;
   tags: unknown[];
-  updated_at: string | null;
-  user_id: string | null;
+  updated_at: string | null; // ? string
+  user_id: string | null; // ? string
+  wait_time: null;
+  webhook_signature: string | null;
+  webhook_source_ip: string | null;
+  webhook_timestamp: string | null;
 }
 
 // ============================================================================
