@@ -160,6 +160,7 @@ export const useCallDetailsQuery = (
 };
 
 // ============================================================================
+// Call Transcript Query
 
 export interface TranscriptSegmentItem {
   confidence: number | null;
@@ -170,21 +171,29 @@ export interface TranscriptSegmentItem {
   start_ms: number;
   text: string;
 }
-
 export type CallTranscriptResponse = {
+  all_results: unknown[];
+  all_results_count: number;
+  best_result_id: string | null;
   call_id: string;
+  comparison_metadata: object; // ?
   created_at: string;
   full_text: string;
+  google_result: null;
   id: string;
   language: string;
+  lead_quality: null;
   model_used: string;
   overall_confidence: number | null;
   processing_time_ms: number;
+  raw_response: null;
   retry_count: number;
+  roles_verified_by_ai: boolean;
   segments: TranscriptSegmentItem[];
   silence_duration_ms: number | null;
-  speaker_labels: unknown;
+  speaker_labels: object; // ?
   speakers_count: number;
+  wer_score: null;
   word_count: number;
 };
 
@@ -212,30 +221,82 @@ export const useCallTranscriptQuery = (
 };
 
 // ============================================================================
+// Call Analysis Query
 
 export type CallAnalysisResponse = {
   action_items: string[];
+  action_items_for_client: string[];
+  action_items_for_manager: string[];
+  call_date: null;
+  call_duration_seconds: number | null;
   call_id: string;
-  client_readiness: null;
+  call_outcome: {
+    specific_outcome_details?: string | null; // ? string
+    status?: string | null; // ? string
+  };
+  call_purpose: string | null;
+  call_time: null;
+  client_confidence_score: null;
+  client_needs: string[];
+  client_objections_concerns: string[];
+  client_readiness: 'высокая' | null;
+  client_satisfaction_score: number | null;
   compliance_issues: string[];
+  consultation_completeness: 'полная' | null;
   created_at: string;
-  expected_deal_size: null;
-  follow_up_priority: null;
+  expected_deal_size: 'низкий' | null;
+  follow_up_priority: 'низкий' | null;
   id: string;
+  identified_names: string[];
   insights: {
-    client_readiness: 'высокая' | null;
-    expected_deal_size: 'высокий' | 'средний' | null;
-    follow_up_priority: 'высокий' | 'средний' | null;
+    call_outcome?: string | null; // ? string | undefined
+    call_purpose?: string | null; // ? string | undefined
+    client_readiness?: 'высокая' | 'средняя' | null; // ? string
+    expected_deal_size?: 'низкий' | 'неизвестно' | null; // ? string
+    follow_up_priority?: 'средний' | 'низкий' | null; // ? string
   };
   key_phrases: string[];
+  manager_confidence_score: number | null;
+  manager_politeness: 'да' | null;
+  manager_strengths: string[];
   missed_opportunities: string[];
   model_used: string;
+  participants_roles: Array<{
+    name: string | null; // ? string
+    role_detail: string | null; // ? string
+    speaker_type: string | null; // ? string
+  }>;
   processing_time_ms: number;
+  product_service_interest: {
+    brand_model_car?: string | null; // ? string | undefined
+    budget_discussed_rub?: number | null; // ? number | undefined
+    currency?: string | null; // ? string | undefined
+    desired_configuration?: string | null; // ? string | undefined
+    desired_year?: string | null; // ? string | undefined
+    parts_description?: string | null; // ? string | undefined
+    service_type?: string | null; // ? string | undefined
+  };
+  raw_response: string | null;
+  recommended_next_steps: string[];
   sentiment_confidence: number; // 0.0 to 1.0
-  sentiment_label: 'positive' | 'neutral' | 'negative';
-  sentiment_score: number;
-  service_quality_score: number; // 1-5
-  summary: string;
+  sentiment_label: 'positive' | 'neutral' | 'negative' | 'Позитивный';
+  sentiment_score: number; // 0.0 to 1.0
+  service_quality_score: number; // 1 to 5
+  service_script_checklist: {
+    checklist_items?: Array<{
+      criterion: string;
+      item_number: number;
+      reason: string;
+      score: number;
+      status: 'выполнено' | 'не_выполнено' | 'неприменимо';
+      type: 'Обязательный' | 'Контекстный';
+    }>;
+    is_applicable?: boolean;
+    max_possible_score_checklist?: number | null; // ? number | undefined
+    total_score_checklist?: number | null; // ? number | undefined
+  };
+  summary: string | null; // ? string
+  summary_text: string | null;
   tokens_used: null;
   topics: string[];
 };
