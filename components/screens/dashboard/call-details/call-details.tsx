@@ -82,7 +82,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
               ref={playerRef}
             />
           )}
-          {analysis && <CallSummary analysis={analysis} call={call} />}
+          {analysis && <CallSummary analysis={analysis} />}
 
           {transcript && (
             <TranscriptChat
@@ -90,7 +90,12 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
               onSegmentPlayClick={handleSegmentPlayClick}
             />
           )}
-          {isServiceCall && <ServiceChecklist />}
+          {isServiceCall && (
+            <ServiceChecklist
+              analysis={analysis}
+              serviceTotalScore={serviceTotalScore}
+            />
+          )}
         </div>
 
         {/* Right side */}

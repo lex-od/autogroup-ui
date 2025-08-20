@@ -223,6 +223,14 @@ export const useCallTranscriptQuery = (
 // ============================================================================
 // Call Analysis Query
 
+export interface ServiceChecklistItem {
+  criterion: string;
+  item_number: number;
+  reason: string;
+  score: number;
+  status: 'выполнено' | 'не_выполнено' | 'неприменимо';
+  type: 'Обязательный' | 'Контекстный';
+}
 export type CallAnalysisResponse = {
   action_items: string[];
   action_items_for_client: string[];
@@ -283,14 +291,7 @@ export type CallAnalysisResponse = {
   sentiment_score: number; // 0.0 to 1.0
   service_quality_score: number; // 1 to 5
   service_script_checklist: {
-    checklist_items?: Array<{
-      criterion: string;
-      item_number: number;
-      reason: string;
-      score: number;
-      status: 'выполнено' | 'не_выполнено' | 'неприменимо';
-      type: 'Обязательный' | 'Контекстный';
-    }>;
+    checklist_items?: ServiceChecklistItem[];
     is_applicable?: boolean;
     max_possible_score_checklist?: number | null; // ? number | undefined
     total_score_checklist?: number | null; // ? number | undefined
