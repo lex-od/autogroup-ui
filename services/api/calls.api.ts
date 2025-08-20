@@ -24,26 +24,48 @@ export type CallStatus =
 
 interface Call {
   audio_format: null;
+  binotel_account_id: null;
+  binotel_status: null;
   call_date: string | null;
+  call_ended_at: string | null;
+  call_started_at: string | null;
+  call_transfer_info: null;
   call_type: CallType;
   client_name: string | null;
+  company_number: string | null;
+  company_number_name: string | null;
   created_at: string;
+  customer_number: null;
+  dst: null;
   duration_seconds: number | null;
+  employee_info: null;
   error_details: null;
   error_message: string | null;
-  file_size_bytes: number;
+  event_type: 'call_recording_ready' | 'call_end' | 'incoming_call' | null;
+  external_id: null;
+  file_size_bytes: number | null;
   id: string;
-  manager_name: string | null;
+  internal_number: null;
+  manager_name: string | null; // ? string
+  missed_call_reason: null;
   original_filename: string | null;
+  original_link: string | null;
   phone_number: string | null;
   priority: 'normal';
   processing_completed_at: string | null;
   processing_started_at: string | null;
+  raw_webhook_data: null;
+  recording_status: 'pending';
+  source: 'manual';
   status: CallStatus;
-  storage_path: string;
+  storage_path: string | null;
   tags: unknown[];
-  updated_at: string | null;
-  user_id: string | null;
+  updated_at: string | null; // ? string
+  user_id: string | null; // ? string
+  wait_time: null;
+  webhook_signature: string | null;
+  webhook_source_ip: string | null;
+  webhook_timestamp: string | null;
 }
 
 // ============================================================================
@@ -138,6 +160,7 @@ export const useCallDetailsQuery = (
 };
 
 // ============================================================================
+// Call Transcript Query
 
 export interface TranscriptSegmentItem {
   confidence: number | null;
@@ -148,21 +171,29 @@ export interface TranscriptSegmentItem {
   start_ms: number;
   text: string;
 }
-
 export type CallTranscriptResponse = {
+  all_results: unknown[];
+  all_results_count: number;
+  best_result_id: string | null;
   call_id: string;
+  comparison_metadata: object; // ?
   created_at: string;
   full_text: string;
+  google_result: null;
   id: string;
   language: string;
+  lead_quality: null;
   model_used: string;
   overall_confidence: number | null;
   processing_time_ms: number;
+  raw_response: null;
   retry_count: number;
+  roles_verified_by_ai: boolean;
   segments: TranscriptSegmentItem[];
   silence_duration_ms: number | null;
-  speaker_labels: unknown;
+  speaker_labels: object; // ?
   speakers_count: number;
+  wer_score: null;
   word_count: number;
 };
 
@@ -190,30 +221,83 @@ export const useCallTranscriptQuery = (
 };
 
 // ============================================================================
+// Call Analysis Query
 
+export interface ServiceChecklistItem {
+  criterion: string;
+  item_number: number;
+  reason: string;
+  score: number;
+  status: 'выполнено' | 'не_выполнено' | 'неприменимо';
+  type: 'Обязательный' | 'Контекстный';
+}
 export type CallAnalysisResponse = {
   action_items: string[];
+  action_items_for_client: string[];
+  action_items_for_manager: string[];
+  call_date: null;
+  call_duration_seconds: number | null;
   call_id: string;
-  client_readiness: null;
+  call_outcome: {
+    specific_outcome_details?: string | null; // ? string
+    status?: string | null; // ? string
+  };
+  call_purpose: string | null;
+  call_time: null;
+  client_confidence_score: null;
+  client_needs: string[];
+  client_objections_concerns: string[];
+  client_readiness: 'высокая' | null;
+  client_satisfaction_score: number | null;
   compliance_issues: string[];
+  consultation_completeness: 'полная' | null;
   created_at: string;
-  expected_deal_size: null;
-  follow_up_priority: null;
+  expected_deal_size: 'низкий' | null;
+  follow_up_priority: 'низкий' | null;
   id: string;
+  identified_names: string[];
   insights: {
-    client_readiness: 'высокая' | null;
-    expected_deal_size: 'высокий' | 'средний' | null;
-    follow_up_priority: 'высокий' | 'средний' | null;
+    call_outcome?: string | null; // ? string | undefined
+    call_purpose?: string | null; // ? string | undefined
+    client_readiness?: 'высокая' | 'средняя' | null; // ? string
+    expected_deal_size?: 'низкий' | 'неизвестно' | null; // ? string
+    follow_up_priority?: 'средний' | 'низкий' | null; // ? string
   };
   key_phrases: string[];
+  manager_confidence_score: number | null;
+  manager_politeness: 'да' | null;
+  manager_strengths: string[];
   missed_opportunities: string[];
   model_used: string;
+  participants_roles: Array<{
+    name: string | null; // ? string
+    role_detail: string | null; // ? string
+    speaker_type: string | null; // ? string
+  }>;
   processing_time_ms: number;
+  product_service_interest: {
+    brand_model_car?: string | null; // ? string | undefined
+    budget_discussed_rub?: number | null; // ? number | undefined
+    currency?: string | null; // ? string | undefined
+    desired_configuration?: string | null; // ? string | undefined
+    desired_year?: string | null; // ? string | undefined
+    parts_description?: string | null; // ? string | undefined
+    service_type?: string | null; // ? string | undefined
+  };
+  raw_response: string | null;
+  recommended_next_steps: string[];
   sentiment_confidence: number; // 0.0 to 1.0
-  sentiment_label: 'positive' | 'neutral' | 'negative';
-  sentiment_score: number;
-  service_quality_score: number; // 1-5
-  summary: string;
+  sentiment_label: 'positive' | 'neutral' | 'negative' | 'Позитивный';
+  sentiment_score: number; // 0.0 to 1.0
+  service_quality_score: number; // 1 to 5
+  service_script_checklist: {
+    checklist_items?: ServiceChecklistItem[];
+    is_applicable?: boolean;
+    max_possible_score_checklist?: number | null; // ? number | undefined
+    total_score_checklist?: number | null; // ? number | undefined
+  };
+  summary: string | null; // ? string
+  summary_text: string | null;
   tokens_used: null;
   topics: string[];
 };

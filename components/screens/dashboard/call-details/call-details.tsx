@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import {
   TranscriptSegmentItem,
   useCallAnalysisQuery,
@@ -41,9 +41,13 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
     { enabled: !!call },
   );
 
-  const isServiceCall = analysis?.topics.some((topic) => {
-    return ['сервис', 'обслуживание', 'ТО'].includes(topic);
-  });
+  const isServiceCall = analysis?.service_script_checklist.is_applicable;
+
+  const serviceTotalScore = useMemo(() => {
+    const checklist = analysis?.service_script_checklist.checklist_items;
+    if (!checklist) return 0;
+    return checklist.reduce((acc, item) => acc + item.score, 0);
+  }, [analysis]);
 
   const handleSegmentPlayClick = useCallback(
     (segment: TranscriptSegmentItem) => {
@@ -70,12 +74,15 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             call={call}
             analysis={analysis}
             isServiceCall={isServiceCall}
+            serviceTotalScore={serviceTotalScore}
           />
-          <AudioPlayer
-            src={getPublicUrl('call-recordings', call.storage_path)}
-            ref={playerRef}
-          />
-          {analysis && <CallSummary analysis={analysis} call={call} />}
+          {call.storage_path && (
+            <AudioPlayer
+              src={getPublicUrl('audio-files', call.storage_path)}
+              ref={playerRef}
+            />
+          )}
+          {analysis && <CallSummary analysis={analysis} />}
 
           {transcript && (
             <TranscriptChat
@@ -83,7 +90,12 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
               onSegmentPlayClick={handleSegmentPlayClick}
             />
           )}
-          {isServiceCall && <ServiceChecklist />}
+          {isServiceCall && (
+            <ServiceChecklist
+              analysis={analysis}
+              serviceTotalScore={serviceTotalScore}
+            />
+          )}
         </div>
 
         {/* Right side */}

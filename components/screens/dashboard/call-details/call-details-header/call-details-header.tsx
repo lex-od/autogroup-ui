@@ -39,16 +39,18 @@ const CallDetailsHeader: FC<Props> = ({ call }) => {
 
         <CallDetailsActionsMenu />
 
-        <Button variant="outline" className="cursor-default" asChild>
-          <a
-            href={getPublicUrl('call-recordings', call.storage_path, {
-              download: true,
-            })}
-          >
-            <Download />
-            <span>Скачать запись</span>
-          </a>
-        </Button>
+        {call.storage_path && (
+          <Button variant="outline" className="cursor-default" asChild>
+            <a
+              href={getPublicUrl('audio-files', call.storage_path, {
+                download: true,
+              })}
+            >
+              <Download />
+              <span>Скачать запись</span>
+            </a>
+          </Button>
+        )}
       </div>
     </div>
   );

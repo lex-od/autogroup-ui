@@ -2,17 +2,13 @@ import { FC } from 'react';
 import { FileText, Clock, User, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  CallAnalysisResponse,
-  CallDetailsResponse,
-} from '@/services/api/calls.api';
+import { CallAnalysisResponse } from '@/services/api/calls.api';
 
 interface Props {
   analysis: CallAnalysisResponse;
-  call: CallDetailsResponse;
 }
 
-const CallSummary: FC<Props> = ({ analysis, call }) => {
+const CallSummary: FC<Props> = ({ analysis }) => {
   return (
     <Card>
       <CardHeader>
@@ -29,44 +25,51 @@ const CallSummary: FC<Props> = ({ analysis, call }) => {
 
         <div className="grid gap-4 border-t pt-4 md:grid-cols-2">
           <div className="flex gap-2">
-            <Target className="mt-0.5 size-4 text-muted-foreground" />
+            <Target className="size-4 text-muted-foreground" />
             <div>
-              <span className="text-xs font-medium text-muted-foreground">
-                Цель звонка *
-              </span>
-              <p className="text-sm">Консультация</p>
+              <p className="text-xs font-medium text-muted-foreground">
+                Цель звонка
+              </p>
+              <p className="text-sm">{analysis.call_purpose || '—'}</p>
             </div>
           </div>
 
           <div className="flex gap-2">
-            <Clock className="mt-0.5 size-4 text-muted-foreground" />
+            <Clock className="size-4 text-muted-foreground" />
             <div>
-              <span className="text-xs font-medium text-muted-foreground">
-                Результат *
-              </span>
-              <p className="text-sm">Консультация завершена успешно</p>
+              <p className="text-xs font-medium text-muted-foreground">
+                Результат
+              </p>
+              <p className="text-sm">
+                {analysis.call_outcome.specific_outcome_details || '—'}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="border-t pt-4">
-          <div className="flex gap-2">
-            <User className="mt-0.5 size-4 text-muted-foreground" />
+        {!!analysis.participants_roles.length && (
+          <div className="flex gap-2 border-t pt-4">
+            <User className="size-4 text-muted-foreground" />
             <div className="space-y-1">
-              <span className="text-xs font-medium text-muted-foreground">
+              <p className="text-xs font-medium text-muted-foreground">
                 Участники
-              </span>
+              </p>
               <div className="flex flex-wrap gap-2">
-                <Badge variant="outline">
-                  Менеджер: {call.manager_name || 'Нет имени'}
-                </Badge>
-                <Badge variant="outline">
-                  Клиент: {call.client_name || 'Нет имени'}
-                </Badge>
+                {analysis.participants_roles.map(
+                  ({ name, role_detail, speaker_type }) => (
+                    <Badge
+                      key={`${name}${role_detail}${speaker_type}`}
+                      variant="outline"
+                    >
+                      {speaker_type}
+                      {name ? `: ${name}` : ''}
+                    </Badge>
+                  ),
+                )}
               </div>
             </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

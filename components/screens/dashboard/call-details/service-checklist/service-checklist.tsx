@@ -1,26 +1,29 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { Award } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import ServiceChecklistItem, {
-  FakeChecklistItem,
-} from './service-checklist-item/service-checklist-item';
+import { CallAnalysisResponse } from '@/services/api/calls.api';
+import ServiceChecklistItem from './service-checklist-item/service-checklist-item';
 
-const fakeServiceChecklist: FakeChecklistItem[] = [
-  {
-    id: '1',
-    name: 'Реакция на звонок (количество гудков)',
-    description:
-      'Оцени, если транскрипция предоставляет метаданные о времени до ответа или явные указания на гудки. Балл: 1, если ответ в течение 20 секунд.',
-    category: 'obligatory',
-    score: 1,
-    maxScore: 1,
-    explanation: 'Ответ получен в течение 15 секунд',
-  },
-];
+interface Props {
+  analysis: CallAnalysisResponse;
+  serviceTotalScore: number;
+}
 
-const ServiceChecklist: FC = () => {
+const ServiceChecklist: FC<Props> = ({ analysis, serviceTotalScore }) => {
+  const serviceMaxScore =
+    analysis?.service_script_checklist.max_possible_score_checklist || 0;
+  const serviceRatio = serviceMaxScore
+    ? serviceTotalScore / serviceMaxScore
+    : 0;
+
+  const applicableChecklist = useMemo(() => {
+    const checklist = analysis.service_script_checklist.checklist_items;
+    if (!checklist) return [];
+    return checklist.filter(({ status }) => status !== 'неприменимо');
+  }, [analysis]);
+
   return (
     <Card id="service-checklist">
       <CardHeader>
@@ -28,23 +31,27 @@ const ServiceChecklist: FC = () => {
           <Award className="size-5 shrink-0" />
           <h2>Чек-лист по скрипту сервиса</h2>
           <Badge variant="secondary" className="ml-auto">
-            1/1 баллов
+            {serviceTotalScore}/{serviceMaxScore} баллов
           </Badge>
         </CardTitle>
 
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <p>Общий результат</p>
-            <p className="font-medium">100%</p>
+            <p className="font-medium">{(serviceRatio * 100).toFixed(0)}%</p>
           </div>
-          <Progress value={100} className="h-2" />
+          <Progress value={serviceRatio * 100} className="h-2" />
         </div>
       </CardHeader>
 
       <CardContent>
         <div className="space-y-4">
-          {fakeServiceChecklist.map((item) => (
-            <ServiceChecklistItem key={item.id} item={item} />
+          {applicableChecklist.map((item, index) => (
+            <ServiceChecklistItem
+              key={item.criterion}
+              item={item}
+              listIndex={index}
+            />
           ))}
         </div>
       </CardContent>
