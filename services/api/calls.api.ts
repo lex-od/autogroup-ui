@@ -223,6 +223,9 @@ export const useCallTranscriptQuery = (
 // ============================================================================
 // Call Analysis Query
 
+export type ClientReadiness = 'высокая' | 'средняя' | 'низкая';
+export type FollowUpPriority = 'высокий' | 'средний' | 'низкий';
+
 export interface ServiceChecklistItem {
   criterion: string;
   item_number: number;
@@ -247,21 +250,21 @@ export type CallAnalysisResponse = {
   client_confidence_score: null;
   client_needs: string[];
   client_objections_concerns: string[];
-  client_readiness: 'высокая' | null;
+  client_readiness: ClientReadiness | null;
   client_satisfaction_score: number | null;
   compliance_issues: string[];
   consultation_completeness: 'полная' | null;
   created_at: string;
-  expected_deal_size: 'низкий' | null;
-  follow_up_priority: 'низкий' | null;
+  expected_deal_size: 'высокий' | 'средний' | 'низкий' | null;
+  follow_up_priority: FollowUpPriority | null;
   id: string;
   identified_names: string[];
   insights: {
     call_outcome?: string | null; // ? string | undefined
     call_purpose?: string | null; // ? string | undefined
-    client_readiness?: 'высокая' | 'средняя' | null; // ? string
+    client_readiness?: ClientReadiness | null; // ? string
     expected_deal_size?: 'низкий' | 'неизвестно' | null; // ? string
-    follow_up_priority?: 'средний' | 'низкий' | null; // ? string
+    follow_up_priority?: FollowUpPriority | null; // ? string
   };
   key_phrases: string[];
   manager_confidence_score: number | null;

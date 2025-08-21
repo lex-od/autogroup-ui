@@ -21,6 +21,10 @@ import ServiceChecklist from './service-checklist/service-checklist';
 import CallDetailsSkeleton from './call-details-skeleton';
 import CallSpecialOffers from './call-special-offers/call-special-offers';
 import CallPromptDetails from './prompt-details/prompt-details';
+import DealPotential from './deal-potential/deal-potential';
+import ClientNeeds from './client-needs/client-needs';
+import MissedOpportunities from './missed-opportunities/missed-opportunities';
+import ManagerStrengths from './manager-strengths/manager-strengths';
 
 interface CallDetailsProps {
   callId: string;
@@ -107,8 +111,16 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
         {/* Right side */}
         <div className="space-y-6">
           {analysis && <AiAnalysis analysis={analysis} />}
+          {analysis && <DealPotential analysis={analysis} />}
+          {analysis && <ClientNeeds analysis={analysis} />}
           {analysis && <AiAnalysisActions actions={analysis.action_items} />}
 
+          {!!analysis?.missed_opportunities.length && (
+            <MissedOpportunities analysis={analysis} />
+          )}
+          {!!analysis?.manager_strengths && (
+            <ManagerStrengths analysis={analysis} />
+          )}
           <CallComments comments={comments} callId={callId} />
         </div>
       </div>
