@@ -19,6 +19,8 @@ import CallInfo from './call-info/call-info';
 import CallSummary from './call-summary/call-summary';
 import ServiceChecklist from './service-checklist/service-checklist';
 import CallDetailsSkeleton from './call-details-skeleton';
+import CallSpecialOffers from './call-special-offers/call-special-offers';
+import CallPromptDetails from './prompt-details/prompt-details';
 
 interface CallDetailsProps {
   callId: string;
@@ -42,6 +44,8 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
   );
 
   const isServiceCall = analysis?.service_script_checklist.is_applicable;
+  const isPromptDetailsExists =
+    analysis && !!Object.keys(analysis.product_service_interest).length;
 
   const serviceTotalScore = useMemo(() => {
     const checklist = analysis?.service_script_checklist.checklist_items;
@@ -83,6 +87,8 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
             />
           )}
           {analysis && <CallSummary analysis={analysis} />}
+          {analysis && <CallSpecialOffers analysis={analysis} />}
+          {isPromptDetailsExists && <CallPromptDetails analysis={analysis} />}
 
           {transcript && (
             <TranscriptChat
@@ -101,7 +107,6 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
         {/* Right side */}
         <div className="space-y-6">
           {analysis && <AiAnalysis analysis={analysis} />}
-
           {analysis && <AiAnalysisActions actions={analysis.action_items} />}
 
           <CallComments comments={comments} callId={callId} />
