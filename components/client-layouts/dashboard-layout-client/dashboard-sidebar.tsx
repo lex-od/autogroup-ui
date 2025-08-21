@@ -103,6 +103,18 @@ const DashboardSidebar = ({
   ];
 
   const secondaryNavigation = [
+    // {
+    //   name: 'Админ-панель',
+    //   href: '/dashboard/admin-panel',
+    //   icon: Shield,
+    //   current: pathname.startsWith('/dashboard/admin-panel'),
+    // },
+    // {
+    //   name: 'Интеграции',
+    //   href: '/dashboard/integrations',
+    //   icon: Plug,
+    //   current: pathname === '/dashboard/integrations',
+    // },
     {
       name: 'Настройки',
       href: '#',
