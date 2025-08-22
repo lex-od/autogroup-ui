@@ -118,7 +118,7 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
           {!!analysis?.missed_opportunities.length && (
             <MissedOpportunities analysis={analysis} />
           )}
-          {!!analysis?.manager_strengths && (
+          {!!analysis?.manager_strengths.length && (
             <ManagerStrengths analysis={analysis} />
           )}
           <CallComments comments={comments} callId={callId} />
