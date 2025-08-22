@@ -17,6 +17,8 @@ import CallSearchInput from './call-search-input';
 import useCallSearchParams from './use-call-search-params';
 import CallStatistics from './call-statistics';
 
+const pageSize = 25;
+
 const CallJournal = () => {
   const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -45,6 +47,7 @@ const CallJournal = () => {
     dateTo: urlDateTo,
     callType: urlCallType,
     search: urlSearch,
+    pageSize,
   });
   const deleteCallsMutation = useDeleteCalls();
 
@@ -122,6 +125,7 @@ const CallJournal = () => {
         callsPending={callsPending}
         currentPage={currentPage}
         onCurrentPageChange={setCurrentPageToUrl}
+        pageSize={pageSize}
         selectedCalls={selectedCalls}
         setSelectedCalls={setSelectedCalls}
       />

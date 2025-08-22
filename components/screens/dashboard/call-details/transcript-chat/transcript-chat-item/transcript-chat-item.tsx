@@ -13,6 +13,8 @@ interface Props {
 }
 
 const TranscriptChatItem: FC<Props> = ({ segment, onPlayClick }) => {
+  const isLeft = segment.speaker === 'A';
+
   const speakerBadgeVariant = (() => {
     const variantRec: Record<
       string,
@@ -36,9 +38,18 @@ const TranscriptChatItem: FC<Props> = ({ segment, onPlayClick }) => {
   })();
 
   return (
-    <div className="space-y-1">
+    <div
+      className={cn(
+        'flex flex-col gap-1',
+        isLeft ? 'items-start' : 'items-end',
+      )}
+    >
       {/* Header */}
-      <div className="flex items-center gap-2">
+      <div
+        className={cn('flex items-center gap-2', {
+          'flex-row-reverse': !isLeft,
+        })}
+      >
         <Badge variant={speakerBadgeVariant}>
           {segment.name || segment.role || segment.speaker}
         </Badge>
@@ -58,10 +69,7 @@ const TranscriptChatItem: FC<Props> = ({ segment, onPlayClick }) => {
 
       {/* Message */}
       <p
-        className={cn(
-          'inline-block rounded-lg p-3 text-sm leading-relaxed',
-          messageColors,
-        )}
+        className={cn('rounded-lg p-3 text-sm leading-relaxed', messageColors)}
       >
         {segment.text}
       </p>

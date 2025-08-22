@@ -18,6 +18,7 @@ interface Props {
   callsPending: boolean;
   currentPage: number;
   onCurrentPageChange: (currentPage: number) => void;
+  pageSize: number;
   selectedCalls: string[];
   setSelectedCalls: React.Dispatch<React.SetStateAction<string[]>>;
 }
@@ -27,10 +28,11 @@ const CallTable: FC<Props> = ({
   callsPending,
   currentPage,
   onCurrentPageChange,
+  pageSize,
   selectedCalls,
   setSelectedCalls,
 }) => {
-  const totalPages = Math.ceil((calls?.total || 0) / 10);
+  const totalPages = Math.ceil((calls?.total || 0) / pageSize);
 
   const toggleSelected = (callId: string) => {
     setSelectedCalls((prev) =>
@@ -82,6 +84,7 @@ const CallTable: FC<Props> = ({
                         <TableHead>Тип</TableHead>
                         <TableHead>Клиент / Телефон</TableHead>
                         <TableHead>Менеджер</TableHead>
+                        <TableHead>Предприятие</TableHead>
                         <TableHead>Дата и время</TableHead>
                         <TableHead>Длительность</TableHead>
                         <TableHead>Статус</TableHead>

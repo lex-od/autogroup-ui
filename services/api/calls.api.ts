@@ -69,6 +69,7 @@ interface Call {
 }
 
 // ============================================================================
+// Calls Query
 
 export type CallsParams = {
   page?: number;
@@ -78,8 +79,11 @@ export type CallsParams = {
   callType?: CallType | null;
   search?: string | null;
 };
-export type CallsItem = Call;
-
+export type CallsItem = Call & {
+  binotel_accounts: {
+    account_name: string | null;
+  } | null;
+};
 export type CallsResponse = {
   data: CallsItem[];
   total: number;
@@ -103,15 +107,21 @@ export const useCallsQuery = (
 
       let query = supabase
         .from('calls')
-        .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
+        .select(
+          `
+            *,
+            binotel_accounts!calls_binotel_account_id_fkey(account_name)
+          `,
+          { count: 'exact' },
+        )
+        .order('call_date', { ascending: false, nullsFirst: false })
         .range((page - 1) * pageSize, page * pageSize - 1);
 
       if (dateFrom) {
-        query = query.gte('created_at', dateFrom);
+        query = query.gte('call_date', dateFrom);
       }
       if (dateTo) {
-        query = query.lte('created_at', dateTo);
+        query = query.lte('call_date', dateTo);
       }
       if (callType) {
         query = query.eq('call_type', callType);
@@ -135,6 +145,7 @@ export const useCallsQuery = (
 };
 
 // ============================================================================
+// Call Details Query
 
 export type CallDetailsResponse = Call;
 
@@ -223,6 +234,9 @@ export const useCallTranscriptQuery = (
 // ============================================================================
 // Call Analysis Query
 
+export type ClientReadiness = 'высокая' | 'средняя' | 'низкая';
+export type FollowUpPriority = 'высокий' | 'средний' | 'низкий';
+
 export interface ServiceChecklistItem {
   criterion: string;
   item_number: number;
@@ -247,21 +261,21 @@ export type CallAnalysisResponse = {
   client_confidence_score: null;
   client_needs: string[];
   client_objections_concerns: string[];
-  client_readiness: 'высокая' | null;
+  client_readiness: ClientReadiness | null;
   client_satisfaction_score: number | null;
   compliance_issues: string[];
   consultation_completeness: 'полная' | null;
   created_at: string;
-  expected_deal_size: 'низкий' | null;
-  follow_up_priority: 'низкий' | null;
+  expected_deal_size: 'высокий' | 'средний' | 'низкий' | null;
+  follow_up_priority: FollowUpPriority | null;
   id: string;
   identified_names: string[];
   insights: {
     call_outcome?: string | null; // ? string | undefined
     call_purpose?: string | null; // ? string | undefined
-    client_readiness?: 'высокая' | 'средняя' | null; // ? string
+    client_readiness?: ClientReadiness | null; // ? string
     expected_deal_size?: 'низкий' | 'неизвестно' | null; // ? string
-    follow_up_priority?: 'средний' | 'низкий' | null; // ? string
+    follow_up_priority?: FollowUpPriority | null; // ? string
   };
   key_phrases: string[];
   manager_confidence_score: number | null;
