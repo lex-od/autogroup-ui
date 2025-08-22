@@ -73,6 +73,10 @@ const CallTableRow: FC<Props> = ({ call, isSelected, onChangeSelected }) => {
       </TableCell>
 
       <TableCell>
+        <p>{call.binotel_accounts?.account_name || '—'}</p>
+      </TableCell>
+
+      <TableCell>
         {call.call_date && (
           <Badge variant="tw-orange">
             <Calendar />

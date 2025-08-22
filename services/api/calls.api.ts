@@ -69,6 +69,7 @@ interface Call {
 }
 
 // ============================================================================
+// Calls Query
 
 export type CallsParams = {
   page?: number;
@@ -78,8 +79,11 @@ export type CallsParams = {
   callType?: CallType | null;
   search?: string | null;
 };
-export type CallsItem = Call;
-
+export type CallsItem = Call & {
+  binotel_accounts: {
+    account_name: string | null;
+  } | null;
+};
 export type CallsResponse = {
   data: CallsItem[];
   total: number;
@@ -103,15 +107,21 @@ export const useCallsQuery = (
 
       let query = supabase
         .from('calls')
-        .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
+        .select(
+          `
+            *,
+            binotel_accounts!calls_binotel_account_id_fkey(account_name)
+          `,
+          { count: 'exact' },
+        )
+        .order('call_date', { ascending: false, nullsFirst: false })
         .range((page - 1) * pageSize, page * pageSize - 1);
 
       if (dateFrom) {
-        query = query.gte('created_at', dateFrom);
+        query = query.gte('call_date', dateFrom);
       }
       if (dateTo) {
-        query = query.lte('created_at', dateTo);
+        query = query.lte('call_date', dateTo);
       }
       if (callType) {
         query = query.eq('call_type', callType);
@@ -135,6 +145,7 @@ export const useCallsQuery = (
 };
 
 // ============================================================================
+// Call Details Query
 
 export type CallDetailsResponse = Call;
 
