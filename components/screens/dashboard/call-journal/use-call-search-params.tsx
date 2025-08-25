@@ -1,10 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ReadonlyURLSearchParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { DateRange } from 'react-day-picker';
 import { useDebounceCallback } from 'usehooks-ts';
 import { CallType } from '@/services/api/calls.api';
@@ -26,82 +21,33 @@ const useCallSearchParams = () => {
     const type = searchParams.get('type');
     const callType = (type || 'all') as CallType | 'all';
 
+    const urlSearch = searchParams.get('search');
+    const search = urlSearch || '';
+
     return {
       currentPage,
       dateRange,
       callType,
+      search,
     };
   }, [searchParams]);
-
-  const urlSearch = searchParams.get('search');
 
   const [currentPage, setCurrentPage] = useState(initParams.currentPage);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(
     initParams.dateRange,
   );
   const [callType, setCallType] = useState(initParams.callType);
-  const [search, setSearch] = useState(urlSearch || '');
+  const [search, setSearch] = useState(initParams.search);
+  const [searchDelayed, setSearchDelayed] = useState(search);
+
   const isFirstRender = useRef(true);
 
   const isFiltersSet = !!(
     dateRange?.from ||
     dateRange?.to ||
     callType !== 'all' ||
-    urlSearch
+    searchDelayed
   );
-
-  const setDateRangeWithPage = useCallback((newDateRange?: DateRange) => {
-    setDateRange(newDateRange);
-    setCurrentPage(1);
-  }, []);
-
-  const setCallTypeWithPage = useCallback((newCallType: string) => {
-    setCallType(newCallType as CallType | 'all');
-    setCurrentPage(1);
-  }, []);
-
-  const setSearchToUrl = useCallback(
-    (search: string, searchParams: ReadonlyURLSearchParams) => {
-      const params = new URLSearchParams(searchParams);
-
-      if (search) {
-        params.set('search', search);
-      } else {
-        params.delete('search');
-      }
-      params.delete('page');
-      router.replace(`${pathname}?${params.toString()}`);
-    },
-    [pathname, router],
-  );
-
-  const setSearchToUrlDebounced = useDebounceCallback(setSearchToUrl, 400);
-
-  const handleSearchChange = useCallback(
-    (search: string) => {
-      setSearch(search);
-
-      if (search.length !== 1) {
-        setSearchToUrlDebounced(search, searchParams);
-      } else {
-        setSearchToUrlDebounced.cancel();
-      }
-    },
-    [searchParams, setSearchToUrlDebounced],
-  );
-
-  const unsetAllFilters = useCallback(() => {
-    setSearch('');
-    setSearchToUrlDebounced.cancel();
-
-    const params = new URLSearchParams(searchParams);
-    params.delete('from');
-    params.delete('to');
-    params.delete('type');
-    params.delete('search');
-    params.delete('page');
-    router.replace(`${pathname}?${params.toString()}`);
-  }, [pathname, router, searchParams, setSearchToUrlDebounced]);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -120,21 +66,63 @@ const useCallSearchParams = () => {
     if (callType !== 'all') {
       params.set('type', callType);
     }
-
+    if (searchDelayed) {
+      params.set('search', searchDelayed);
+    }
     router.replace(`${pathname}?${params}`);
-  }, [router, pathname, currentPage, dateRange, callType]);
+  }, [router, pathname, currentPage, dateRange, callType, searchDelayed]);
+
+  const setDateRangeWithPage = useCallback((dateRange?: DateRange) => {
+    setDateRange(dateRange);
+    setCurrentPage(1);
+  }, []);
+
+  const setCallTypeWithPage = useCallback((callType: string) => {
+    setCallType(callType as CallType | 'all');
+    setCurrentPage(1);
+  }, []);
+
+  const setSearchDelayedWithPageDebounce = useDebounceCallback(
+    useCallback((search: string) => {
+      setSearchDelayed(search);
+      setCurrentPage(1);
+    }, []),
+    400,
+  );
+
+  const setSearchWithPage = useCallback(
+    (search: string) => {
+      setSearch(search);
+
+      if (search.length !== 1) {
+        setSearchDelayedWithPageDebounce(search);
+      } else {
+        setSearchDelayedWithPageDebounce.cancel();
+      }
+    },
+    [setSearchDelayedWithPageDebounce],
+  );
+
+  const unsetAllFilters = useCallback(() => {
+    setCurrentPage(1);
+    setDateRange(undefined);
+    setCallType('all');
+    setSearch('');
+    setSearchDelayed('');
+    setSearchDelayedWithPageDebounce.cancel();
+  }, [setSearchDelayedWithPageDebounce]);
 
   return {
-    urlSearch,
-    search,
     currentPage,
-    callType,
-    isFiltersSet,
-    dateRange,
     setCurrentPage,
+    dateRange,
     setDateRangeWithPage,
+    callType,
     setCallTypeWithPage,
-    handleSearchChange,
+    search,
+    setSearchWithPage,
+    searchDelayed,
+    isFiltersSet,
     unsetAllFilters,
   };
 };

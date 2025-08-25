@@ -21,22 +21,22 @@ import CallStatistics from './call-statistics';
 const pageSize = 25;
 
 const CallJournal = () => {
-  const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-
   const {
-    urlSearch,
-    search,
     currentPage,
-    callType,
-    isFiltersSet,
-    dateRange,
     setCurrentPage,
+    dateRange,
     setDateRangeWithPage,
+    callType,
     setCallTypeWithPage,
-    handleSearchChange,
+    search,
+    setSearchWithPage,
+    searchDelayed,
+    isFiltersSet,
     unsetAllFilters,
   } = useCallSearchParams();
+
+  const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const callsParams = useMemo((): CallsParams => {
     return {
@@ -44,10 +44,10 @@ const CallJournal = () => {
       dateFrom: dateRange?.from?.toISOString(),
       dateTo: dateRange?.to ? endOfDay(dateRange.to).toISOString() : null,
       callType: callType === 'all' ? null : callType,
-      search: urlSearch,
+      search: searchDelayed,
       pageSize,
     };
-  }, [currentPage, dateRange, callType, urlSearch]);
+  }, [currentPage, dateRange, callType, searchDelayed]);
 
   const { data: calls, isPending: callsPending } = useCallsQuery(callsParams);
   const deleteCallsMutation = useDeleteCalls();
@@ -72,7 +72,7 @@ const CallJournal = () => {
       {/* Поиск и компактная кнопка фильтров */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Поиск */}
-        <CallSearchInput value={search} onChange={handleSearchChange} />
+        <CallSearchInput value={search} onChange={setSearchWithPage} />
 
         {/* Кнопка удаления выбранных */}
         {selectedCalls.length > 0 && (
