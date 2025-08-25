@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ReadonlyURLSearchParams,
   usePathname,
@@ -6,7 +6,6 @@ import {
   useSearchParams,
 } from 'next/navigation';
 import { DateRange } from 'react-day-picker';
-import { endOfDay } from 'date-fns';
 import { useDebounceCallback } from 'usehooks-ts';
 import { CallType } from '@/services/api/calls.api';
 
@@ -15,73 +14,51 @@ const useCallSearchParams = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const urlCurrentPage = searchParams.get('page');
-  const urlDateFrom = searchParams.get('from');
-  const urlDateTo = searchParams.get('to');
-  const urlCallType = searchParams.get('type') as CallType | null;
+  const initParams = useMemo(() => {
+    const page = searchParams.get('page');
+    const currentPage = page ? Number(page) : 1;
+
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    const dateRange =
+      from && to ? { from: new Date(from), to: new Date(to) } : undefined;
+
+    const type = searchParams.get('type');
+    const callType = (type || 'all') as CallType | 'all';
+
+    return {
+      currentPage,
+      dateRange,
+      callType,
+    };
+  }, [searchParams]);
+
   const urlSearch = searchParams.get('search');
 
+  const [currentPage, setCurrentPage] = useState(initParams.currentPage);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(
+    initParams.dateRange,
+  );
+  const [callType, setCallType] = useState(initParams.callType);
   const [search, setSearch] = useState(urlSearch || '');
+  const isFirstRender = useRef(true);
 
-  const currentPage = urlCurrentPage ? Number(urlCurrentPage) : 1;
-  const callType = urlCallType || 'all';
-  const isFiltersSet = !!(urlDateFrom || urlDateTo || urlCallType || urlSearch);
-
-  const dateRange = useMemo(() => {
-    if (!urlDateFrom || !urlDateTo) {
-      return undefined;
-    }
-    return {
-      from: new Date(urlDateFrom),
-      to: new Date(urlDateTo),
-    };
-  }, [urlDateFrom, urlDateTo]);
-
-  const setCurrentPageToUrl = useCallback(
-    (page: number) => {
-      const params = new URLSearchParams(searchParams);
-
-      if (page > 1) {
-        params.set('page', String(page));
-      } else {
-        params.delete('page');
-      }
-      router.replace(`${pathname}?${params.toString()}`);
-    },
-    [pathname, router, searchParams],
+  const isFiltersSet = !!(
+    dateRange?.from ||
+    dateRange?.to ||
+    callType !== 'all' ||
+    urlSearch
   );
 
-  const setDateRangeToUrl = useCallback(
-    (range?: DateRange) => {
-      const params = new URLSearchParams(searchParams);
+  const setDateRangeWithPage = useCallback((newDateRange?: DateRange) => {
+    setDateRange(newDateRange);
+    setCurrentPage(1);
+  }, []);
 
-      if (range?.from && range?.to) {
-        params.set('from', range.from.toISOString());
-        params.set('to', endOfDay(range.to).toISOString());
-      } else {
-        params.delete('from');
-        params.delete('to');
-      }
-      params.delete('page');
-      router.replace(`${pathname}?${params.toString()}`);
-    },
-    [pathname, router, searchParams],
-  );
-
-  const setCallTypeToUrl = useCallback(
-    (type: string) => {
-      const params = new URLSearchParams(searchParams);
-
-      if (type !== 'all') {
-        params.set('type', type);
-      } else {
-        params.delete('type');
-      }
-      params.delete('page');
-      router.replace(`${pathname}?${params.toString()}`);
-    },
-    [pathname, router, searchParams],
-  );
+  const setCallTypeWithPage = useCallback((newCallType: string) => {
+    setCallType(newCallType as CallType | 'all');
+    setCurrentPage(1);
+  }, []);
 
   const setSearchToUrl = useCallback(
     (search: string, searchParams: ReadonlyURLSearchParams) => {
@@ -126,20 +103,37 @@ const useCallSearchParams = () => {
     router.replace(`${pathname}?${params.toString()}`);
   }, [pathname, router, searchParams, setSearchToUrlDebounced]);
 
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const params = new URLSearchParams();
+
+    if (currentPage > 1) {
+      params.set('page', String(currentPage));
+    }
+    if (dateRange?.from && dateRange?.to) {
+      params.set('from', dateRange.from.toISOString());
+      params.set('to', dateRange.to.toISOString());
+    }
+    if (callType !== 'all') {
+      params.set('type', callType);
+    }
+
+    router.replace(`${pathname}?${params}`);
+  }, [router, pathname, currentPage, dateRange, callType]);
+
   return {
-    urlCurrentPage,
-    urlDateFrom,
-    urlDateTo,
-    urlCallType,
     urlSearch,
     search,
     currentPage,
     callType,
     isFiltersSet,
     dateRange,
-    setCurrentPageToUrl,
-    setDateRangeToUrl,
-    setCallTypeToUrl,
+    setCurrentPage,
+    setDateRangeWithPage,
+    setCallTypeWithPage,
     handleSearchChange,
     unsetAllFilters,
   };

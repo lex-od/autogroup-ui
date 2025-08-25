@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Filter, Trash2, ChevronDown, FunnelX } from 'lucide-react';
+import { endOfDay } from 'date-fns';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,7 +11,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { useDeleteCalls } from '@/services/api/queries/calls.queries';
-import { useCallsQuery } from '@/services/api/calls.api';
+import { CallsParams, useCallsQuery } from '@/services/api/calls.api';
 import CallJournalFilters from './call-journal-filters/call-journal-filters';
 import CallTable from './call-table/call-table';
 import CallSearchInput from './call-search-input';
@@ -24,31 +25,31 @@ const CallJournal = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const {
-    urlCurrentPage,
-    urlDateFrom,
-    urlDateTo,
-    urlCallType,
     urlSearch,
     search,
     currentPage,
     callType,
     isFiltersSet,
     dateRange,
-    setCurrentPageToUrl,
-    setDateRangeToUrl,
-    setCallTypeToUrl,
+    setCurrentPage,
+    setDateRangeWithPage,
+    setCallTypeWithPage,
     handleSearchChange,
     unsetAllFilters,
   } = useCallSearchParams();
 
-  const { data: calls, isPending: callsPending } = useCallsQuery({
-    page: urlCurrentPage ? Number(urlCurrentPage) : 1,
-    dateFrom: urlDateFrom,
-    dateTo: urlDateTo,
-    callType: urlCallType,
-    search: urlSearch,
-    pageSize,
-  });
+  const callsParams = useMemo((): CallsParams => {
+    return {
+      page: currentPage,
+      dateFrom: dateRange?.from?.toISOString(),
+      dateTo: dateRange?.to ? endOfDay(dateRange.to).toISOString() : null,
+      callType: callType === 'all' ? null : callType,
+      search: urlSearch,
+      pageSize,
+    };
+  }, [currentPage, dateRange, callType, urlSearch]);
+
+  const { data: calls, isPending: callsPending } = useCallsQuery(callsParams);
   const deleteCallsMutation = useDeleteCalls();
 
   const handleDeleteSelected = async () => {
@@ -112,9 +113,9 @@ const CallJournal = () => {
         <CollapsibleContent>
           <CallJournalFilters
             dateRange={dateRange}
-            onDateRangeChange={setDateRangeToUrl}
+            onDateRangeChange={setDateRangeWithPage}
             callType={callType}
-            onCallTypeChange={setCallTypeToUrl}
+            onCallTypeChange={setCallTypeWithPage}
           />
         </CollapsibleContent>
       </Collapsible>
@@ -124,7 +125,7 @@ const CallJournal = () => {
         calls={calls}
         callsPending={callsPending}
         currentPage={currentPage}
-        onCurrentPageChange={setCurrentPageToUrl}
+        onCurrentPageChange={setCurrentPage}
         pageSize={pageSize}
         selectedCalls={selectedCalls}
         setSelectedCalls={setSelectedCalls}
