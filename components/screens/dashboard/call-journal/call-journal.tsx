@@ -1,8 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Filter, Trash2, ChevronDown, FunnelX } from 'lucide-react';
-import { endOfDay } from 'date-fns';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,11 +10,11 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { useDeleteCalls } from '@/services/api/queries/calls.queries';
-import { CallsParams, useCallsQuery } from '@/services/api/calls.api';
+import { useCallsQuery } from '@/services/api/calls.api';
 import CallJournalFilters from './call-journal-filters/call-journal-filters';
 import CallTable from './call-table/call-table';
 import CallSearchInput from './call-search-input';
-import useCallSearchParams from './use-call-search-params';
+import useCallSearchParams from './use-call-search-params/use-call-search-params';
 import CallStatistics from './call-statistics';
 
 const pageSize = 25;
@@ -38,18 +37,14 @@ const CallJournal = () => {
   const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  const callsParams = useMemo((): CallsParams => {
-    return {
-      page: currentPage,
-      dateFrom: dateRange?.from?.toISOString(),
-      dateTo: dateRange?.to ? endOfDay(dateRange.to).toISOString() : null,
-      callType: callType === 'all' ? null : callType,
-      search: searchDelayed,
-      pageSize,
-    };
-  }, [currentPage, dateRange, callType, searchDelayed]);
-
-  const { data: calls, isPending: callsPending } = useCallsQuery(callsParams);
+  const { data: calls, isPending: callsPending } = useCallsQuery({
+    page: currentPage,
+    dateFrom: dateRange?.from?.toISOString(),
+    dateTo: dateRange?.to?.toISOString(),
+    callType: callType === 'all' ? null : callType,
+    search: searchDelayed,
+    pageSize,
+  });
   const deleteCallsMutation = useDeleteCalls();
 
   const handleDeleteSelected = async () => {

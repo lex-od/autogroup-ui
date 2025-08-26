@@ -1,9 +1,12 @@
-import { FC, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { Card, CardContent } from '@/components/ui/card';
 import SelectBasic from '@/components/ui-custom/select-basic';
 import DateRangePicker from '@/components/ui-custom/date-range-picker';
-import { callTypeOptions } from './call-journal-filters.utils';
+import {
+  callTypeOptions,
+  getInclusiveRange,
+} from './call-journal-filters.utils';
 
 interface Props {
   dateRange?: DateRange;
@@ -20,6 +23,11 @@ const CallJournalFilters: FC<Props> = ({
 }) => {
   const [isRangeOpen, setIsRangeOpen] = useState(false);
 
+  const handleDateRangeChange = useCallback(
+    (dateRange?: DateRange) => onDateRangeChange(getInclusiveRange(dateRange)),
+    [onDateRangeChange],
+  );
+
   return (
     <Card className="bg-muted/30 py-4">
       <CardContent className="px-4">
@@ -29,7 +37,7 @@ const CallJournalFilters: FC<Props> = ({
             open={isRangeOpen}
             onOpenChange={setIsRangeOpen}
             dateRange={dateRange}
-            onDateRangeChange={onDateRangeChange}
+            onDateRangeChange={handleDateRangeChange}
             label="Период"
             placeholder="Все время"
           />

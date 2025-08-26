@@ -1,43 +1,19 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { DateRange } from 'react-day-picker';
 import { useDebounceCallback } from 'usehooks-ts';
 import { CallType } from '@/services/api/calls.api';
+import useReadCallSearchParams from './use-read-call-search-params';
 
 const useCallSearchParams = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { safeParams } = useReadCallSearchParams();
 
-  const initParams = useMemo(() => {
-    const page = searchParams.get('page');
-    const currentPage = page ? Number(page) : 1;
-
-    const from = searchParams.get('from');
-    const to = searchParams.get('to');
-    const dateRange =
-      from && to ? { from: new Date(from), to: new Date(to) } : undefined;
-
-    const type = searchParams.get('type');
-    const callType = (type || 'all') as CallType | 'all';
-
-    const urlSearch = searchParams.get('search');
-    const search = urlSearch || '';
-
-    return {
-      currentPage,
-      dateRange,
-      callType,
-      search,
-    };
-  }, [searchParams]);
-
-  const [currentPage, setCurrentPage] = useState(initParams.currentPage);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(
-    initParams.dateRange,
-  );
-  const [callType, setCallType] = useState(initParams.callType);
-  const [search, setSearch] = useState(initParams.search);
+  const [currentPage, setCurrentPage] = useState(safeParams.currentPage);
+  const [dateRange, setDateRange] = useState(safeParams.dateRange);
+  const [callType, setCallType] = useState(safeParams.callType);
+  const [search, setSearch] = useState(safeParams.search);
   const [searchDelayed, setSearchDelayed] = useState(search);
 
   const isFirstRender = useRef(true);
