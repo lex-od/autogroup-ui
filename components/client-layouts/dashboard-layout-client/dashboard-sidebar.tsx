@@ -1,15 +1,13 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Phone,
-  Settings,
   ChevronLeft,
   ChevronRight,
   CloudUpload,
+  Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -103,24 +101,24 @@ const DashboardSidebar = ({
   ];
 
   const secondaryNavigation = [
-    // {
-    //   name: 'Админ-панель',
-    //   href: '/dashboard/admin-panel',
-    //   icon: Shield,
-    //   current: pathname.startsWith('/dashboard/admin-panel'),
-    // },
+    {
+      name: 'Админ-панель',
+      href: '/dashboard/admin-panel',
+      icon: Shield,
+      current: pathname.startsWith('/dashboard/admin-panel'),
+    },
     // {
     //   name: 'Интеграции',
     //   href: '/dashboard/integrations',
     //   icon: Plug,
     //   current: pathname === '/dashboard/integrations',
     // },
-    {
-      name: 'Настройки',
-      href: '#',
-      icon: Settings,
-      current: pathname === '/dashboard/settings',
-    },
+    // {
+    //   name: 'Настройки',
+    //   href: '#',
+    //   icon: Settings,
+    //   current: pathname === '/dashboard/settings',
+    // },
   ];
 
   return (
