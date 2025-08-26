@@ -14,39 +14,35 @@ import { useCallsQuery } from '@/services/api/calls.api';
 import CallJournalFilters from './call-journal-filters/call-journal-filters';
 import CallTable from './call-table/call-table';
 import CallSearchInput from './call-search-input';
-import useCallSearchParams from './use-call-search-params';
+import useCallSearchParams from './use-call-search-params/use-call-search-params';
 import CallStatistics from './call-statistics';
 
 const pageSize = 25;
 
 const CallJournal = () => {
-  const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-
   const {
-    urlCurrentPage,
-    urlDateFrom,
-    urlDateTo,
-    urlCallType,
-    urlSearch,
-    search,
     currentPage,
-    callType,
-    isFiltersSet,
+    setCurrentPage,
     dateRange,
-    setCurrentPageToUrl,
-    setDateRangeToUrl,
-    setCallTypeToUrl,
-    handleSearchChange,
+    setDateRangeWithPage,
+    callType,
+    setCallTypeWithPage,
+    search,
+    setSearchWithPage,
+    searchDelayed,
+    isFiltersSet,
     unsetAllFilters,
   } = useCallSearchParams();
 
+  const [selectedCalls, setSelectedCalls] = useState<string[]>([]);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
   const { data: calls, isPending: callsPending } = useCallsQuery({
-    page: urlCurrentPage ? Number(urlCurrentPage) : 1,
-    dateFrom: urlDateFrom,
-    dateTo: urlDateTo,
-    callType: urlCallType,
-    search: urlSearch,
+    page: currentPage,
+    dateFrom: dateRange?.from?.toISOString(),
+    dateTo: dateRange?.to?.toISOString(),
+    callType: callType === 'all' ? null : callType,
+    search: searchDelayed,
     pageSize,
   });
   const deleteCallsMutation = useDeleteCalls();
@@ -71,7 +67,7 @@ const CallJournal = () => {
       {/* Поиск и компактная кнопка фильтров */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Поиск */}
-        <CallSearchInput value={search} onChange={handleSearchChange} />
+        <CallSearchInput value={search} onChange={setSearchWithPage} />
 
         {/* Кнопка удаления выбранных */}
         {selectedCalls.length > 0 && (
@@ -112,9 +108,9 @@ const CallJournal = () => {
         <CollapsibleContent>
           <CallJournalFilters
             dateRange={dateRange}
-            onDateRangeChange={setDateRangeToUrl}
+            onDateRangeChange={setDateRangeWithPage}
             callType={callType}
-            onCallTypeChange={setCallTypeToUrl}
+            onCallTypeChange={setCallTypeWithPage}
           />
         </CollapsibleContent>
       </Collapsible>
@@ -124,7 +120,7 @@ const CallJournal = () => {
         calls={calls}
         callsPending={callsPending}
         currentPage={currentPage}
-        onCurrentPageChange={setCurrentPageToUrl}
+        onCurrentPageChange={setCurrentPage}
         pageSize={pageSize}
         selectedCalls={selectedCalls}
         setSelectedCalls={setSelectedCalls}
