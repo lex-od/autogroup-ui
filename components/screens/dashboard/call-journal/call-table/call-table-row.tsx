@@ -14,6 +14,7 @@ import {
 import { CallsItem } from '@/services/api/calls.api';
 import CallStatusBadge from '@/components/ui-custom/call-status-badge';
 import CallTypeBadge from '@/components/ui-custom/call-type-badge';
+import { useNavigateForward } from '@/components/hooks';
 
 interface Props {
   call: CallsItem;
@@ -23,6 +24,7 @@ interface Props {
 
 const CallTableRow: FC<Props> = ({ call, isSelected, onChangeSelected }) => {
   const router = useRouter();
+  const { currentId, pushCurrentHistoryPoint } = useNavigateForward();
 
   const formatDuration = (durationSeconds: number | null) => {
     if (!durationSeconds) {
@@ -33,10 +35,15 @@ const CallTableRow: FC<Props> = ({ call, isSelected, onChangeSelected }) => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const handleRowClick = () => {
+    pushCurrentHistoryPoint();
+    router.push(`/dashboard/calls/${call.id}?back_id=${currentId}`);
+  };
+
   return (
     <TableRow
       className="cursor-default border-b border-border/40 hover:bg-muted/50"
-      onClick={() => router.push(`/dashboard/calls/${call.id}`)}
+      onClick={handleRowClick}
     >
       <TableCell onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <input

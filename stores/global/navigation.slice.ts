@@ -9,8 +9,8 @@ export type NavigationSlice = {
   navigation: {
     history: HistoryPoint[];
 
-    pushHistoryPoint: (historyPoint: HistoryPoint) => void;
-    removeHistoryPointById: (id: string) => void;
+    pushHistoryPoint: (point: HistoryPoint) => void;
+    removeHistoryPoint: (id: string) => void;
   };
 };
 
@@ -23,15 +23,15 @@ export const createNavigationSlice: StateCreator<
   navigation: {
     history: [],
 
-    pushHistoryPoint: (historyPoint: HistoryPoint) => {
+    pushHistoryPoint: (point: HistoryPoint) => {
       set(({ navigation }) => ({
         navigation: {
           ...navigation,
-          history: [...navigation.history, historyPoint].slice(-3),
+          history: [...navigation.history, point].slice(-3),
         },
       }));
     },
-    removeHistoryPointById: (id: string) => {
+    removeHistoryPoint: (id: string) => {
       set(({ navigation }) => ({
         navigation: {
           ...navigation,
