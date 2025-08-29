@@ -1,10 +1,10 @@
 import { FC } from 'react';
-import Link from 'next/link';
 import { ArrowLeft, Download } from 'lucide-react';
 import { CallDetailsResponse } from '@/services/api/calls.api';
 import { Button } from '@/components/ui/button';
 import { getPublicUrl } from '@/lib/supabase';
 import CallStatusBadge from '@/components/ui-custom/call-status-badge';
+import { useNavigateBack } from '@/components/hooks';
 import CallDetailsActionsMenu from './call-details-actions-menu';
 
 interface Props {
@@ -12,15 +12,15 @@ interface Props {
 }
 
 const CallDetailsHeader: FC<Props> = ({ call }) => {
+  const { navigateBack } = useNavigateBack('/dashboard/calls');
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       {/* Left side */}
       <div className="flex flex-wrap items-center gap-x-4">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/dashboard/calls" className="cursor-default">
-            <ArrowLeft />
-            <span>Назад к звонкам</span>
-          </Link>
+        <Button variant="ghost" size="sm" onClick={navigateBack}>
+          <ArrowLeft />
+          <span>Назад</span>
         </Button>
 
         <div>

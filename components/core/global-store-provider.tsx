@@ -4,15 +4,11 @@ import {
   createContext,
   useRef,
   useContext,
-  type FC,
-  type PropsWithChildren,
+  FC,
+  PropsWithChildren,
 } from 'react';
 import { useStore } from 'zustand';
-
-import {
-  type GlobalStore,
-  createGlobalStore,
-} from '@/stores/global/global-store';
+import { GlobalStore, createGlobalStore } from '@/stores/global/global.store';
 
 type GlobalStoreApi = ReturnType<typeof createGlobalStore>;
 
