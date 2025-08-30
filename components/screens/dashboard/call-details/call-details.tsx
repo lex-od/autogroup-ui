@@ -36,11 +36,11 @@ const CallDetails = ({ callId }: CallDetailsProps) => {
   const { data: call, isPending: callPending } = useCallDetailsQuery(callId);
   const { data: transcript, isLoading: transcriptLoading } =
     useCallTranscriptQuery(callId, {
-      enabled: call?.status === 'completed',
+      // enabled: call?.status === 'completed',
     });
   const { data: analysis, isLoading: analysisLoading } = useCallAnalysisQuery(
     callId,
-    { enabled: call?.status === 'completed' },
+    // { enabled: call?.status === 'completed' },
   );
   const { data: comments, isLoading: commentsLoading } = useCallCommentsQuery(
     { callId, pageSize: 100 },
